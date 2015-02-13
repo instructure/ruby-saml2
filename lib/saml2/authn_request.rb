@@ -26,6 +26,8 @@ module SAML2
     def valid?(sp_metadata)
       return false unless sp_metadata
       return false unless Schemas.protocol.validate(@document).empty?
+      # Check for the correct root element
+      return false unless @document.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
       return false unless sp_metadata.issuer == issuer
 
       # TODO: check signature if present
@@ -43,6 +45,8 @@ module SAML2
 
     def issuer
       @issuer ||= begin
+        # don't use @document.root; typically you'll use the issuer before validation
+        # to look up the SP metadata
         node = @document.at_xpath('/samlp:AuthnRequest/saml:Issuer', Namespaces::ALL)
         node && node.text.strip
       end
@@ -50,7 +54,7 @@ module SAML2
 
     def name_id_policy
       @name_id_policy ||= begin
-        node = @document.at_xpath(@document, '/samlp:AuthnRequest/samlp:NameIDPolicy', Namespaces::ALL)
+        node = @document.root.at_xpath('samlp:NameIDPolicy', Namespaces::ALL)
         if node
           allow_create = node['AllowCreate'].nil? ? nil : node['AllowCreate'] == 'true'
           NameID::Policy.new(allow_create, node['Format'])
@@ -59,11 +63,11 @@ module SAML2
     end
 
     def id
-      authn_request['ID']
+      @document.root['ID']
     end
 
     def protocol_binding
-      authn_request['ProtocolBinding']
+      @document.root['ProtocolBinding']
     end
 
     def assertion_consumer_service
@@ -71,27 +75,22 @@ module SAML2
     end
 
     def assertion_consumer_service_url
-      authn_request['AssertionConsumerServiceURL']
+      @document.root['AssertionConsumerServiceURL']
     end
 
     def assertion_consumer_service_index
       @acs_index ||= begin
-        authn_request['AssertionConsumerServiceIndex'] &&
-          authn_request['AssertionConsumerServiceIndex'].to_i
+        @document.root['AssertionConsumerServiceIndex'] &&
+            @document.root['AssertionConsumerServiceIndex'].to_i
       end
     end
 
     def force_authn?
-      authn_request['ForceAuthn']
+      @document.root['ForceAuthn']
     end
 
     def is_passive?
-      authn_request['IsPassive']
-    end
-
-    protected
-    def authn_request
-      @authn_request ||= @document.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
+      @document.root['IsPassive']
     end
   end
 end

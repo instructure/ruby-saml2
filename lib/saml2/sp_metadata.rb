@@ -14,20 +14,19 @@ module SAML2
 
     def valid?
       return false unless Schemas.metadata.validate(@document).empty?
+      # Check for the correct root element
+      return false unless @document.at_xpath('/md:EntityDescriptor', Namespaces::ALL)
 
       true
     end
 
     def issuer
-      @issuer ||= begin
-        node = @document.at_xpath('/md:EntityDescriptor', Namespaces::ALL)
-        node && node['entityID']
-      end
+      @issuer ||= @document.root['entityID']
     end
 
     def assertion_consumer_services
       @acs ||= begin
-        nodes = @document.xpath('/md:EntityDescriptor/md:SPSSODescriptor/md:AssertionConsumerService', Namespaces::ALL)
+        nodes = @document.root.xpath('md:SPSSODescriptor/md:AssertionConsumerService', Namespaces::ALL)
         AssertionConsumerService::Array.new(nodes.map do |node|
           AssertionConsumerService.new(node['Location'],
                                        node['index'],
@@ -39,7 +38,7 @@ module SAML2
 
     def signing_certificate
       @signing_certificate ||= begin
-        node = @document.at_xpath("/md:EntityDescriptor/md:SPSSODescriptor/md:KeyDescriptor[@use='signing']/dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate",
+        node = @document.root.at_xpath("md:SPSSODescriptor/md:KeyDescriptor[@use='signing']/dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate",
                                   Namespaces::ALL)
         node && node.content.strip
       end
