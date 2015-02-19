@@ -3,6 +3,7 @@ require 'securerandom'
 require 'time'
 
 require 'saml2/assertion'
+require 'saml2/authn_statement'
 require 'saml2/base'
 require 'saml2/subject'
 
@@ -24,6 +25,10 @@ module SAML2
       assertion.subject = Subject.new
       assertion.subject.name_id = name_id
       assertion.issuer = issuer
+      authn_statement = AuthnStatement.new
+      authn_statement.authn_instant = response.issue_instant
+      authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
+      assertion.authn_statements << authn_statement
       response.assertions << assertion
       response
     end

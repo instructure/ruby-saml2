@@ -3,10 +3,14 @@ require 'saml2/namespaces'
 module SAML2
   class NameID
     module Format
-      ENTITY      = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity".freeze
-      PERSISTENT  = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent".freeze
-      TRANSIENT   = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient".freeze
-      UNSPECIFIED = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified".freeze
+      EMAIL_ADDRESS                 = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress".freeze
+      ENTITY                        = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity".freeze
+      KERBEROS                      = "urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos".freeze # name[/instance]@REALM
+      PERSISTENT                    = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent".freeze # opaque, pseudo-random, unique per SP-IdP pair
+      TRANSIENT                     = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient".freeze # opaque, will likely change
+      UNSPECIFIED                   = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified".freeze
+      WINDOWS_DOMAIN_QUALIFIED_NAME = "urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName".freeze # [DomainName\]UserName
+      X509_SUBJECT_NAME             = "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName".freeze
     end
 
     class Policy

@@ -27,6 +27,7 @@ module SAML2
       response.assertions.first.instance_variable_set(:@id, "_cdfc3faf-90ad-462f-880d-677483210684")
       response.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
       response.assertions.first.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
+      response.assertions.first.authn_statements.first.authn_instant = Time.parse("2015-02-12T22:51:29Z")
       response.sign(fixture('certificate.pem'), fixture('privatekey.key'))
       # verifiable on the command line with:
       # xmlsec1 --verify --pubkey-cert-pem certificate.pem --privkey-pem privatekey.key --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion response_signed.xml
