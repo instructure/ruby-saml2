@@ -28,9 +28,9 @@ class SamlIdpController < ApplicationController
     end
 
     if @current_user
-      response = SAML2::Response.respond_to(authn_request)
-      response.issuer = self.class.entity_id
-      response.name_id = self.class.idp_name_id(@current_user, sp)
+      response = SAML2::Response.respond_to(authn_request,
+          NameID.new(self.class.entity_id),
+          self.class.idp_name_id(@current_user, sp))
       response.sign(self.class.x509_certificate, self.class.private_key)
 
       @saml_response = Base64.encode64(response.to_xml)
