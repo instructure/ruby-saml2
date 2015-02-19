@@ -12,7 +12,7 @@ module SAML2
       @document = document
     end
 
-    def valid?
+    def valid_schema?
       return false unless Schemas.metadata.validate(@document).empty?
       # Check for the correct root element
       return false unless @document.at_xpath('/md:EntityDescriptor', Namespaces::ALL)
@@ -20,8 +20,8 @@ module SAML2
       true
     end
 
-    def issuer
-      @issuer ||= @document.root['entityID']
+    def entity_id
+      @entity_id ||= @document.root['entityID']
     end
 
     def assertion_consumer_services

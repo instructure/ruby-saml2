@@ -19,8 +19,10 @@ require 'saml2'
 class SamlIdpController < ApplicationController
   def create
     authn_request = SAML2::AuthnRequest.decode(params[:SAMLRequest])
-    sp = authn_request.issuer == self.class.sp_entity_id && self.class.sp_metadata
-    unless authn_request.valid?(sp)
+    unless authn_request.valid_schema? &&
+      authn_request.valid_interoperable_profile? &&
+      authn_request.resolve(self.class.sp_metadata)
+
       flash[:error] = "Invalid login request"
       return redirect_to @current_user ? root_url : login_url
     end
@@ -47,10 +49,6 @@ class SamlIdpController < ApplicationController
 
   def self.saml_config
     @config ||= YAML.load(File.read('saml.yml'))
-  end
-
-  def self.sp_entity_id
-    saml_config[:sp_entity_id]
   end
 
   def self.sp_metadata

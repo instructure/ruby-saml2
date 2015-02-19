@@ -4,24 +4,24 @@ module SAML2
   describe SPMetadata do
     it "should parse and validate" do
       sp = SPMetadata.parse(fixture('spmetadata.xml'))
-      sp.valid?.must_equal true
+      sp.valid_schema?.must_equal true
     end
 
     it "should parse valid XML, but validate failure" do
       sp = SPMetadata.parse("<xml></xml>")
-      sp.valid?.must_equal false
+      sp.valid_schema?.must_equal false
     end
 
     it "should not validate non-XML" do
       sp = SPMetadata.parse("garbage")
-      sp.valid?.must_equal false
+      sp.valid_schema?.must_equal false
     end
 
     describe "valid metadata" do
       let(:sp) { SPMetadata.parse(fixture('spmetadata.xml')) }
 
       it "should find the issuer" do
-        sp.issuer.must_equal "http://siteadmin.instructure.com/saml2"
+        sp.entity_id.must_equal "http://siteadmin.instructure.com/saml2"
       end
 
       it "should create the ACS array" do

@@ -6,7 +6,7 @@ module SAML2
 
     let(:request) do
       request = AuthnRequest.parse(fixture('authnrequest.xml'))
-      request.valid?(sp)
+      request.resolve(sp)
       request
     end
 
