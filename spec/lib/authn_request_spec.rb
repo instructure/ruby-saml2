@@ -5,6 +5,18 @@ module SAML2
     let(:sp) { SPMetadata.parse(fixture('spmetadata.xml')) }
     let(:request) { AuthnRequest.parse(fixture('authnrequest.xml')) }
 
+    describe '.decode' do
+      it "should not choke on empty string" do
+        authnrequest = AuthnRequest.decode('')
+        authnrequest.valid_schema?.must_equal false
+      end
+
+      it "should not choke on garbage" do
+        authnrequest = AuthnRequest.decode('abc')
+        authnrequest.valid_schema?.must_equal false
+      end
+    end
+
     it "should be valid" do
       request.valid_schema?.must_equal true
       request.resolve(sp).must_equal true

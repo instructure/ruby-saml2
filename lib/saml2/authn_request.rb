@@ -11,10 +11,13 @@ require 'saml2/subject'
 module SAML2
   class AuthnRequest
     def self.decode(authnrequest)
-      zstream  = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-      authnrequest = zstream.inflate(Base64.decode64(authnrequest))
-      zstream.finish
-      zstream.close
+      begin
+        zstream  = Zlib::Inflate.new(-Zlib::MAX_WBITS)
+        authnrequest = zstream.inflate(Base64.decode64(authnrequest))
+        zstream.finish
+        zstream.close
+      rescue Zlib::BufError
+      end
       parse(authnrequest)
     end
 
