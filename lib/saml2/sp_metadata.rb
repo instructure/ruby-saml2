@@ -1,6 +1,7 @@
 require 'nokogiri'
 
 require 'saml2/assertion_consumer_service'
+require 'saml2/organization'
 
 module SAML2
   class SPMetadata
@@ -22,6 +23,10 @@ module SAML2
 
     def entity_id
       @entity_id ||= @document.root['entityID']
+    end
+
+    def organization
+      @organization ||= Organization.from_xml(@document.root.at_xpath('md:Organization', Namespaces::ALL))
     end
 
     def assertion_consumer_services

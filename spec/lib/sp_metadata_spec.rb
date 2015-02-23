@@ -33,6 +33,13 @@ module SAML2
       it "should find the signing certificate" do
         sp.signing_certificate.must_match /MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/
       end
+
+      it "should parse the organization" do
+        sp.organization.display_name.must_equal 'Canvas'
+        sp.organization.display_name('en').must_equal 'Canvas'
+        sp.organization.display_name('es').must_equal nil
+        sp.organization.display_name(:all).must_equal en: 'Canvas'
+      end
     end
   end
 end
