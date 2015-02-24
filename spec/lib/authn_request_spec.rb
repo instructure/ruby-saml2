@@ -2,7 +2,7 @@ require_relative '../spec_helper'
 
 module SAML2
   describe AuthnRequest do
-    let(:sp) { SPMetadata.parse(fixture('spmetadata.xml')) }
+    let(:sp) { Entity.parse(fixture('service_provider.xml')).roles.first }
     let(:request) { AuthnRequest.parse(fixture('authnrequest.xml')) }
 
     describe '.decode' do

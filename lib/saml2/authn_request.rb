@@ -30,7 +30,7 @@ module SAML2
     end
 
     def valid_schema?
-      return false unless Schemas.protocol.validate(@document).empty?
+      return false unless Schemas.protocol.valid?(@document)
       # Check for the correct root element
       return false unless @document.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
 
@@ -55,17 +55,15 @@ module SAML2
       true
     end
 
-    def resolve(sp_metadata)
-      return false if issuer && sp_metadata.entity_id != issuer.id
-
+    def resolve(service_provider)
       # TODO: check signature if present
 
       if assertion_consumer_service_url
-        @assertion_consumer_service = sp_metadata.assertion_consumer_services.find { |acs| acs.location == assertion_consumer_service_url }
+        @assertion_consumer_service = service_provider.assertion_consumer_services.find { |acs| acs.location == assertion_consumer_service_url }
       else
-        @assertion_consumer_service  = sp_metadata.assertion_consumer_services.resolve(assertion_consumer_service_index)
+        @assertion_consumer_service  = service_provider.assertion_consumer_services.resolve(assertion_consumer_service_index)
       end
-      @attribute_consuming_service = sp_metadata.attribute_consuming_services.resolve(attribute_consuming_service_index)
+      @attribute_consuming_service = service_provider.attribute_consuming_services.resolve(attribute_consuming_service_index)
 
       return false unless @assertion_consumer_service
       return false if attribute_consuming_service_index && !@attribute_consuming_service
