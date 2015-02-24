@@ -1,8 +1,16 @@
 require 'nokogiri'
+
+require 'saml2/base'
+require 'saml2/identity_provider'
+require 'saml2/organization_and_contacts'
 require 'saml2/service_provider'
 
 module SAML2
-  class Entity
+  class Entity < Base
+    include OrganizationAndContacts
+
+    attr_writer :entity_id
+
     def self.parse(xml)
       document = Nokogiri::XML(xml)
 
@@ -45,8 +53,12 @@ module SAML2
       node && new(node)
     end
 
-    def initialize(root)
+    def initialize(root = nil)
+      super
       @root = root
+      unless @root
+        @roles = []
+      end
     end
 
     def valid_schema?
@@ -54,11 +66,7 @@ module SAML2
     end
 
     def entity_id
-      @root['entityID']
-    end
-
-    def organization
-      @organization ||= Organization.from_xml(@root.at_xpath('md:Organization', Namespaces::ALL))
+      @entity_id || @root && @root['entityID']
     end
 
     def roles
@@ -67,6 +75,19 @@ module SAML2
         when 'SPSSODescriptor'
           ServiceProvider.new(self, node)
         end
+      end
+    end
+
+    def build(builder)
+      builder['md'].EntityDescriptor('entityID' => entity_id,
+                                     'xmlns:md' => Namespaces::METADATA,
+                                     'xmlns:dsig' => Namespaces::DSIG,
+                                     'xmlns:xenc' => Namespaces::XENC) do |builder|
+        roles.each do |role|
+          role.build(builder)
+        end
+
+        super
       end
     end
   end

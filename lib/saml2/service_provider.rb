@@ -1,10 +1,10 @@
 require 'nokogiri'
 
-require 'saml2/assertion_consumer_service'
-require 'saml2/organization'
+require 'saml2/endpoint'
+require 'saml2/sso'
 
 module SAML2
-  class ServiceProvider
+  class ServiceProvider < SSO
     attr_reader :entity
 
     def initialize(entity, root)
@@ -14,7 +14,7 @@ module SAML2
     def assertion_consumer_services
       @assertion_consumer_services ||= begin
         nodes = @root.xpath('md:AssertionConsumerService', Namespaces::ALL)
-        AssertionConsumerService::Array.from_xml(nodes)
+        Endpoint::Indexed::Array.from_xml(nodes)
       end
     end
 
@@ -22,14 +22,6 @@ module SAML2
       @attribute_consuming_services ||= begin
         nodes = @root.xpath('md:AttributeConsumingService', Namespaces::ALL)
         AttributeConsumingService::Array.from_xml(nodes)
-      end
-    end
-
-    def signing_certificate
-      @signing_certificate ||= begin
-        node = @root.at_xpath("md:KeyDescriptor[@use='signing']/dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate",
-                                  Namespaces::ALL)
-        node && node.content.strip
       end
     end
   end

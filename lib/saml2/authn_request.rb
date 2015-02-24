@@ -1,8 +1,8 @@
 require 'base64'
 require 'zlib'
 
-require 'saml2/assertion_consumer_service'
 require 'saml2/attribute_consuming_service'
+require 'saml2/endpoint'
 require 'saml2/name_id'
 require 'saml2/namespaces'
 require 'saml2/schemas'
@@ -49,7 +49,7 @@ module SAML2
       return false unless valid_web_browser_sso_profile?
 
       return false unless assertion_consumer_service_url
-      return false if protocol_binding && protocol_binding != AssertionConsumerService::Bindings::HTTP_POST
+      return false if protocol_binding && protocol_binding != Endpoint::Bindings::HTTP_POST
       return false if subject
 
       true

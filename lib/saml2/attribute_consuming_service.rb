@@ -28,7 +28,9 @@ module SAML2
     end
   end
 
-  class AttributeConsumingService < IndexedObject
+  class AttributeConsumingService < Base
+    include IndexedObject
+
     attr_reader :name, :requested_attributes
 
     def initialize(name = nil, requested_attributes = [])

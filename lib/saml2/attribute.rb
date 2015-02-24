@@ -34,9 +34,19 @@ module SAML2
         builder.parent['NameFormat'] = name_format if name_format
         Array(value).each do |val|
           val = val.iso8601 if val.respond_to?(:iso8601)
+          # TODO: write xsd:type
           builder['saml'].AttributeValue(val.to_s)
         end
       end
+    end
+
+    def from_xml(node)
+      @value = node.xpath('saml:AttributeValue', Namespace::ALL).map do |node|
+        # TODO: read the xsd:type, and do type conversions
+        node.content && node.content.strip
+      end
+      @value = @value.first if @value.length == 1
+      super
     end
   end
 

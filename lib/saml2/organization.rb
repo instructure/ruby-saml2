@@ -11,13 +11,13 @@ module SAML2
     end
 
     def initialize(name, display_name, url)
-      if name && !name.is_a?(Hash)
+      if !name.is_a?(Hash)
         name = { nil => name}
       end
-      if display_name && !display_name.is_a?(Hash)
+      if !display_name.is_a?(Hash)
         display_name = { nil => display_name }
       end
-      if url && !url.is_a?(Hash)
+      if !url.is_a?(Hash)
         url = { nil => url }
       end
 
@@ -25,18 +25,33 @@ module SAML2
     end
 
     def name(lang = nil)
-      localized_name(@name, lang)
+      self.class.localized_name(@name, lang)
     end
 
     def display_name(lang = nil)
-      localized_name(@display_name, lang)
+      self.class.localized_name(@display_name, lang)
     end
 
     def url(lang = nil)
-      localized_name(@url, lang)
+      self.class.localized_name(@url, lang)
+    end
+
+    def build(builder)
+      builder['md'].Organization do |builder|
+        self.class.build(builder, @name, 'OrganizationName')
+        self.class.build(builder, @display_name, 'OrganizationDisplayName')
+        self.class.build(builder, @url, 'OrganizationURL')
+      end
     end
 
     private
+
+    def self.build(builder, hash, element)
+      hash.each do |lang, value|
+        builder['md'].__send__(element, value, 'xml:lang' => lang)
+      end
+    end
+
     def self.nodes_to_hash(nodes)
       hash = {}
       nodes.each do |node|
@@ -45,7 +60,7 @@ module SAML2
       hash
     end
 
-    def localized_name(hash, lang)
+    def self.localized_name(hash, lang)
       case lang
         when :all
           hash

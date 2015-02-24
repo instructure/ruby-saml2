@@ -15,6 +15,11 @@ module SAML2
     end
 
     def to_xml
+      unless @document
+        builder = Nokogiri::XML::Builder.new
+        build(builder)
+        @document = builder.doc
+      end
       document
     end
 
