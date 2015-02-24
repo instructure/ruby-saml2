@@ -2,7 +2,7 @@ Ruby SAML2 Library
 ==================
 
 [![Build Status](https://travis-ci.org/instructure/ruby-saml2.png)](https://travis-ci.org/instructure/ruby-saml2)
-[![Code Climate](https://codeclimate.com/github/instructure/ruby-saml2/badges/gpa.svg)](https://codeclimate.com/github/instructure/ruby-saml2)
+[![Code Climate](https://codeclimate.com/repos/54ed091e6956806d8f0000fc/badges/43dca52252fbdf9bb8d8/gpa.svg)](https://codeclimate.com/repos/54ed091e6956806d8f0000fc/feed)
 [![Gem Version](https://fury-badge.herokuapp.com/rb/saml2.png)](http://badge.fury.io/rb/saml2)
 
 About
