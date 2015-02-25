@@ -17,10 +17,19 @@ module SAML2
     attr_accessor :issuer, :in_response_to, :destination, :status_code
 
     def self.respond_to(authn_request, issuer, name_id, attributes = [])
-      response = new
+      response = initiate(nil, issuer, name_id)
       response.in_response_to = authn_request.id
       response.destination = authn_request.assertion_consumer_service.location
+      if authn_request.attribute_consuming_service
+        response.assertion.first.statements << authn_request.attribute_consuming_service.create_statement(attributes)
+      end
+      response
+    end
+
+    def self.initiate(service_provider, issuer, name_id)
+      response = new
       response.issuer = issuer
+      response.destination = service_provider.assertion_consumer_services.default.location if service_provider
       assertion = Assertion.new(response.document)
       assertion.subject = Subject.new
       assertion.subject.name_id = name_id
@@ -29,9 +38,6 @@ module SAML2
       authn_statement.authn_instant = response.issue_instant
       authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
       assertion.statements << authn_statement
-      if authn_request.attribute_consuming_service
-        assertion.statements << authn_request.attribute_consuming_service.create_statement(attributes)
-      end
       response.assertions << assertion
       response
     end
@@ -56,9 +62,10 @@ module SAML2
           ID: id,
           Version: '2.0',
           IssueInstant: issue_instant.iso8601,
-          Destination: destination,
-          InResponseTo: in_response_to
+          Destination: destination
         ) do |builder|
+          builder.parent['InResponseTo'] = in_response_to if in_response_to
+
           issuer.build(builder, element: 'Issuer', include_namespace: true) if issuer
 
           builder['samlp'].Status do |builder|

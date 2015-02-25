@@ -33,5 +33,11 @@ module SAML2
       # xmlsec1 --verify --pubkey-cert-pem certificate.pem --privkey-pem privatekey.key --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion response_signed.xml
       response.to_s.must_equal fixture('response_signed.xml')
     end
+
+    it "should generate valid XML for IdP initiated response" do
+      response = Response.initiate(sp, NameID.new('issuer'),
+                              NameID.new('jacob', NameID::Format::PERSISTENT))
+      Schemas.protocol.validate(Nokogiri::XML(response.to_s)).must_equal []
+    end
   end
 end
