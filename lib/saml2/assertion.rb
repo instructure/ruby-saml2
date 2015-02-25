@@ -3,8 +3,7 @@ module SAML2
     attr_reader :id, :issue_instant, :statements
     attr_accessor :issuer, :subject
 
-    def initialize(document)
-      @document = document
+    def initialize
       @id = "_#{SecureRandom.uuid}"
       @issue_instant = Time.now.utc
       @statements = []
@@ -13,29 +12,13 @@ module SAML2
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
       to_xml
 
-      # the assertion has to be in the document _somewhere_ to sign it
-      # (cause xmlsec will do an xpath on the document to resolve the
-      # reference)
-      unless @xml.parent
-        needs_unlink = true
-        if @document.root
-          @document.root << @xml
-        else
-          @document << @xml
-        end
-      end
-
-      begin
-        @xml.set_id_attribute('ID')
-        @xml.sign!(cert: x509_certificate, key: private_key, digest_alg: algorithm_name.to_s, signature_alg: "rsa-#{algorithm_name}", uri: "##{id}")
-      ensure
-        @xml.unlink if needs_unlink
-      end
+      @xml.set_id_attribute('ID')
+      @xml.sign!(cert: x509_certificate, key: private_key, digest_alg: algorithm_name.to_s, signature_alg: "rsa-#{algorithm_name}", uri: "##{id}")
       self
     end
 
     def to_xml
-      @xml ||= Nokogiri::XML::Builder.detached(@document) do |builder|
+      @xml ||= Nokogiri::XML::Builder.new do |builder|
         builder['saml'].Assertion(
             'xmlns:saml' => Namespaces::SAML,
             ID: id,
@@ -50,7 +33,7 @@ module SAML2
 
           statements.each { |stmt| stmt.build(builder) }
         end
-      end.first
+      end.doc.root
     end
   end
 end

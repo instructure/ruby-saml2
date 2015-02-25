@@ -20,11 +20,7 @@ module SAML2
         build(builder)
         @document = builder.doc
       end
-      document
-    end
-
-    def document
-      @document ||= Nokogiri::XML::Document.new
+      @document
     end
   end
 end

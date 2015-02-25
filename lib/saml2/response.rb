@@ -30,7 +30,7 @@ module SAML2
       response = new
       response.issuer = issuer
       response.destination = service_provider.assertion_consumer_services.default.location if service_provider
-      assertion = Assertion.new(response.document)
+      assertion = Assertion.new
       assertion.subject = Subject.new
       assertion.subject.name_id = name_id
       assertion.issuer = issuer
@@ -53,31 +53,27 @@ module SAML2
       assertions.each { |assertion| assertion.sign(*args) }
     end
 
-    def to_xml
-      return document if @serialized
-      @serialized = true
-      document << Nokogiri::XML::Builder.detached(document) do |builder|
-        builder['samlp'].Response(
-          'xmlns:samlp' => Namespaces::SAMLP,
-          ID: id,
-          Version: '2.0',
-          IssueInstant: issue_instant.iso8601,
-          Destination: destination
-        ) do |builder|
-          builder.parent['InResponseTo'] = in_response_to if in_response_to
+    private
+    def build(builder)
+      builder['samlp'].Response(
+        'xmlns:samlp' => Namespaces::SAMLP,
+        ID: id,
+        Version: '2.0',
+        IssueInstant: issue_instant.iso8601,
+        Destination: destination
+      ) do |builder|
+        builder.parent['InResponseTo'] = in_response_to if in_response_to
 
-          issuer.build(builder, element: 'Issuer', include_namespace: true) if issuer
+        issuer.build(builder, element: 'Issuer', include_namespace: true) if issuer
 
-          builder['samlp'].Status do |builder|
-            builder['samlp'].StatusCode(Value: status_code)
-            end
-
-          assertions.each do |assertion|
-            builder.parent << assertion.to_xml
+        builder['samlp'].Status do |builder|
+          builder['samlp'].StatusCode(Value: status_code)
           end
+
+        assertions.each do |assertion|
+          builder.parent << assertion.to_xml
         end
       end
-      document
     end
   end
 end
