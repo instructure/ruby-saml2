@@ -12,5 +12,11 @@ module SAML2
 
       subject
     end
+
+    def build(builder)
+      builder['saml'].Subject do |builder|
+        name_id.build(builder)
+      end
+    end
   end
 end

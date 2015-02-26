@@ -27,9 +27,7 @@ module SAML2
         ) do |builder|
           issuer.build(builder, element: 'Issuer')
 
-          builder['saml'].Subject do |builder|
-            subject.name_id.build(builder)
-          end
+          subject.build(builder)
 
           statements.each { |stmt| stmt.build(builder) }
         end
