@@ -1,6 +1,8 @@
 require 'base64'
 require 'zlib'
 
+require 'saml2/assertion_consumer_service'
+require 'saml2/attribute_consuming_service'
 require 'saml2/name_id'
 require 'saml2/namespaces'
 require 'saml2/schemas'
@@ -56,13 +58,14 @@ module SAML2
       # TODO: check signature if present
 
       if assertion_consumer_service_url
-        @acs = sp_metadata.assertion_consumer_services.find { |acs| acs.location == assertion_consumer_service_url }
-      elsif assertion_consumer_service_index
-        @acs = sp_metadata.assertion_consumer_services[assertion_consumer_service_index]
+        @assertion_consumer_service = sp_metadata.assertion_consumer_services.find { |acs| acs.location == assertion_consumer_service_url }
       else
-        @acs = sp_metadata.assertion_consumer_services.default
+        @assertion_consumer_service  = sp_metadata.assertion_consumer_services.resolve(assertion_consumer_service_index)
       end
-      return false unless @acs
+      @attribute_consuming_service = sp_metadata.attribute_consuming_services.resolve(attribute_consuming_service_index)
+
+      return false unless @assertion_consumer_service
+      return false if attribute_consuming_service_index && !@attribute_consuming_service
 
       true
     end
@@ -79,26 +82,25 @@ module SAML2
       @document.root['ID']
     end
 
-    def assertion_consumer_service
-      @acs
-    end
+    attr_reader :assertion_consumer_service, :attribute_consuming_service
 
     def assertion_consumer_service_url
       @document.root['AssertionConsumerServiceURL']
     end
 
     def assertion_consumer_service_index
-      @acs_index ||= begin
-        @document.root['AssertionConsumerServiceIndex'] &&
-            @document.root['AssertionConsumerServiceIndex'].to_i
-      end
+      @document.root['AssertionConsumerServiceIndex'] && @document.root['AssertionConsumerServiceIndex'].to_i
+    end
+
+    def attribute_consuming_service_index
+      @document.root['AttributeConsumerServiceIndex'] && @document.root['AttributeConsumerServiceIndex'].to_i
     end
 
     def force_authn?
       @document.root['ForceAuthn']
     end
 
-    def is_passive?
+    def passive?
       @document.root['IsPassive']
     end
 

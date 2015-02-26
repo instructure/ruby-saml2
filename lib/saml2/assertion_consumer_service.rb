@@ -1,13 +1,22 @@
+require 'saml2/indexed_object'
+
 module SAML2
-  class AssertionConsumerService
+  class AssertionConsumerService < IndexedObject
     module Bindings
       HTTP_POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST".freeze
     end
 
-    attr_reader :location, :index, :binding
+    attr_reader :location, :binding
 
-    def initialize(location, index, is_default = false, binding = Bindings::HTTP_POST)
-      @location, @index, @is_default, @binding = location, index && index.to_i, is_default, binding
+    def initialize(location = nil, index = nil, is_default = false, binding = Bindings::HTTP_POST)
+      super(index, is_default)
+      @location, @binding = location, binding
+    end
+
+    def from_xml(node)
+      @location = node['Location']
+      @binding = node['Binding']
+      super
     end
 
     def ==(rhs)
@@ -16,30 +25,7 @@ module SAML2
 
     def eql?(rhs)
       location == rhs.location &&
-          binding == rhs.binding &&
-          index == rhs.index &&
-          is_default? == rhs.is_default?
-    end
-
-    def is_default?
-      @is_default
-    end
-
-    class Array < ::Array
-      attr_reader :default
-
-      def initialize(acses)
-        replace(acses.sort_by { |acs| acs.index || 0 })
-        @index = {}
-        each { |acs| @index[acs.index] = acs }
-        @default = find { |acs| acs.is_default? } || first
-
-        freeze
-      end
-
-      def [](index)
-        @index[index]
-      end
+          binding == rhs.binding && super
     end
   end
 end

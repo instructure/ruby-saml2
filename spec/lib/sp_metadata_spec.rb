@@ -24,9 +24,10 @@ module SAML2
         sp.entity_id.must_equal "http://siteadmin.instructure.com/saml2"
       end
 
-      it "should create the ACS array" do
+      it "should create the assertion_consumer_services array" do
         sp.assertion_consumer_services.length.must_equal 4
         sp.assertion_consumer_services.map(&:index).must_equal [0, 1, 2, 3]
+        sp.assertion_consumer_services.first.location.must_equal 'https://siteadmin.instructure.com/saml_consume'
       end
 
       it "should find the signing certificate" do

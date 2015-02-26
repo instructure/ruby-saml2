@@ -1,13 +1,13 @@
 module SAML2
   class Assertion
-    attr_reader :id, :issue_instant, :authn_statements
+    attr_reader :id, :issue_instant, :statements
     attr_accessor :issuer, :subject
 
     def initialize(document)
       @document = document
       @id = "_#{SecureRandom.uuid}"
       @issue_instant = Time.now.utc
-      @authn_statements = []
+      @statements = []
     end
 
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
@@ -48,7 +48,7 @@ module SAML2
             subject.name_id.build(builder)
           end
 
-          authn_statements.each { |stmt| stmt.build(builder) }
+          statements.each { |stmt| stmt.build(builder) }
         end
       end.first
     end

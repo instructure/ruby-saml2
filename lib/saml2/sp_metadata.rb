@@ -25,14 +25,16 @@ module SAML2
     end
 
     def assertion_consumer_services
-      @acs ||= begin
+      @assertion_consumer_services ||= begin
         nodes = @document.root.xpath('md:SPSSODescriptor/md:AssertionConsumerService', Namespaces::ALL)
-        AssertionConsumerService::Array.new(nodes.map do |node|
-          AssertionConsumerService.new(node['Location'],
-                                       node['index'],
-                                       node['isDefault'],
-                                       node['Binding'])
-        end)
+        AssertionConsumerService::Array.from_xml(nodes)
+      end
+    end
+
+    def attribute_consuming_services
+      @attribute_consuming_services ||= begin
+        nodes = @document.root.xpath('md:SPSSODescriptor/md:AttributeConsumingService', Namespaces::ALL)
+        AttributeConsumingService::Array.from_xml(nodes)
       end
     end
 

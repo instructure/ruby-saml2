@@ -16,7 +16,7 @@ module SAML2
     attr_reader :id, :issue_instant, :assertions
     attr_accessor :issuer, :in_response_to, :destination, :status_code
 
-    def self.respond_to(authn_request, issuer, name_id)
+    def self.respond_to(authn_request, issuer, name_id, attributes = [])
       response = new
       response.in_response_to = authn_request.id
       response.destination = authn_request.assertion_consumer_service.location
@@ -28,7 +28,10 @@ module SAML2
       authn_statement = AuthnStatement.new
       authn_statement.authn_instant = response.issue_instant
       authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
-      assertion.authn_statements << authn_statement
+      assertion.statements << authn_statement
+      if authn_request.attribute_consuming_service
+        assertion.statements << authn_request.attribute_consuming_service.create_statement(attributes)
+      end
       response.assertions << assertion
       response
     end
