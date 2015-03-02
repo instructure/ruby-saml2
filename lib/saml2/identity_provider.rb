@@ -1,5 +1,4 @@
 require 'saml2/attribute'
-require 'saml2/namespaces'
 require 'saml2/sso'
 
 module SAML2
@@ -24,21 +23,15 @@ module SAML2
     end
 
     def single_sign_on_services
-      @single_sign_on_services ||= @root.xpath('md:SingleSignOnService', Namespaces::ALL).map do |node|
-        Endpoint.from_xml(node)
-      end
+      @single_sign_on_services ||= load_object_array(@root, 'md:SingleSignOnService', Endpoint)
     end
 
     def attribute_profiles
-      @attribute_profiles ||= @root.xpath('md:AttributeProfile', Namespaces::ALL).map do |node|
-        node.content && node.content.strip
-      end
+      @attribute_profiles ||= load_string_array(@root, 'md:AttributeProfile')
     end
 
     def attributes
-      @attributes ||= @root.xpath('saml:Attribute', Namespaces::ALL).map do |node|
-        Attribute.from_xml(node)
-      end
+      @attributes ||= load_object_array(@root, 'saml:Attribute', Attribute)
     end
 
     def build(builder)

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<EntitiesDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata">
+  <EntityDescriptor entityID="urn:entity1">
+    <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://entity1.com/SAML2/Login" index="0"/>
+    </SPSSODescriptor>
+  </EntityDescriptor>
+  <EntityDescriptor entityID="urn:entity2">
+    <SPSSODescriptor protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+      <AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://entity2.com/SAML2/Login" index="0"/>
+    </SPSSODescriptor>
+  </EntityDescriptor>
+</EntitiesDescriptor>

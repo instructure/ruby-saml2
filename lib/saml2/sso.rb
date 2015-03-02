@@ -13,15 +13,11 @@ module SAML2
     end
 
     def single_logout_services
-      @single_logout_services ||= @root.xpath('md:SingleLogoutService', Namespaces::ALL).map do |node|
-        Endpoint.from_xml(node)
-      end
+      @single_logout_services ||= load_object_array(@root, 'md:SingleLogoutService', Endpoint)
     end
 
     def name_id_formats
-      @name_id_formats ||= @root.xpath('md:NameIDFormat', Namespaces::ALL).map do |node|
-        node.content && node.content.strip
-      end
+      @name_id_formats ||= load_string_array(@root, 'md:NameIDFormat')
     end
 
     protected

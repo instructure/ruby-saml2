@@ -1,3 +1,5 @@
+require 'saml2/base'
+
 module SAML2
   class Contact
     module Type
@@ -20,8 +22,8 @@ module SAML2
       result.given_name = given_name && given_name.content && given_name.content.strip
       surname = node.at_xpath('md:SurName', Namespaces::ALL)
       result.surname = surname && surname.content && surname.content.strip
-      result.email_addresses = node.xpath('md:EmailAddress', Namespaces::ALL).map { |node| node.content && node.content.strip }
-      result.telephone_numbers = node.xpath('md:TelephoneNumber', Namespaces::ALL).map { |node| node.content && node.content.strip }
+      result.email_addresses = Base.load_string_array(node, 'md:EmailAddress')
+      result.telephone_numbers = Base.load_string_array(node, 'md:TelephoneNumber')
       result
     end
 

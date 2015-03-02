@@ -38,9 +38,8 @@ module SAML2
     end
 
     def from_xml(node)
-      nodes = node.xpath("md:RequestedAttribute", Namespaces::ALL)
       @name = node['ServiceName']
-      @requested_attributes = nodes.map { |attr| RequestedAttribute.from_xml(attr) }
+      @requested_attributes = load_object_array(node, "md:RequestedAttribute", RequestedAttribute)
       super
     end
 

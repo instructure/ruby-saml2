@@ -29,7 +29,7 @@ module SAML2
     end
 
     def keys
-      @keys ||= @root.xpath('md:KeyDescriptor', Namespaces::ALL).map { |key| Key.from_xml(key) }
+      @keys ||= load_object_array(@root, 'md:KeyDescriptor', Key)
     end
 
     def signing_keys

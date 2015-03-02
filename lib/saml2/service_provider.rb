@@ -5,10 +5,12 @@ require 'saml2/sso'
 
 module SAML2
   class ServiceProvider < SSO
-    attr_reader :entity
+    class << self
+      alias_method :from_xml, :new
+    end
 
-    def initialize(entity, root)
-      @entity, @root = entity, root
+    def initialize(root)
+      @root = root
     end
 
     def assertion_consumer_services

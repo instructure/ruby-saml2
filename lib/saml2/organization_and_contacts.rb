@@ -20,9 +20,7 @@ module SAML2
     end
 
     def contacts
-      @contacts ||= @root.xpath('md:ContactPerson', Namespaces::ALL).map do |node|
-        Contact.from_xml(node)
-      end
+      @contacts ||= load_object_array(@root, 'md:ContactPerson', Contact)
     end
 
     protected

@@ -31,5 +31,15 @@ module SAML2
         entity.organization.display_name(:all).must_equal en: 'Canvas'
       end
     end
+
+    describe Entity::Group do
+      it "should parse and validate" do
+        group = Entity.parse(fixture('entities.xml'))
+        group.must_be_instance_of Entity::Group
+        group.valid_schema?.must_equal true
+
+        group.map(&:entity_id).must_equal ['urn:entity1', 'urn:entity2']
+      end
+    end
   end
 end

@@ -33,15 +33,9 @@ module SAML2
 
       def initialize(root)
         @root = root
-        replace(root.xpath("md:EntityDescriptor|md:EntitiesDescriptor", Namespaces::ALL).map do |node|
-                  case name
-                  when 'EntityDescriptor'
-                    Entity.from_xml(node)
-                  when 'EntitiesDescriptor'
-                    Group.from_xml(node)
-                  end
-                end
-        )
+        replace(Base.load_object_array(@root, "md:EntityDescriptor|md:EntitiesDescriptor",
+                'EntityDescriptor' => Entity,
+                'EntitiesDescriptor' => Group))
       end
 
       def valid_schema?
@@ -70,12 +64,8 @@ module SAML2
     end
 
     def roles
-      @roles ||= @root.xpath('md:SPSSODescriptor', Namespaces::ALL).map do |node|
-        case node.name
-        when 'SPSSODescriptor'
-          ServiceProvider.new(self, node)
-        end
-      end
+      # TODO: load IdPSSODescriptors as well
+      @roles ||= load_object_array(@root, 'md:SPSSODescriptor', ServiceProvider)
     end
 
     def build(builder)
