@@ -15,11 +15,11 @@ module SAML2
 
       result = new(node['contactType'])
       company = node.at_xpath('md:Company', Namespaces::ALL)
-      result.company = company && company.strip
+      result.company = company && company.content && company.content.strip
       given_name = node.at_xpath('md:GivenName', Namespaces::ALL)
-      result.given_name = given_name && given_name.strip
+      result.given_name = given_name && given_name.content && given_name.content.strip
       surname = node.at_xpath('md:SurName', Namespaces::ALL)
-      result.surname = surname && surname.strip
+      result.surname = surname && surname.content && surname.content.strip
       result.email_addresses = node.xpath('md:EmailAddress', Namespaces::ALL).map { |node| node.content && node.content.strip }
       result.telephone_numbers = node.xpath('md:TelephoneNumber', Namespaces::ALL).map { |node| node.content && node.content.strip }
       result
