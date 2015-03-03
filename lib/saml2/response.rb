@@ -20,6 +20,9 @@ module SAML2
       response = initiate(nil, issuer, name_id)
       response.in_response_to = authn_request.id
       response.destination = authn_request.assertion_consumer_service.location
+      confirmation = response.assertions.first.subject.confirmation
+      confirmation.in_response_to = authn_request.id
+      confirmation.recipient = response.destination
       if authn_request.attribute_consuming_service
         response.assertion.first.statements << authn_request.attribute_consuming_service.create_statement(attributes)
       end
@@ -33,6 +36,11 @@ module SAML2
       assertion = Assertion.new
       assertion.subject = Subject.new
       assertion.subject.name_id = name_id
+      assertion.subject.confirmation = Subject::Confirmation.new
+      assertion.subject.confirmation.method = Subject::Confirmation::Methods::BEARER
+      assertion.subject.confirmation.not_before = Time.now.utc
+      assertion.subject.confirmation.not_on_or_after = Time.now.utc + 30
+      assertion.subject.confirmation.recipient = response.destination if response.destination
       assertion.issuer = issuer
       authn_statement = AuthnStatement.new
       authn_statement.authn_instant = response.issue_instant

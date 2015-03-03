@@ -24,10 +24,16 @@ module SAML2
 
     it "should generate a valid signature" do
       response.instance_variable_set(:@id, "_9a15e699-2d04-4ba7-a521-cfa4dcd21f44")
-      response.assertions.first.instance_variable_set(:@id, "_cdfc3faf-90ad-462f-880d-677483210684")
+      assertion = response.assertions.first
+      assertion.instance_variable_set(:@id, "_cdfc3faf-90ad-462f-880d-677483210684")
       response.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
-      response.assertions.first.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
-      response.assertions.first.statements.first.authn_instant = Time.parse("2015-02-12T22:51:29Z")
+      assertion.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
+      assertion.statements.first.authn_instant = Time.parse("2015-02-12T22:51:29Z")
+      confirmation = assertion.subject.confirmation
+      confirmation.not_before = Time.parse("2015-02-12T22:51:29Z")
+      confirmation.not_on_or_after = Time.parse("2015-02-12T22:54:29Z")
+      confirmation.recipient = response.destination
+      confirmation.in_response_to = response.in_response_to
       response.sign(fixture('certificate.pem'), fixture('privatekey.key'))
       # verifiable on the command line with:
       # xmlsec1 --verify --pubkey-cert-pem certificate.pem --privkey-pem privatekey.key --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion response_signed.xml
