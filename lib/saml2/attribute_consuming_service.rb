@@ -45,7 +45,7 @@ module SAML2
 
     def create_statement(attributes)
       if attributes.is_a?(Hash)
-        attributes = attributes.map { |k, v| Attribute.new(k, v) }
+        attributes = attributes.map { |k, v| Attribute.create(k, v) }
       end
 
       attributes_hash = {}

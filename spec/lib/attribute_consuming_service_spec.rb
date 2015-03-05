@@ -47,9 +47,9 @@ module SAML2
 
       it "should match explicit name formats" do
         acs.requested_attributes.first.name_format = 'format'
-        stmt = acs.create_statement([Attribute.new('name', 'cody', 'format'),
+        stmt = acs.create_statement([Attribute.new('name', 'cody', nil, 'format'),
                                      Attribute.new('name', 'unspecified'),
-                                     Attribute.new('name', 'other', 'otherformat')])
+                                     Attribute.new('name', 'other', nil, 'otherformat')])
         stmt.attributes.length.must_equal 1
         stmt.attributes.first.name.must_equal 'name'
         stmt.attributes.first.value.must_equal 'cody'
