@@ -24,12 +24,12 @@ module SAML2
       confirmation.in_response_to = authn_request.id
       confirmation.recipient = response.destination
       if authn_request.attribute_consuming_service
-        response.assertion.first.statements << authn_request.attribute_consuming_service.create_statement(attributes)
+        response.assertions.first.statements << authn_request.attribute_consuming_service.create_statement(attributes)
       end
       response
     end
 
-    def self.initiate(service_provider, issuer, name_id)
+    def self.initiate(service_provider, issuer, name_id, attributes = nil)
       response = new
       response.issuer = issuer
       response.destination = service_provider.assertion_consumer_services.default.location if service_provider
@@ -46,6 +46,9 @@ module SAML2
       authn_statement.authn_instant = response.issue_instant
       authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
       assertion.statements << authn_statement
+      if (attributes && service_provider.attribute_consuming_services.default)
+        assertion.statements << service_provider.attribute_consuming_services.default.create_statement(attributes)
+      end
       response.assertions << assertion
       response
     end
