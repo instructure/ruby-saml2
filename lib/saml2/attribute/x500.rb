@@ -52,7 +52,7 @@ module SAML2
       def build(builder)
         super
         attr = builder.parent.last_element_child
-        attr['xmlns:x500'] = Namespaces::X500
+        attr.add_namespace_definition('x500', Namespaces::X500)
         attr['x500:Encoding'] = 'LDAP'
       end
 

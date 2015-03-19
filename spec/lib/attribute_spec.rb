@@ -3,7 +3,7 @@ require_relative '../spec_helper'
 module SAML2
   describe Attribute do
     let(:eduPersonPrincipalNameXML) { <<XML.strip
-<saml:Attribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" FriendlyName="eduPersonPrincipalName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" xmlns:x500="urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500" x500:Encoding="LDAP" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
+<saml:Attribute xmlns:x500="urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500" Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" FriendlyName="eduPersonPrincipalName" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" x500:Encoding="LDAP" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">
   <saml:AttributeValue xsi:type="xsd:string">user@domain</saml:AttributeValue>
 </saml:Attribute>
 XML

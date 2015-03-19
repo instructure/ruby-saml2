@@ -61,6 +61,11 @@
                               Location="https://siteadmin.beta.instructure.com/saml_consume"/>
     <AssertionConsumerService index="3" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
                               Location="https://siteadmin.test.instructure.com/saml_consume"/>
+
+    <AttributeConsumingService index="0">
+      <ServiceName xml:lang="en">service</ServiceName>
+      <RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" />
+    </AttributeConsumingService>
   </SPSSODescriptor>
   <Organization>
     <OrganizationName xml:lang="en">Canvas</OrganizationDisplayName>

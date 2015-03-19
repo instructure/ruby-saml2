@@ -69,6 +69,7 @@ module SAML2
           raise RequiredAttributeMissing.new(requested_attr)
         end
       end
+      return nil if attributes.empty?
       AttributeStatement.new(attributes)
     end
   end

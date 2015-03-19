@@ -16,15 +16,16 @@ module SAML2
     attr_reader :id, :issue_instant, :assertions
     attr_accessor :issuer, :in_response_to, :destination, :status_code
 
-    def self.respond_to(authn_request, issuer, name_id, attributes = [])
+    def self.respond_to(authn_request, issuer, name_id, attributes = nil)
       response = initiate(nil, issuer, name_id)
       response.in_response_to = authn_request.id
       response.destination = authn_request.assertion_consumer_service.location
       confirmation = response.assertions.first.subject.confirmation
       confirmation.in_response_to = authn_request.id
       confirmation.recipient = response.destination
-      if authn_request.attribute_consuming_service
-        response.assertions.first.statements << authn_request.attribute_consuming_service.create_statement(attributes)
+      if attributes && authn_request.attribute_consuming_service
+        statement = authn_request.attribute_consuming_service.create_statement(attributes)
+        response.assertions.first.statements << statement if statement
       end
       response
     end
@@ -46,8 +47,9 @@ module SAML2
       authn_statement.authn_instant = response.issue_instant
       authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
       assertion.statements << authn_statement
-      if (attributes && service_provider.attribute_consuming_services.default)
-        assertion.statements << service_provider.attribute_consuming_services.default.create_statement(attributes)
+      if attributes && service_provider.attribute_consuming_services.default
+        statement = service_provider.attribute_consuming_services.default.create_statement(attributes)
+        assertion.statements << statement if statement
       end
       response.assertions << assertion
       response
