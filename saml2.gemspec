@@ -27,10 +27,7 @@ Gem::Specification.new do |s|
   # Very specifically at least 1.5.8 - they fixed a bug with namespaces
   # on root elements with XML::Builder in that release
   s.add_dependency('nokogiri', ">= 1.5.8", "<1.7")
-  # This isn't strictly correct, since we'll require the next released
-  # version, but if you pull it in from github, we don't want this
-  # version requirement to stop you
-  s.add_dependency('nokogiri-xmlsec-me-harder', ">=0.9.1")
+  s.add_dependency('nokogiri-xmlsec-me-harder', ">=0.9.2")
 
   s.add_development_dependency "rake"
   s.add_development_dependency "minitest"
