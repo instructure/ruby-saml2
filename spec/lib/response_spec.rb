@@ -39,6 +39,7 @@ module SAML2
     it "should generate a valid signature" do
       freeze_response
       response.sign(fixture('certificate.pem'), fixture('privatekey.key'))
+      Schemas.protocol.validate(response.to_xml).must_equal []
       # verifiable on the command line with:
       # xmlsec1 --verify --pubkey-cert-pem certificate.pem --privkey-pem privatekey.key --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion response_signed.xml
       response.to_s.must_equal fixture('response_signed.xml')
