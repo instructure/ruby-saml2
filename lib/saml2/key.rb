@@ -18,7 +18,7 @@ module SAML2
     end
 
     def initialize(x509, use = nil, encryption_methods = [])
-      @use, @x509, @encryption_methods = use, x509, encryption_methods
+      @use, @x509, @encryption_methods = use, x509.gsub(/\w*-+(BEGIN|END) CERTIFICATE-+\w*/, "").strip, encryption_methods
     end
 
     def encryption?
