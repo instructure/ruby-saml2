@@ -30,7 +30,6 @@ module SAML2
       assertion.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
       assertion.statements.first.authn_instant = Time.parse("2015-02-12T22:51:29Z")
       confirmation = assertion.subject.confirmation
-      confirmation.not_before = Time.parse("2015-02-12T22:51:29Z")
       confirmation.not_on_or_after = Time.parse("2015-02-12T22:54:29Z")
       confirmation.recipient = response.destination
       confirmation.in_response_to = response.in_response_to

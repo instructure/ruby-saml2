@@ -39,7 +39,6 @@ module SAML2
       assertion.subject.name_id = name_id
       assertion.subject.confirmation = Subject::Confirmation.new
       assertion.subject.confirmation.method = Subject::Confirmation::Methods::BEARER
-      assertion.subject.confirmation.not_before = Time.now.utc
       assertion.subject.confirmation.not_on_or_after = Time.now.utc + 30
       assertion.subject.confirmation.recipient = response.destination if response.destination
       assertion.issuer = issuer
