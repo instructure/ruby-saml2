@@ -28,6 +28,8 @@ module SAML2
       assertion.instance_variable_set(:@id, "_cdfc3faf-90ad-462f-880d-677483210684")
       response.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
       assertion.instance_variable_set(:@issue_instant, Time.parse("2015-02-12T22:51:29Z"))
+      assertion.conditions.not_before = Time.parse("2015-02-12T22:51:24Z")
+      assertion.conditions.not_on_or_after = Time.parse("2015-02-12T22:51:59Z")
       assertion.statements.first.authn_instant = Time.parse("2015-02-12T22:51:29Z")
       confirmation = assertion.subject.confirmation
       confirmation.not_on_or_after = Time.parse("2015-02-12T22:54:29Z")

@@ -1,12 +1,15 @@
+require 'saml2/conditions'
+
 module SAML2
   class Assertion
-    attr_reader :id, :issue_instant, :statements
+    attr_reader :id, :issue_instant, :conditions, :statements
     attr_accessor :issuer, :subject
 
     def initialize
       @id = "_#{SecureRandom.uuid}"
       @issue_instant = Time.now.utc
       @statements = []
+      @conditions = Conditions.new
     end
 
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
@@ -33,6 +36,7 @@ module SAML2
 
           subject.build(builder)
 
+          conditions.build(builder)
           statements.each { |stmt| stmt.build(builder) }
         end
       end.doc.root

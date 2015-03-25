@@ -27,6 +27,8 @@ module SAML2
         statement = authn_request.attribute_consuming_service.create_statement(attributes)
         response.assertions.first.statements << statement if statement
       end
+      response.assertions.first.conditions << Conditions::AudienceRestriction.new(authn_request.issuer.id)
+
       response
     end
 
@@ -42,6 +44,8 @@ module SAML2
       assertion.subject.confirmation.not_on_or_after = Time.now.utc + 30
       assertion.subject.confirmation.recipient = response.destination if response.destination
       assertion.issuer = issuer
+      assertion.conditions.not_before = Time.now.utc - 5
+      assertion.conditions.not_on_or_after = Time.now.utc + 30
       authn_statement = AuthnStatement.new
       authn_statement.authn_instant = response.issue_instant
       authn_statement.authn_context_class_ref = AuthnStatement::Classes::UNSPECIFIED
