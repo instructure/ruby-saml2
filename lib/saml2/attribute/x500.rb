@@ -24,6 +24,8 @@ module SAML2
         TARGETED_I_D         = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10'.freeze
         UNIT_D_N             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4'.freeze
       end
+      # http://www.ietf.org/rfc/rfc4519.txt
+      UID = USERID           = 'urn:oid:0.9.2342.19200300.100.1.1'.freeze
       # http://www.ietf.org/rfc/rfc4524.txt
       MAIL                   = 'urn:oid:0.9.2342.19200300.100.1.3'.freeze
 
