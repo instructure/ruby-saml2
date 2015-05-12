@@ -1,23 +1,10 @@
+require 'date'
+
 require 'saml2/base'
 require 'saml2/namespaces'
 
 module SAML2
-  class AttributeType < Base
-    attr_accessor :name, :friendly_name, :name_format
-
-    def initialize(name = nil, friendly_name = nil, name_format = nil)
-      @name, @friendly_name, @name_format = name, friendly_name, name_format
-    end
-
-    def from_xml(node)
-      @name = node['Name']
-      @friendly_name = node['FriendlyName']
-      @name_format = node['NameFormat']
-      self
-    end
-  end
-
-  class Attribute < AttributeType
+  class Attribute < Base
     module NameFormats
       BASIC       = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic".freeze
       UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified".freeze
@@ -38,25 +25,28 @@ module SAML2
         super unless self == Attribute
 
         # look for an appropriate subclass
-        klass = subclasses.find { |klass| klass.recognizes?(node) }
-        if klass
-          klass.from_xml(node)
-        else
-          super
-        end
+        klass = class_for(node)
+        klass ? klass.from_xml(node) : super
       end
 
       def create(name, value = nil)
-        klass = subclasses.find { |klass| klass.recognizes?(name) } || self
-        klass.new(name, value)
+
+        (class_for(name) || self).new(name, value)
+      end
+
+      protected
+
+      def class_for(name_or_node)
+        subclasses.find do |klass|
+          klass.respond_to?(:recognizes?) && klass.recognizes?(name_or_node)
+        end
       end
     end
 
-    attr_accessor :value
+    attr_accessor :name, :friendly_name, :name_format, :value
 
     def initialize(name = nil, value = nil, friendly_name = nil, name_format = nil)
-      super(name, friendly_name, name_format)
-      @value = value
+      @name, @value, @friendly_name, @name_format = name, value, friendly_name, name_format
     end
 
     def build(builder)
@@ -73,10 +63,17 @@ module SAML2
     end
 
     def from_xml(node)
-      @value = node.xpath('saml:AttributeValue', Namespaces::ALL).map do |node|
+      @name = node['Name']
+      @friendly_name = node['FriendlyName']
+      @name_format = node['NameFormat']
+      values = node.xpath('saml:AttributeValue', Namespaces::ALL).map do |node|
         convert_from_xsi(node['xsi:type'], node.content && node.content.strip)
       end
-      @value = @value.first if @value.length == 1
+      @value = case values.length
+               when 0; nil
+               when 1; values.first
+               else; values
+               end
       super
     end
 

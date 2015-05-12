@@ -69,6 +69,59 @@ module SAML2
         stmt.attributes.first.name.must_equal 'name'
         stmt.attributes.first.value.must_equal 'cody'
       end
+
+      it "requires that provided attributes match a single default" do
+        acs.requested_attributes.clear
+        attr = RequestedAttribute.new('attr')
+        attr.value = 'value'
+        acs.requested_attributes << attr
+        -> { acs.create_statement('attr' => 'something') }.must_raise InvalidAttributeValue
+        stmt = acs.create_statement('attr' => 'value')
+        stmt.attributes.length.must_equal 1
+        stmt.attributes.first.name.must_equal 'attr'
+        stmt.attributes.first.value.must_equal 'value'
+      end
+
+      it "requires that provided attributes be from allowed enumeration" do
+        acs.requested_attributes.clear
+        attr = RequestedAttribute.new('attr')
+        attr.value = ['value1', 'value2']
+        acs.requested_attributes << attr
+        -> { acs.create_statement('attr' => 'something') }.must_raise InvalidAttributeValue
+        stmt = acs.create_statement('attr' => 'value1')
+        stmt.attributes.length.must_equal 1
+        stmt.attributes.first.name.must_equal 'attr'
+        stmt.attributes.first.value.must_equal 'value1'
+      end
+
+      it "auto-provides missing required attribute with a default" do
+        acs.requested_attributes.clear
+        attr = RequestedAttribute.new('attr', true)
+        attr.value = 'value'
+        acs.requested_attributes << attr
+        stmt = acs.create_statement({})
+        stmt.attributes.length.must_equal 1
+        stmt.attributes.first.name.must_equal 'attr'
+        stmt.attributes.first.value.must_equal 'value'
+      end
+
+      it "doesn't auto-provide missing required attribute with an enumeration" do
+        acs.requested_attributes.clear
+        attr = RequestedAttribute.new('attr', true)
+        attr.value = ['value1', 'value2']
+        acs.requested_attributes << attr
+        -> { acs.create_statement({}) }.must_raise RequiredAttributeMissing
+      end
+
+      it "doesn't auto-provide missing non-required attribute with a default" do
+        acs.requested_attributes.clear
+        attr = RequestedAttribute.new('attr')
+        attr.value = 'value'
+        acs.requested_attributes << attr
+        stmt = acs.create_statement({})
+        stmt.must_equal nil
+      end
+
     end
   end
 end

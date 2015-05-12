@@ -3,9 +3,9 @@ require 'saml2/indexed_object'
 require 'saml2/namespaces'
 
 module SAML2
-  class RequestedAttribute < AttributeType
+  class RequestedAttribute < Attribute
     def initialize(name = nil, is_required = nil, name_format = nil)
-      super(name, name_format)
+      super(name, nil, nil, name_format)
       @is_required = is_required
     end
 
@@ -25,6 +25,17 @@ module SAML2
     def initialize(requested_attribute)
       super("Required attribute #{requested_attribute.name} not provided")
       @requested_attribute = requested_attribute
+    end
+  end
+
+  class InvalidAttributeValue < RuntimeError
+    attr_reader :requested_attribute, :provided_value
+
+    def initialize(requested_attribute, provided_value)
+      super("Attribute #{requested_attribute.name} is provided value " \
+        "#{provided_value.inspect}, but only allows "                  \
+        "#{Array(requested_attribute.value).inspect}")
+      @requested_attribute, @provided_value = requested_attribute, provided_value
     end
   end
 
@@ -64,9 +75,20 @@ module SAML2
           attr ||= attributes_hash[[requested_attr.name, nil]]
         end
         if attr
+          if requested_attr.value &&
+            !Array(requested_attr.value).include?(attr.value)
+            raise InvalidAttributeValue.new(requested_attr, attr.value)
+          end
           attributes << attr
         elsif requested_attr.required?
-          raise RequiredAttributeMissing.new(requested_attr)
+          # if the metadata includes only one possible value, helpfully set
+          # that value
+          if requested_attr.value && !requested_attr.value.is_a?(::Array)
+            attributes << Attribute.create(requested_attr.name,
+                                           requested_attr.value)
+          else
+            raise RequiredAttributeMissing.new(requested_attr)
+          end
         end
       end
       return nil if attributes.empty?
