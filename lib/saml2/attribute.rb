@@ -1,5 +1,7 @@
 require 'date'
 
+require 'active_support/core_ext/array/wrap'
+
 require 'saml2/base'
 require 'saml2/namespaces'
 
@@ -53,7 +55,7 @@ module SAML2
       builder['saml'].Attribute('Name' => name) do |builder|
         builder.parent['FriendlyName'] = friendly_name if friendly_name
         builder.parent['NameFormat'] = name_format if name_format
-        Array(value).each do |val|
+        Array.wrap(value).each do |value|
           xsi_type, val = convert_to_xsi(value)
           builder['saml'].AttributeValue(val) do |builder|
             builder.parent['xsi:type'] = xsi_type if xsi_type
@@ -67,7 +69,7 @@ module SAML2
       @friendly_name = node['FriendlyName']
       @name_format = node['NameFormat']
       values = node.xpath('saml:AttributeValue', Namespaces::ALL).map do |node|
-        convert_from_xsi(node['xsi:type'], node.content && node.content.strip)
+        convert_from_xsi(node.attribute_with_ns('type', Namespaces::XSI), node.content && node.content.strip)
       end
       @value = case values.length
                when 0; nil
@@ -78,27 +80,36 @@ module SAML2
     end
 
     private
-    XSI_TYPES = {
-        'xsd:string' => [String, nil, nil],
-        nil => [DateTime, ->(v) { v.iso8601 }, ->(v) { DateTime.parse(v) if v }]
+    XS_TYPES = {
+      lookup_qname('xs:boolean', Namespaces::ALL) =>
+        [[TrueClass, FalseClass], nil, ->(v) { %w{true 1}.include?(v) ? true : false }],
+      lookup_qname('xs:string', Namespaces::ALL) =>
+        [String, nil, nil],
+      lookup_qname('xs:date', Namespaces::ALL) =>
+        [Date, nil, ->(v) { Date.parse(v) if v }],
+      lookup_qname('xs:dateTime', Namespaces::ALL) =>
+        [Time, ->(v) { v.iso8601 }, ->(v) { Time.parse(v) if v }]
     }.freeze
 
     def convert_to_xsi(value)
-      xsi_type = nil
+      xs_type = nil
       converter = nil
-      XSI_TYPES.each do |type, (klass, to_xsi, from_xsi)|
-        if klass === value
-          xsi_type = type
+      XS_TYPES.each do |type, (klasses, to_xsi, _from_xsi)|
+        if Array.wrap(klasses).any? { |klass| klass === value }
+          xs_type = "xs:#{type.last}"
           converter = to_xsi
           break
         end
       end
       value = converter.call(value) if converter
-      [xsi_type, value]
+      [xs_type, value]
     end
 
     def convert_from_xsi(type, value)
-      info = XSI_TYPES[type]
+      return value unless type
+      qname = self.class.lookup_qname(type.value, type.namespaces)
+
+      info = XS_TYPES[qname]
       if info && info.last
         value = info.last.call(value)
       end
@@ -106,15 +117,24 @@ module SAML2
     end
   end
 
-  class AttributeStatement
+  class AttributeStatement < Base
     attr_reader :attributes
 
-    def initialize(attributes)
+    def initialize(attributes = [])
       @attributes = attributes
     end
 
+    def from_xml(node)
+      @attributes = node.xpath('saml:Attribute', Namespaces::ALL).map do |attr|
+        Attribute.from_xml(attr)
+      end
+
+      super
+    end
+
     def build(builder)
-      builder['saml'].AttributeStatement('xmlns:xsi' => Namespaces::XSI) do |builder|
+      builder['saml'].AttributeStatement('xmlns:xs' => Namespaces::XS,
+                                         'xmlns:xsi' => Namespaces::XSI) do |builder|
         @attributes.each { |attr| attr.build(builder) }
       end
     end

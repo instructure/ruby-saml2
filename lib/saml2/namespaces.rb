@@ -5,17 +5,19 @@ module SAML2
     SAML     = "urn:oasis:names:tc:SAML:2.0:assertion".freeze
     SAMLP    = "urn:oasis:names:tc:SAML:2.0:protocol".freeze
     XENC     = "http://www.w3.org/2001/04/xmlenc#".freeze
+    XS       = "http://www.w3.org/2001/XMLSchema".freeze
     XSI      = "http://www.w3.org/2001/XMLSchema-instance".freeze
     X500     = "urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500".freeze
 
     ALL = {
-        'dsig'  => DSIG,
-        'md'    => METADATA,
-        'saml'  => SAML,
-        'samlp' => SAMLP,
-        'x500'  => X500,
-        'xenc'  => XENC,
-        'xsi'   => XSI
+        'xmlns:dsig'  => DSIG,
+        'xmlns:md'    => METADATA,
+        'xmlns:saml'  => SAML,
+        'xmlns:samlp' => SAMLP,
+        'xmlns:x500'  => X500,
+        'xmlns:xenc'  => XENC,
+        'xmlns:xs'    => XS,
+        'xmlns:xsi'   => XSI,
     }.freeze
   end
 end

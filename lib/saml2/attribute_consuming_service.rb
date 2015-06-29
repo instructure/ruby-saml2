@@ -1,3 +1,5 @@
+require 'active_support/core_ext/array/wrap'
+
 require 'saml2/attribute'
 require 'saml2/indexed_object'
 require 'saml2/namespaces'
@@ -34,7 +36,7 @@ module SAML2
     def initialize(requested_attribute, provided_value)
       super("Attribute #{requested_attribute.name} is provided value " \
         "#{provided_value.inspect}, but only allows "                  \
-        "#{Array(requested_attribute.value).inspect}")
+        "#{Array.wrap(requested_attribute.value).inspect}")
       @requested_attribute, @provided_value = requested_attribute, provided_value
     end
   end
@@ -76,7 +78,7 @@ module SAML2
         end
         if attr
           if requested_attr.value &&
-            !Array(requested_attr.value).include?(attr.value)
+            !Array.wrap(requested_attr.value).include?(attr.value)
             raise InvalidAttributeValue.new(requested_attr, attr.value)
           end
           attributes << attr

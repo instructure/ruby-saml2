@@ -1,3 +1,5 @@
+require 'active_support/core_ext/array/wrap'
+
 module SAML2
   class Conditions < Array
     attr_accessor :not_before, :not_on_or_after
@@ -49,12 +51,12 @@ module SAML2
       end
 
       def valid?(options)
-        Array(audience).include?(options[:audience]) ? :valid : :invalid
+        Array.wrap(audience).include?(options[:audience]) ? :valid : :invalid
       end
 
       def build(builder)
         builder['saml'].AudienceRestriction do |builder|
-          Array(audience).each do |single_audience|
+          Array.wrap(audience).each do |single_audience|
             builder['saml'].Audience(single_audience)
           end
         end

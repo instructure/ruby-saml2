@@ -41,6 +41,11 @@ module SAML2
       end
     end
 
+    def self.lookup_qname(qname, namespaces)
+      prefix, local_name = split_qname(qname)
+      [lookup_namespace(prefix, namespaces), local_name]
+    end
+
     protected
     def load_string_array(node, element)
       self.class.load_string_array(node, element)
@@ -48,6 +53,19 @@ module SAML2
 
     def load_object_array(node, element, klass)
       self.class.load_object_array(node, element, klass)
+    end
+
+    def self.split_qname(qname)
+      if qname.include?(':')
+        qname.split(':', 2)
+      else
+        [nil, qname]
+      end
+    end
+
+    def self.lookup_namespace(prefix, namespaces)
+      return nil if namespaces.empty?
+      namespaces[prefix.empty? ? 'xmlns' : "xmlns:#{prefix}"]
     end
   end
 end
