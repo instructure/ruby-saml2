@@ -47,8 +47,22 @@ module SAML2
         Schemas.federation.valid?(@root.document)
       end
 
+      def signature
+        unless instance_variable_defined?(:@signature)
+          @signature = @root.at_xpath('dsig:Signature', Namespaces::ALL)
+          signed_node = @signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
+          @root.set_id_attribute('ID')
+          @signature = nil unless signed_node == "##{@root['ID']}"
+        end
+        @signature
+      end
+
       def signed?
-        !!@root.at_xpath('dsig:Signature', Namespaces::ALL)
+        !!signature
+      end
+
+      def valid_signature?(*args)
+        signature.verify_with(*args)
       end
 
       def valid_until
