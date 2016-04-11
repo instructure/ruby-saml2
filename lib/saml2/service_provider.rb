@@ -5,14 +5,6 @@ require 'saml2/sso'
 
 module SAML2
   class ServiceProvider < SSO
-    class << self
-      alias_method :from_xml, :new
-    end
-
-    def initialize(root)
-      @root = root
-    end
-
     def assertion_consumer_services
       @assertion_consumer_services ||= begin
         nodes = @root.xpath('md:AssertionConsumerService', Namespaces::ALL)

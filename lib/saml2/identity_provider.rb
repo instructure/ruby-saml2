@@ -5,14 +5,20 @@ module SAML2
   class IdentityProvider < SSO
     attr_writer :want_authn_requests_signed, :single_sign_on_services, :attribute_profiles, :attributes
 
-    def initialize(node = nil)
-      super(node)
-      unless node
-        @want_authn_requests_signed = nil
-        @single_sign_on_services = []
-        @attribute_profiles = []
-        @attributes = []
-      end
+    def initialize
+      super
+      @want_authn_requests_signed = nil
+      @single_sign_on_services = []
+      @attribute_profiles = []
+      @attributes = []
+    end
+
+    def from_xml(node)
+      super
+      remove_instance_variable(:@want_authn_requests_signed)
+      @single_sign_on_services = nil
+      @attribute_profiles = nil
+      @attributes = nil
     end
 
     def want_authn_requests_signed?

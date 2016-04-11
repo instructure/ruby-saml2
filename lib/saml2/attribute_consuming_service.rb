@@ -12,8 +12,8 @@ module SAML2
     end
 
     def from_xml(node)
-      @is_required = node['isRequired'] && node['isRequired'] == 'true'
       super
+      @is_required = node['isRequired'] && node['isRequired'] == 'true'
     end
 
     def required?
@@ -47,13 +47,13 @@ module SAML2
     attr_reader :name, :requested_attributes
 
     def initialize(name = nil, requested_attributes = [])
+      super()
       @name, @requested_attributes = name, requested_attributes
     end
 
     def from_xml(node)
       @name = node['ServiceName']
       @requested_attributes = load_object_array(node, "md:RequestedAttribute", RequestedAttribute)
-      super
     end
 
     def create_statement(attributes)

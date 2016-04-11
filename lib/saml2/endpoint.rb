@@ -11,7 +11,7 @@ module SAML2
 
     attr_reader :location, :binding
 
-    def initialize(location, binding = Bindings::HTTP_POST)
+    def initialize(location = nil, binding = Bindings::HTTP_POST)
       @location, @binding = location, binding
     end
 
@@ -22,7 +22,6 @@ module SAML2
     def from_xml(node)
       @location = node['Location']
       @binding = node['Binding']
-      self
     end
 
     def build(builder, element)

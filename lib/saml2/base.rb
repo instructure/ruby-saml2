@@ -4,11 +4,12 @@ module SAML2
   class Base
     def self.from_xml(node)
       return nil unless node
-      new.from_xml(node)
+      result = new
+      result.from_xml(node)
+      result
     end
 
-    def from_xml(node)
-      self
+    def from_xml(_node)
     end
 
     def to_s
@@ -17,7 +18,7 @@ module SAML2
     end
 
     def to_xml
-      unless @document
+      unless instance_variable_defined?(:@document)
         builder = Nokogiri::XML::Builder.new
         build(builder)
         @document = builder.doc

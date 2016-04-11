@@ -5,11 +5,15 @@ module SAML2
   module OrganizationAndContacts
     attr_writer :organization, :contacts
 
-    def initialize(node = nil)
-      unless node
-        @organization = nil
-        @contacts = []
-      end
+    def initialize
+      @organization = nil
+      @contacts = []
+    end
+
+    def from_xml(node)
+      remove_instance_variable(:@organization)
+      @contacts = nil
+      super
     end
 
     def organization

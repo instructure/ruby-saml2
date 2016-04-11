@@ -4,6 +4,11 @@ module SAML2
   module IndexedObject
     attr_reader :index
 
+    def initialize(*args)
+      @is_default = nil
+      super
+    end
+
     def eql?(rhs)
       index == rhs.index &&
           default? == rhs.default? &&
@@ -11,7 +16,7 @@ module SAML2
     end
 
     def default?
-      @is_default
+      !!@is_default
     end
 
     def from_xml(node)

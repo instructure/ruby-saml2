@@ -14,14 +14,18 @@ module SAML2
 
     attr_writer :supported_protocols, :keys
 
-    def initialize(node = nil)
+    def initialize
+      super
+      @supported_protocols = Set.new
+      @supported_protocols << Protocols::SAML2
+      @keys = []
+    end
+
+    def from_xml(node)
       super
       @root = node
-      unless @root
-        @supported_protocols = Set.new
-        @supported_protocols << Protocols::SAML2
-        @keys = []
-      end
+      @supported_protocols = nil
+      @keys = nil
     end
 
     def supported_protocols

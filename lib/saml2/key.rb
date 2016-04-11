@@ -29,6 +29,14 @@ module SAML2
       use.nil? || use == Type::SIGNING
     end
 
+    def certificate
+      @certificate ||= OpenSSL::X509::Certificate.new(Base64.decode64(x509))
+    end
+
+    def fingerprint
+      @fingerprint ||= Digest::SHA1.hexdigest(certificate.to_der).gsub(/(\h{2})(?=\h)/, '\1:')
+    end
+
     def build(builder)
       builder['md'].KeyDescriptor do |builder|
         builder.parent['use'] = use if use

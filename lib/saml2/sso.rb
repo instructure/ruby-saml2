@@ -4,12 +4,16 @@ module SAML2
   class SSO < Role
     attr_reader :single_logout_services, :name_id_formats
 
-    def initialize(node = nil)
+    def initialize
       super
-      unless node
-        @single_logout_services = []
-        @name_id_formats = []
-      end
+      @single_logout_services = []
+      @name_id_formats = []
+    end
+
+    def from_xml(node)
+      super
+      @single_logout_services = nil
+      @name_id_formats = nil
     end
 
     def single_logout_services

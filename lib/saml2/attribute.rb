@@ -24,7 +24,7 @@ module SAML2
 
       def from_xml(node)
         # pass through for subclasses
-        super unless self == Attribute
+        return super unless self == Attribute
 
         # look for an appropriate subclass
         klass = class_for(node)
@@ -76,7 +76,6 @@ module SAML2
                when 1; values.first
                else; values
                end
-      super
     end
 
     private
@@ -128,8 +127,6 @@ module SAML2
       @attributes = node.xpath('saml:Attribute', Namespaces::ALL).map do |attr|
         Attribute.from_xml(attr)
       end
-
-      super
     end
 
     def build(builder)

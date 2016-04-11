@@ -13,7 +13,7 @@ module SAML2
       end
 
       it "should find the signing certificate" do
-        sp.signing_keys.first.x509.must_match /MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/
+        sp.signing_keys.first.x509.must_match(/MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/)
       end
 
       it "should load the organization" do
