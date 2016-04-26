@@ -44,7 +44,7 @@ module SAML2
       end
 
       def valid_schema?
-        Schemas.metadata.valid?(@root.document)
+        Schemas.federation.valid?(@root.document)
       end
 
       def signed?
@@ -74,7 +74,7 @@ module SAML2
     end
 
     def valid_schema?
-      Schemas.metadata.valid?(@root.document)
+      Schemas.federation.valid?(@root.document)
     end
 
     def entity_id

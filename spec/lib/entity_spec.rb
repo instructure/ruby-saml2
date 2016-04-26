@@ -30,6 +30,10 @@ module SAML2
         entity.organization.display_name('es').must_equal nil
         entity.organization.display_name(:all).must_equal en: 'Canvas'
       end
+
+      it "validates metadata from ADFS containing lots of non-SAML schemas" do
+        Entity.parse(fixture('FederationMetadata.xml')).valid_schema?.must_equal true
+      end
     end
 
     describe Entity::Group do
