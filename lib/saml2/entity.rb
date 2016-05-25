@@ -51,7 +51,8 @@ module SAML2
         unless instance_variable_defined?(:@signature)
           @signature = @root.at_xpath('dsig:Signature', Namespaces::ALL)
           signed_node = @signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
-          @root.set_id_attribute('ID')
+          # validating the schema will automatically add ID attributes, so check that first
+          @root.set_id_attribute('ID') unless @root.document.get_id(@root['ID'])
           @signature = nil unless signed_node == "##{@root['ID']}"
         end
         @signature
