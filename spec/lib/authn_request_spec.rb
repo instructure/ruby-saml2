@@ -15,6 +15,11 @@ module SAML2
         authnrequest = AuthnRequest.decode('abc')
         authnrequest.valid_schema?.must_equal false
       end
+
+      it "doesn't allow deflate bombs" do
+        bomb = Base64.encode64(Zlib::Deflate.deflate("\0" * 2 * 1024 * 1024))
+        -> { AuthnRequest.decode(bomb) }.must_raise MessageTooLarge
+      end
     end
 
     it "should be valid" do

@@ -9,16 +9,28 @@ require 'saml2/schemas'
 require 'saml2/subject'
 
 module SAML2
+  class MessageTooLarge < RuntimeError
+  end
+
   class AuthnRequest
     def self.decode(authnrequest)
       begin
-        zstream  = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-        authnrequest = zstream.inflate(Base64.decode64(authnrequest))
-        zstream.finish
+        raise MessageTooLarge if authnrequest.bytesize > SAML2.config[:max_message_size]
+        authnrequest = Base64.decode64(authnrequest)
+        zstream = Zlib::Inflate.new
+        xml = ''
+        # do it in 1K slices, so we can protect against bombs
+        (0..authnrequest.bytesize / 1024).each do |i|
+          xml.concat(zstream.inflate(authnrequest.byteslice(i * 1024, 1024)))
+          raise MessageTooLarge if xml.bytesize > SAML2.config[:max_message_size]
+        end
+        xml.concat(zstream.finish)
+        raise MessageTooLarge if xml.bytesize > SAML2.config[:max_message_size]
+
         zstream.close
-      rescue Zlib::BufError
+      rescue Zlib::DataError, Zlib::BufError
       end
-      parse(authnrequest)
+      parse(xml)
     end
 
     def self.parse(authnrequest)
