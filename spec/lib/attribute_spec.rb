@@ -4,9 +4,9 @@ module SAML2
   describe Attribute do
     def serialize(attribute)
       doc = Nokogiri::XML::Builder.new do |builder|
-        builder['saml'].Root('xmlns:saml' => Namespaces::SAML) do |builder|
-          attribute.build(builder)
-          builder.parent.child['xmlns:saml'] = Namespaces::SAML
+        builder['saml'].Root('xmlns:saml' => Namespaces::SAML) do |root|
+          attribute.build(root)
+          root.parent.child['xmlns:saml'] = Namespaces::SAML
         end
       end.doc
       doc.root.child.to_s

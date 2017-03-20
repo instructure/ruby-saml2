@@ -77,17 +77,17 @@ module SAML2
         Version: '2.0',
         IssueInstant: issue_instant.iso8601,
         Destination: destination
-      ) do |builder|
-        builder.parent['InResponseTo'] = in_response_to if in_response_to
+      ) do |response|
+        response.parent['InResponseTo'] = in_response_to if in_response_to
 
-        issuer.build(builder, element: 'Issuer', include_namespace: true) if issuer
+        issuer.build(response, element: 'Issuer', include_namespace: true) if issuer
 
-        builder['samlp'].Status do |builder|
-          builder['samlp'].StatusCode(Value: status_code)
+        response['samlp'].Status do |status|
+          status['samlp'].StatusCode(Value: status_code)
           end
 
         assertions.each do |assertion|
-          builder.parent << assertion.to_xml
+          response.parent << assertion.to_xml
         end
       end
     end

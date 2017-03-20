@@ -16,9 +16,9 @@ module SAML2
     attr_accessor :authn_instant, :authn_context_class_ref
 
     def build(builder)
-      builder['saml'].AuthnStatement('AuthnInstant' => authn_instant.iso8601) do |builder|
-        builder['saml'].AuthnContext do |builder|
-          builder['saml'].AuthnContextClassRef(authn_context_class_ref) if authn_context_class_ref
+      builder['saml'].AuthnStatement('AuthnInstant' => authn_instant.iso8601) do |authn_statement|
+        authn_statement['saml'].AuthnContext do |authn_context|
+          authn_context['saml'].AuthnContextClassRef(authn_context_class_ref) if authn_context_class_ref
         end
       end
     end

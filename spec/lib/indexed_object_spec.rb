@@ -16,7 +16,7 @@ module SAML2
       acses.map(&:location).must_equal ['a', 'b']
       acses[1].location.must_equal 'a'
       acses[3].location.must_equal 'b'
-      acses[0].must_equal nil
+      assert_nil(acses[0])
     end
 
     describe "#default" do

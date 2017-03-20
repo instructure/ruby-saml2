@@ -120,9 +120,9 @@ module SAML2
       builder['md'].EntityDescriptor('entityID' => entity_id,
                                      'xmlns:md' => Namespaces::METADATA,
                                      'xmlns:dsig' => Namespaces::DSIG,
-                                     'xmlns:xenc' => Namespaces::XENC) do |builder|
+                                     'xmlns:xenc' => Namespaces::XENC) do |entity_descriptor|
         roles.each do |role|
-          role.build(builder)
+          role.build(entity_descriptor)
         end
 
         super

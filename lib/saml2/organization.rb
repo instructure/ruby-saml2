@@ -37,10 +37,10 @@ module SAML2
     end
 
     def build(builder)
-      builder['md'].Organization do |builder|
-        self.class.build(builder, @name, 'OrganizationName')
-        self.class.build(builder, @display_name, 'OrganizationDisplayName')
-        self.class.build(builder, @url, 'OrganizationURL')
+      builder['md'].Organization do |organization|
+        self.class.build(organization, @name, 'OrganizationName')
+        self.class.build(organization, @display_name, 'OrganizationDisplayName')
+        self.class.build(organization, @url, 'OrganizationURL')
       end
     end
 

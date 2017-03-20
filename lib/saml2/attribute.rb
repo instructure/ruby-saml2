@@ -52,13 +52,13 @@ module SAML2
     end
 
     def build(builder)
-      builder['saml'].Attribute('Name' => name) do |builder|
-        builder.parent['FriendlyName'] = friendly_name if friendly_name
-        builder.parent['NameFormat'] = name_format if name_format
+      builder['saml'].Attribute('Name' => name) do |attribute|
+        attribute.parent['FriendlyName'] = friendly_name if friendly_name
+        attribute.parent['NameFormat'] = name_format if name_format
         Array.wrap(value).each do |value|
           xsi_type, val = convert_to_xsi(value)
-          builder['saml'].AttributeValue(val) do |builder|
-            builder.parent['xsi:type'] = xsi_type if xsi_type
+          attribute['saml'].AttributeValue(val) do |attribute_value|
+            attribute_value.parent['xsi:type'] = xsi_type if xsi_type
           end
         end
       end
@@ -68,8 +68,8 @@ module SAML2
       @name = node['Name']
       @friendly_name = node['FriendlyName']
       @name_format = node['NameFormat']
-      values = node.xpath('saml:AttributeValue', Namespaces::ALL).map do |node|
-        convert_from_xsi(node.attribute_with_ns('type', Namespaces::XSI), node.content && node.content.strip)
+      values = node.xpath('saml:AttributeValue', Namespaces::ALL).map do |value|
+        convert_from_xsi(value.attribute_with_ns('type', Namespaces::XSI), value.content && value.content.strip)
       end
       @value = case values.length
                when 0; nil
@@ -131,8 +131,8 @@ module SAML2
 
     def build(builder)
       builder['saml'].AttributeStatement('xmlns:xs' => Namespaces::XS,
-                                         'xmlns:xsi' => Namespaces::XSI) do |builder|
-        @attributes.each { |attr| attr.build(builder) }
+                                         'xmlns:xsi' => Namespaces::XSI) do |statement|
+        @attributes.each { |attr| attr.build(statement) }
       end
     end
   end

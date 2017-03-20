@@ -27,17 +27,17 @@ module SAML2
     end
 
     def self.load_string_array(node, element)
-      node.xpath(element, Namespaces::ALL).map do |node|
-        node.content && node.content.strip
+      node.xpath(element, Namespaces::ALL).map do |element_node|
+        element_node.content && element_node.content.strip
       end
     end
 
     def self.load_object_array(node, element, klass)
-      node.xpath(element, Namespaces::ALL).map do |node|
+      node.xpath(element, Namespaces::ALL).map do |element_node|
         if klass.is_a?(Hash)
-          klass[node.name].from_xml(node)
+          klass[element_node.name].from_xml(element_node)
         else
-          klass.from_xml(node)
+          klass.from_xml(element_node)
         end
       end
     end

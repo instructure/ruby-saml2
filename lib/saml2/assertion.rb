@@ -31,13 +31,13 @@ module SAML2
             ID: id,
             Version: '2.0',
             IssueInstant: issue_instant.iso8601
-        ) do |builder|
-          issuer.build(builder, element: 'Issuer')
+        ) do |assertion|
+          issuer.build(assertion, element: 'Issuer')
 
-          subject.build(builder)
+          subject.build(assertion)
 
-          conditions.build(builder)
-          statements.each { |stmt| stmt.build(builder) }
+          conditions.build(assertion)
+          statements.each { |stmt| stmt.build(assertion) }
         end
       end.doc.root
     end

@@ -14,9 +14,9 @@ module SAML2
     end
 
     def build(builder)
-      builder['saml'].Subject do |builder|
-        name_id.build(builder) if name_id
-        confirmation.build(builder) if confirmation
+      builder['saml'].Subject do |subject|
+        name_id.build(subject) if name_id
+        confirmation.build(subject) if confirmation
       end
     end
 
@@ -30,16 +30,16 @@ module SAML2
       attr_accessor :method, :not_before, :not_on_or_after, :recipient, :in_response_to
 
       def build(builder)
-        builder['saml'].SubjectConfirmation('Method' => method) do |builder|
+        builder['saml'].SubjectConfirmation('Method' => method) do |subject_confirmation|
           if in_response_to ||
               recipient ||
               not_before ||
               not_on_or_after
-            builder['saml'].SubjectConfirmationData do |builder|
-              builder.parent['NotBefore'] = not_before.iso8601 if not_before
-              builder.parent['NotOnOrAfter'] = not_on_or_after.iso8601 if not_on_or_after
-              builder.parent['Recipient'] = recipient if recipient
-              builder.parent['InResponseTo'] = in_response_to if in_response_to
+            subject_confirmation['saml'].SubjectConfirmationData do |subject_confirmation_data|
+              subject_confirmation_data.parent['NotBefore'] = not_before.iso8601 if not_before
+              subject_confirmation_data.parent['NotOnOrAfter'] = not_on_or_after.iso8601 if not_on_or_after
+              subject_confirmation_data.parent['Recipient'] = recipient if recipient
+              subject_confirmation_data.parent['InResponseTo'] = in_response_to if in_response_to
             end
           end
         end

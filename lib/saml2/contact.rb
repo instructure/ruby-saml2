@@ -34,15 +34,15 @@ module SAML2
     end
 
     def build(builder)
-      builder['md'].ContactPerson('contactType' => type) do |builder|
-        builder['md'].Company(company) if company
-        builder['md'].GivenName(given_name) if given_name
-        builder['md'].SurName(surname) if surname
+      builder['md'].ContactPerson('contactType' => type) do |contact_person|
+        contact_person['md'].Company(company) if company
+        contact_person['md'].GivenName(given_name) if given_name
+        contact_person['md'].SurName(surname) if surname
         email_addresses.each do |email|
-          builder['md'].EmailAddress(email)
+          contact_person['md'].EmailAddress(email)
         end
         telephone_numbers.each do |tel|
-          builder['md'].TelephoneNumber(tel)
+          contact_person['md'].TelephoneNumber(tel)
         end
       end
     end

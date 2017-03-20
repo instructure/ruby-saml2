@@ -38,15 +38,15 @@ module SAML2
     end
 
     def build(builder)
-      builder['md'].KeyDescriptor do |builder|
-        builder.parent['use'] = use if use
-        builder['dsig'].KeyInfo do |builder|
-          builder['dsig'].X509Data do |builder|
-            builder['dsig'].X509Certificate(x509)
+      builder['md'].KeyDescriptor do |key_descriptor|
+        key_descriptor.parent['use'] = use if use
+        key_descriptor['dsig'].KeyInfo do |key_info|
+          key_info['dsig'].X509Data do |x509_data|
+            x509_data['dsig'].X509Certificate(x509)
           end
         end
         encryption_methods.each do |method|
-          builder['xenc'].EncryptionMethod('Algorithm' => method)
+          key_descriptor['xenc'].EncryptionMethod('Algorithm' => method)
         end
       end
     end

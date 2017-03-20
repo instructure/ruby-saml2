@@ -119,7 +119,7 @@ module SAML2
         attr.value = 'value'
         acs.requested_attributes << attr
         stmt = acs.create_statement({})
-        stmt.must_equal nil
+        assert_nil(stmt)
       end
 
     end

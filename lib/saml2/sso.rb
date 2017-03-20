@@ -2,8 +2,6 @@ require 'saml2/role'
 
 module SAML2
   class SSO < Role
-    attr_reader :single_logout_services, :name_id_formats
-
     def initialize
       super
       @single_logout_services = []

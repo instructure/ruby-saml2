@@ -26,12 +26,12 @@ module SAML2
     end
 
     def build(builder)
-      builder['saml'].Conditions do |builder|
-        builder.parent['NotBefore'] = not_before.iso8601 if not_before
-        builder.parent['NotOnOrAfter'] = not_on_or_after.iso8601 if not_on_or_after
+      builder['saml'].Conditions do |conditions|
+        conditions.parent['NotBefore'] = not_before.iso8601 if not_before
+        conditions.parent['NotOnOrAfter'] = not_on_or_after.iso8601 if not_on_or_after
 
         each do |condition|
-          condition.build(builder)
+          condition.build(conditions)
         end
       end
     end
@@ -55,9 +55,9 @@ module SAML2
       end
 
       def build(builder)
-        builder['saml'].AudienceRestriction do |builder|
+        builder['saml'].AudienceRestriction do |audience_restriction|
           Array.wrap(audience).each do |single_audience|
-            builder['saml'].Audience(single_audience)
+            audience_restriction['saml'].Audience(single_audience)
           end
         end
       end

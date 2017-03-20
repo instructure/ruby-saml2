@@ -9,12 +9,12 @@ module SAML2
 
     it "should return nil when not valid schema" do
       entity = Entity.parse("<xml></xml>")
-      entity.must_equal nil
+      assert_nil(entity)
     end
 
     it "should return nil on non-XML" do
       entity = Entity.parse("garbage")
-      entity.must_equal nil
+      assert_nil(entity)
     end
 
     describe "valid schema" do
@@ -27,7 +27,7 @@ module SAML2
       it "should parse the organization" do
         entity.organization.display_name.must_equal 'Canvas'
         entity.organization.display_name('en').must_equal 'Canvas'
-        entity.organization.display_name('es').must_equal nil
+        assert_nil(entity.organization.display_name('es'))
         entity.organization.display_name(:all).must_equal en: 'Canvas'
       end
 

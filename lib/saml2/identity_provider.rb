@@ -41,21 +41,21 @@ module SAML2
     end
 
     def build(builder)
-      builder['md'].IDPSSODescriptor do |builder|
-        super(builder)
+      builder['md'].IDPSSODescriptor do |idp_sso_descriptor|
+        super(idp_sso_descriptor)
 
-        builder['WantAuthnRequestsSigned'] = want_authn_requests_signed? unless want_authn_requests_signed?.nil?
+        idp_sso_descriptor['WantAuthnRequestsSigned'] = want_authn_requests_signed? unless want_authn_requests_signed?.nil?
 
         single_sign_on_services.each do |sso|
-          sso.build(builder, 'SingleSignOnService')
+          sso.build(idp_sso_descriptor, 'SingleSignOnService')
         end
 
         attribute_profiles.each do |ap|
-          builder['md'].AttributeProfile(ap)
+          idp_sso_descriptor['md'].AttributeProfile(ap)
         end
 
         attributes.each do |attr|
-          attr.build(builder)
+          attr.build(idp_sso_descriptor)
         end
       end
     end
