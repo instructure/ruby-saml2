@@ -17,7 +17,7 @@ module SAML2
       begin
         raise MessageTooLarge if authnrequest.bytesize > SAML2.config[:max_message_size]
         authnrequest = Base64.decode64(authnrequest)
-        zstream = Zlib::Inflate.new
+        zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
         xml = ''
         # do it in 1K slices, so we can protect against bombs
         (0..authnrequest.bytesize / 1024).each do |i|
