@@ -19,6 +19,10 @@ module SAML2
       !!@is_default
     end
 
+    def default_defined?
+      !@is_default.nil?
+    end
+
     def from_xml(node)
       @index = node['index'] && node['index'].to_i
       @is_default = node['isDefault'] && node['isDefault'] == 'true'
@@ -50,10 +54,10 @@ module SAML2
       end
     end
 
-    def build(builder)
+    def build(builder, *)
       super
-      builder.parent.last['index'] = index
-      builder.parent.last['isDefault'] = default? unless default?.nil?
+      builder.parent.children.last['index'] = index
+      builder.parent.children.last['isDefault'] = default? if default_defined?
     end
 
     private

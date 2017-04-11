@@ -31,7 +31,7 @@ module SAML2
     class Indexed < Endpoint
       include IndexedObject
 
-      def initialize(location = nil, index = nil, is_default = false, binding = Bindings::HTTP_POST)
+      def initialize(location = nil, index = nil, is_default = nil, binding = Bindings::HTTP_POST)
         super(location, binding)
         @index, @is_default = index, is_default
       end

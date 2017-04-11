@@ -7,6 +7,24 @@ module SAML2
       SIGNING    = 'signing'.freeze
     end
 
+    class EncryptionMethod
+      module Algorithm
+        AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'.freeze
+      end
+
+      attr_accessor :algorithm, :key_size
+
+      def initialize(algorithm = Algorithm::AES128_CBC, key_size = 128)
+        @algorithm, @key_size = algorithm, key_size
+      end
+
+      def build(builder)
+        builder['md'].EncryptionMethod('Algorithm' => algorithm) do |encryption_method|
+          encryption_method['xenc'].KeySize(key_size) if key_size
+        end
+      end
+    end
+
     attr_accessor :use, :x509, :encryption_methods
 
     def self.from_xml(node)
@@ -46,7 +64,7 @@ module SAML2
           end
         end
         encryption_methods.each do |method|
-          key_descriptor['xenc'].EncryptionMethod('Algorithm' => method)
+          method.build(key_descriptor)
         end
       end
     end

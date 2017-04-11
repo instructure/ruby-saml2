@@ -2,6 +2,27 @@ require_relative '../spec_helper'
 
 module SAML2
   describe ServiceProvider do
+    it "should serialize valid xml" do
+      entity = Entity.new
+      entity.entity_id = 'http://sso.canvaslms.com/SAML2'
+      entity.organization = Organization.new('Canvas', 'Canvas by Instructure', 'https://www.canvaslms.com/')
+      contact = Contact.new(Contact::Type::TECHNICAL)
+      contact.company = 'Instructure'
+      contact.email_addresses << 'mailto:ops@instructure.com'
+      entity.contacts << contact
+
+      sp = ServiceProvider.new
+      sp.single_logout_services << Endpoint.new('https://sso.canvaslms.com/SAML2/Logout',
+                                                 Endpoint::Bindings::HTTP_REDIRECT)
+      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login1', 0)
+      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login2', 1)
+      sp.keys << Key.new('somedata', Key::Type::ENCRYPTION, [Key::EncryptionMethod.new])
+      sp.keys << Key.new('somedata', Key::Type::SIGNING)
+
+      entity.roles << sp
+      expect(Schemas.metadata.validate(Nokogiri::XML(entity.to_s))).to eq []
+    end
+
     describe "valid metadata" do
       let(:entity) { Entity.parse(fixture('service_provider.xml')) }
       let(:sp) { entity.roles.first }
