@@ -30,6 +30,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'nokogiri-xmlsec-me-harder', "~> 0.9", ">= 0.9.3pre"
   s.add_dependency 'activesupport', ">= 3.2", "< 5.1"
 
-  s.add_development_dependency "rake"
-  s.add_development_dependency "minitest"
+  s.add_development_dependency "rake", "~> 12.0"
+  s.add_development_dependency "rspec", "~> 3.5"
 end

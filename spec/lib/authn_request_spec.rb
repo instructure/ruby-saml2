@@ -8,12 +8,12 @@ module SAML2
     describe '.decode' do
       it "should not choke on empty string" do
         authnrequest = AuthnRequest.decode('')
-        authnrequest.valid_schema?.must_equal false
+        expect(authnrequest.valid_schema?).to eq false
       end
 
       it "should not choke on garbage" do
         authnrequest = AuthnRequest.decode('abc')
-        authnrequest.valid_schema?.must_equal false
+        expect(authnrequest.valid_schema?).to eq false
       end
 
       it "doesn't allow deflate bombs" do
@@ -65,40 +65,36 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
 AAAAAAAAAAAAAAAAAAAAAAAAAAAAAL4G
 BOMB
-        -> { AuthnRequest.decode(bomb) }.must_raise MessageTooLarge
+        expect { AuthnRequest.decode(bomb) }.to raise_error MessageTooLarge
       end
     end
 
     it "should be valid" do
-      request.valid_schema?.must_equal true
-      request.resolve(sp).must_equal true
-      request.assertion_consumer_service.location.must_equal "https://siteadmin.test.instructure.com/saml_consume"
+      expect(request.valid_schema?).to eq true
+      expect(request.resolve(sp)).to eq true
+      expect(request.assertion_consumer_service.location).to eq "https://siteadmin.test.instructure.com/saml_consume"
     end
 
     it "should not be valid if the ACS url is not in the SP" do
-      request.stub(:assertion_consumer_service_url, "garbage") do
-        request.resolve(sp).must_equal false
-      end
+      allow(request).to receive(:assertion_consumer_service_url).and_return("garbage")
+      expect(request.resolve(sp)).to eq false
     end
 
     it "should use the default ACS if not specified" do
-      request.stub(:assertion_consumer_service_url, nil) do
-        request.resolve(sp).must_equal true
-        request.assertion_consumer_service.location.must_equal "https://siteadmin.instructure.com/saml_consume"
-      end
+      allow(request).to receive(:assertion_consumer_service_url).and_return(nil)
+      expect(request.resolve(sp)).to eq true
+      expect(request.assertion_consumer_service.location).to eq "https://siteadmin.instructure.com/saml_consume"
     end
 
     it "should find the ACS by index" do
-      request.stub(:assertion_consumer_service_url, nil) do
-        request.stub(:assertion_consumer_service_index, 2) do
-          request.resolve(sp).must_equal true
-          request.assertion_consumer_service.location.must_equal "https://siteadmin.beta.instructure.com/saml_consume"
-        end
-      end
+      allow(request).to receive(:assertion_consumer_service_url).and_return(nil)
+      allow(request).to receive(:assertion_consumer_service_index).and_return(2)
+      expect(request.resolve(sp)).to eq true
+      expect(request.assertion_consumer_service.location).to eq "https://siteadmin.beta.instructure.com/saml_consume"
     end
 
     it "should find the NameID policy" do
-      request.name_id_policy.must_equal NameID::Policy.new(true, NameID::Format::PERSISTENT)
+      expect(request.name_id_policy).to eq NameID::Policy.new(true, NameID::Format::PERSISTENT)
     end
   end
 end

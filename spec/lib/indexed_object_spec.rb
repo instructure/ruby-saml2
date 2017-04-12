@@ -6,17 +6,17 @@ module SAML2
       acses = Endpoint::Indexed::Array.new(
           [Endpoint::Indexed.new('b', 1),
            Endpoint::Indexed.new('a', 0)])
-      acses.map(&:location).must_equal ['a', 'b']
+      expect(acses.map(&:location)).to eq ['a', 'b']
     end
 
     it "should be accessible by index" do
       acses = Endpoint::Indexed::Array.new(
           [Endpoint::Indexed.new('b', 3),
            Endpoint::Indexed.new('a', 1)])
-      acses.map(&:location).must_equal ['a', 'b']
-      acses[1].location.must_equal 'a'
-      acses[3].location.must_equal 'b'
-      assert_nil(acses[0])
+      expect(acses.map(&:location)).to eq ['a', 'b']
+      expect(acses[1].location).to eq 'a'
+      expect(acses[3].location).to eq 'b'
+      expect(acses[0]).to be_nil
     end
 
     describe "#default" do
@@ -24,14 +24,14 @@ module SAML2
         acses = Endpoint::Indexed::Array.new(
             [Endpoint::Indexed.new('a', 0),
              Endpoint::Indexed.new('b', 1)])
-        acses.default.location.must_equal 'a'
+        expect(acses.default.location).to eq 'a'
       end
 
       it "should default to a tagged default" do
         acses = Endpoint::Indexed::Array.new(
             [Endpoint::Indexed.new('a', 0),
              Endpoint::Indexed.new('b', 1, true)])
-        acses.default.location.must_equal 'b'
+        expect(acses.default.location).to eq 'b'
       end
     end
   end

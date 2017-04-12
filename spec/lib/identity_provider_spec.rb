@@ -17,7 +17,7 @@ module SAML2
       idp.keys << Key.new('somedata', Key::Type::SIGNING)
 
       entity.roles << idp
-      Schemas.metadata.validate(Nokogiri::XML(entity.to_s)).must_equal []
+      expect(Schemas.metadata.validate(Nokogiri::XML(entity.to_s))).to eq []
     end
 
     describe "valid metadata" do
@@ -25,12 +25,12 @@ module SAML2
       let(:idp) { entity.roles.first }
 
       it "should create the single_sign_on_services array" do
-        idp.single_sign_on_services.length.must_equal 3
-        idp.single_sign_on_services.first.location.must_equal 'https://sso.school.edu/idp/profile/Shibboleth/SSO'
+        expect(idp.single_sign_on_services.length).to eq 3
+        expect(idp.single_sign_on_services.first.location).to eq 'https://sso.school.edu/idp/profile/Shibboleth/SSO'
       end
 
       it "should find the signing certificate" do
-        idp.keys.first.x509.must_match(/MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/)
+        expect(idp.keys.first.x509).to match(/MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/)
       end
     end
   end

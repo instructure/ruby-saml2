@@ -21,22 +21,22 @@ XML
 
     it "should auto-parse X500 attributes" do
       attr = Attribute.from_xml(Nokogiri::XML(eduPersonPrincipalNameXML).root)
-      attr.must_be_instance_of Attribute::X500
-      attr.value.must_equal "user@domain"
-      attr.name.must_equal Attribute::X500::EduPerson::PRINCIPAL_NAME
-      attr.friendly_name.must_equal 'eduPersonPrincipalName'
-      attr.name_format.must_equal Attribute::NameFormats::URI
+      expect(attr).to be_instance_of Attribute::X500
+      expect(attr.value).to eq "user@domain"
+      expect(attr.name).to eq Attribute::X500::EduPerson::PRINCIPAL_NAME
+      expect(attr.friendly_name).to eq 'eduPersonPrincipalName'
+      expect(attr.name_format).to eq Attribute::NameFormats::URI
     end
 
     it "should serialize an X500 attribute correctly" do
       attr = Attribute.create('eduPersonPrincipalName', 'user@domain')
-      attr.must_be_instance_of Attribute::X500
-      attr.value.must_equal "user@domain"
-      attr.name.must_equal Attribute::X500::EduPerson::PRINCIPAL_NAME
-      attr.friendly_name.must_equal 'eduPersonPrincipalName'
-      attr.name_format.must_equal Attribute::NameFormats::URI
+      expect(attr).to be_instance_of Attribute::X500
+      expect(attr.value).to eq "user@domain"
+      expect(attr.name).to eq Attribute::X500::EduPerson::PRINCIPAL_NAME
+      expect(attr.friendly_name).to eq 'eduPersonPrincipalName'
+      expect(attr.name_format).to eq Attribute::NameFormats::URI
 
-      serialize(attr).must_equal eduPersonPrincipalNameXML
+      expect(serialize(attr)).to eq eduPersonPrincipalNameXML
     end
 
     it "should parse and serialize boolean values" do
@@ -49,10 +49,10 @@ XML
 XML
 
       stmt = AttributeStatement.from_xml(Nokogiri::XML(xml).root)
-      stmt.attributes.first.value.must_equal true
+      expect(stmt.attributes.first.value).to eq true
 
       # serializes canonically
-      serialize(stmt).must_equal(xml.sub('>1<', '>true<'))
+      expect(serialize(stmt)).to eq(xml.sub('>1<', '>true<'))
     end
 
     it "should parse and serialize dateTime values" do
@@ -65,10 +65,10 @@ XML
 XML
 
       stmt = AttributeStatement.from_xml(Nokogiri::XML(xml).root)
-      stmt.attributes.first.value.must_equal Time.at(1435603023)
+      expect(stmt.attributes.first.value).to eq Time.at(1435603023)
 
       # serializes canonically
-      serialize(stmt).must_equal(xml)
+      expect(serialize(stmt)).to eq xml
     end
 
     it "should parse values with different namespace prefixes" do
@@ -79,7 +79,7 @@ XML
 XML
 
       attr = Attribute.from_xml(Nokogiri::XML(xml).root)
-      attr.value.must_equal false
+      expect(attr.value).to eq false
     end
 
     it "should parse untagged values" do
@@ -90,7 +90,7 @@ XML
 XML
 
       attr = Attribute.from_xml(Nokogiri::XML(xml).root)
-      attr.value.must_equal "something"
+      expect(attr.value).to eq "something"
     end
 
   end

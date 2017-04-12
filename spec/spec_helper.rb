@@ -1,4 +1,3 @@
-require 'minitest/autorun'
 require 'saml2'
 
 def fixture(name)
