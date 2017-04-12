@@ -1,3 +1,6 @@
+require 'securerandom'
+require 'time'
+
 require 'saml2/base'
 
 module SAML2

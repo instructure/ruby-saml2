@@ -1,5 +1,7 @@
 require 'saml2/authn_request'
 require 'saml2/entity'
+require 'saml2/logout_request'
+require 'saml2/logout_response'
 require 'saml2/response'
 require 'saml2/version'
 

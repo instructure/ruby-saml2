@@ -36,23 +36,29 @@ module SAML2
       end
     end
 
-    attr_reader :id, :format
+    attr_accessor :id, :format, :name_qualifier, :sp_name_qualifier
 
     def self.from_xml(node)
       node && new(node.content.strip, node['Format'])
     end
 
-    def initialize(id = nil, format = nil)
-      @id, @format = id, format
+    def initialize(id = nil, format = nil, name_qualifier: nil, sp_name_qualifier: nil)
+      @id, @format, @name_qualifier, @sp_name_qualifier =
+          id, format, name_qualifier, sp_name_qualifier
     end
 
     def ==(rhs)
-      id == rhs.id && format == rhs.format
+      id == rhs.id &&
+          format == rhs.format &&
+          name_qualifier == rhs.name_qualifier &&
+          sp_name_qualifier == rhs.sp_name_qualifier
     end
 
     def build(builder, element: nil)
       args = {}
       args['Format'] = format if format
+      args['NameQualifier'] = name_qualifier if name_qualifier
+      args['SPNameQualifier'] = sp_name_qualifier if sp_name_qualifier
       builder['saml'].__send__(element || 'NameID', id, args)
     end
   end

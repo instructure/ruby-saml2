@@ -1,20 +1,14 @@
 require 'nokogiri-xmlsec'
-require 'securerandom'
 require 'time'
 
 require 'saml2/assertion'
 require 'saml2/authn_statement'
-require 'saml2/message'
+require 'saml2/status_response'
 require 'saml2/subject'
 
 module SAML2
-  class Response < Message
-    module Status
-      SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success".freeze
-    end
-
+  class Response < StatusResponse
     attr_reader :assertions
-    attr_accessor :in_response_to, :status_code
 
     def self.respond_to(authn_request, issuer, name_id, attributes = nil)
       response = initiate(nil, issuer, name_id)
@@ -60,7 +54,6 @@ module SAML2
 
     def initialize
       super
-      @status_code = Status::SUCCESS
       @assertions = []
     end
 
@@ -69,18 +62,13 @@ module SAML2
     end
 
     private
+
     def build(builder)
       builder['samlp'].Response(
         'xmlns:samlp' => Namespaces::SAMLP,
         'xmlns:saml' => Namespaces::SAML
       ) do |response|
         super(response)
-
-        response.parent['InResponseTo'] = in_response_to if in_response_to
-
-        response['samlp'].Status do |status|
-          status['samlp'].StatusCode(Value: status_code)
-          end
 
         assertions.each do |assertion|
           response.parent << assertion.to_xml
