@@ -50,11 +50,10 @@ module SAML2
       id == rhs.id && format == rhs.format
     end
 
-    def build(builder, options = {})
+    def build(builder, element: nil)
       args = {}
       args['Format'] = format if format
-      args['xmlns:saml'] = Namespaces::SAML if options[:include_namespace]
-      builder['saml'].__send__(options.delete(:element) || 'NameID', id, args)
+      builder['saml'].__send__(element || 'NameID', id, args)
     end
   end
 end

@@ -1,12 +1,10 @@
+require 'saml2/bindings/http_redirect'
+
 module SAML2
   class Endpoint < Base
     module Bindings
       HTTP_POST     = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST".freeze
-      HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect".freeze
-    end
-
-    module Encodings
-      DEFLATE= "urn:oasis:names:tc:SAML:2.0:bindings:URL-Encoding:DEFLATE".freeze
+      HTTP_REDIRECT = ::SAML2::Bindings::HTTPRedirect::URN
     end
 
     attr_reader :location, :binding

@@ -4,17 +4,17 @@ require 'time'
 
 require 'saml2/assertion'
 require 'saml2/authn_statement'
-require 'saml2/base'
+require 'saml2/message'
 require 'saml2/subject'
 
 module SAML2
-  class Response < Base
+  class Response < Message
     module Status
       SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success".freeze
     end
 
-    attr_reader :id, :issue_instant, :assertions
-    attr_accessor :issuer, :in_response_to, :destination, :status_code
+    attr_reader :assertions
+    attr_accessor :in_response_to, :status_code
 
     def self.respond_to(authn_request, issuer, name_id, attributes = nil)
       response = initiate(nil, issuer, name_id)
@@ -59,9 +59,8 @@ module SAML2
     end
 
     def initialize
-      @id = "_#{SecureRandom.uuid}"
+      super
       @status_code = Status::SUCCESS
-      @issue_instant = Time.now.utc
       @assertions = []
     end
 
@@ -73,14 +72,11 @@ module SAML2
     def build(builder)
       builder['samlp'].Response(
         'xmlns:samlp' => Namespaces::SAMLP,
-        ID: id,
-        Version: '2.0',
-        IssueInstant: issue_instant.iso8601,
-        Destination: destination
+        'xmlns:saml' => Namespaces::SAML
       ) do |response|
-        response.parent['InResponseTo'] = in_response_to if in_response_to
+        super(response)
 
-        issuer.build(response, element: 'Issuer', include_namespace: true) if issuer
+        response.parent['InResponseTo'] = in_response_to if in_response_to
 
         response['samlp'].Status do |status|
           status['samlp'].StatusCode(Value: status_code)

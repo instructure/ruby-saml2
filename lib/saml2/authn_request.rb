@@ -2,49 +2,29 @@ require 'base64'
 require 'zlib'
 
 require 'saml2/attribute_consuming_service'
+require 'saml2/bindings/http_redirect'
 require 'saml2/endpoint'
 require 'saml2/name_id'
 require 'saml2/namespaces'
+require 'saml2/request'
 require 'saml2/schemas'
 require 'saml2/subject'
 
 module SAML2
-  class MessageTooLarge < RuntimeError
-  end
-
-  class AuthnRequest
+  class AuthnRequest < Request
+    # deprecated; takes _just_ the SAMLRequest parameter's value
     def self.decode(authnrequest)
-      begin
-        raise MessageTooLarge if authnrequest.bytesize > SAML2.config[:max_message_size]
-        authnrequest = Base64.decode64(authnrequest)
-        zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-        xml = ''
-        # do it in 1K slices, so we can protect against bombs
-        (0..authnrequest.bytesize / 1024).each do |i|
-          xml.concat(zstream.inflate(authnrequest.byteslice(i * 1024, 1024)))
-          raise MessageTooLarge if xml.bytesize > SAML2.config[:max_message_size]
-        end
-        xml.concat(zstream.finish)
-        raise MessageTooLarge if xml.bytesize > SAML2.config[:max_message_size]
-
-        zstream.close
-      rescue Zlib::DataError, Zlib::BufError
-      end
-      parse(xml)
-    end
-
-    def self.parse(authnrequest)
-      new(Nokogiri::XML(authnrequest))
-    end
-
-    def initialize(document)
-      @document = document
+      result, _relay_state = Bindings::HTTPRedirect.decode("http://host/?SAMLRequest=#{authnrequest}")
+      return nil unless result.is_a?(AuthnRequest)
+      result
+    rescue CorruptMessage
+      AuthnRequest.from_xml(Nokogiri::XML('<xml></xml>').root)
     end
 
     def valid_schema?
-      return false unless Schemas.protocol.valid?(@document)
+      return false unless super
       # Check for the correct root element
-      return false unless @document.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
+      return false unless @root.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
 
       true
     end
@@ -83,46 +63,38 @@ module SAML2
       true
     end
 
-    def issuer
-      @issuer ||= NameID.from_xml(@document.root.at_xpath('saml:Issuer', Namespaces::ALL))
-    end
-
     def name_id_policy
-      @name_id_policy ||= NameID::Policy.from_xml(@document.root.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
-    end
-
-    def id
-      @document.root['ID']
+      @name_id_policy ||= NameID::Policy.from_xml(@root.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
     end
 
     attr_reader :assertion_consumer_service, :attribute_consuming_service
 
     def assertion_consumer_service_url
-      @document.root['AssertionConsumerServiceURL']
+      @root['AssertionConsumerServiceURL']
     end
 
     def assertion_consumer_service_index
-      @document.root['AssertionConsumerServiceIndex'] && @document.root['AssertionConsumerServiceIndex'].to_i
+      @root['AssertionConsumerServiceIndex'] && @root['AssertionConsumerServiceIndex'].to_i
     end
 
     def attribute_consuming_service_index
-      @document.root['AttributeConsumerServiceIndex'] && @document.root['AttributeConsumerServiceIndex'].to_i
+      @root['AttributeConsumerServiceIndex'] && @root['AttributeConsumerServiceIndex'].to_i
     end
 
     def force_authn?
-      @document.root['ForceAuthn']
+      @root['ForceAuthn']
     end
 
     def passive?
-      @document.root['IsPassive']
+      @root['IsPassive']
     end
 
     def protocol_binding
-      @document.root['ProtocolBinding']
+      @root['ProtocolBinding']
     end
 
     def subject
-      @subject ||= Subject.from_xml(@document.at_xpath('saml:Subject', Namespaces::ALL))
+      @subject ||= Subject.from_xml(@root.at_xpath('saml:Subject', Namespaces::ALL))
     end
   end
 end

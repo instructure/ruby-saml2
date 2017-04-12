@@ -11,10 +11,9 @@ module SAML2
     end
 
     let(:response) do
-      response = Response.respond_to(request,
-                                     NameID.new('issuer'),
-                                     NameID.new('jacob', NameID::Format::PERSISTENT))
-      response
+      Response.respond_to(request,
+                          NameID.new('issuer'),
+                          NameID.new('jacob', NameID::Format::PERSISTENT))
     end
 
     it "should generate valid XML" do
