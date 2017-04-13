@@ -25,6 +25,15 @@ module SAML2
   class UnsupportedEncoding < InvalidMessage
   end
 
+  class UnsupportedSignatureAlgorithm < InvalidMessage
+  end
+
+  class InvalidSignature < InvalidMessage
+  end
+
+  class UnsignedMessage < InvalidMessage
+  end
+
   # In the SAML Schema, Request and Response don't technically share a common
   # ancestor, but they have several things in common so it's useful to represent
   # that here
