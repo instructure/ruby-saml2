@@ -9,7 +9,10 @@ module SAML2
       result
     end
 
-    def from_xml(_node)
+    attr_reader :xml
+
+    def from_xml(node)
+      @xml = node
     end
 
     def to_s
@@ -28,7 +31,7 @@ module SAML2
 
     def self.load_string_array(node, element)
       node.xpath(element, Namespaces::ALL).map do |element_node|
-        element_node.content && element_node.content.strip
+        element_node.content&.strip
       end
     end
 

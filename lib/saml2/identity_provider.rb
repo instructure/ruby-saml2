@@ -23,21 +23,21 @@ module SAML2
 
     def want_authn_requests_signed?
       unless instance_variable_defined?(:@want_authn_requests_signed)
-        @want_authn_requests_signed = @root['WantAuthnRequestsSigned'] && @root['WantAuthnRequestsSigned'] == 'true'
+        @want_authn_requests_signed = xml['WantAuthnRequestsSigned'] && xml['WantAuthnRequestsSigned'] == 'true'
       end
       @want_authn_requests_signed
     end
 
     def single_sign_on_services
-      @single_sign_on_services ||= load_object_array(@root, 'md:SingleSignOnService', Endpoint)
+      @single_sign_on_services ||= load_object_array(xml, 'md:SingleSignOnService', Endpoint)
     end
 
     def attribute_profiles
-      @attribute_profiles ||= load_string_array(@root, 'md:AttributeProfile')
+      @attribute_profiles ||= load_string_array(xml, 'md:AttributeProfile')
     end
 
     def attributes
-      @attributes ||= load_object_array(@root, 'saml:Attribute', Attribute)
+      @attributes ||= load_object_array(xml, 'saml:Attribute', Attribute)
     end
 
     def build(builder)

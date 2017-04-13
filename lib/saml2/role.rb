@@ -23,17 +23,16 @@ module SAML2
 
     def from_xml(node)
       super
-      @root = node
       @supported_protocols = nil
       @keys = nil
     end
 
     def supported_protocols
-      @supported_protocols ||= @root['protocolSupportEnumeration'].split
+      @supported_protocols ||= xml['protocolSupportEnumeration'].split
     end
 
     def keys
-      @keys ||= load_object_array(@root, 'md:KeyDescriptor', Key)
+      @keys ||= load_object_array(xml, 'md:KeyDescriptor', Key)
     end
 
     def signing_keys

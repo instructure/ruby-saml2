@@ -52,6 +52,7 @@ module SAML2
     end
 
     def from_xml(node)
+      super
       @name = node['ServiceName']
       @requested_attributes = load_object_array(node, "md:RequestedAttribute", RequestedAttribute)
     end

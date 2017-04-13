@@ -39,7 +39,10 @@ module SAML2
     attr_accessor :id, :format, :name_qualifier, :sp_name_qualifier
 
     def self.from_xml(node)
-      node && new(node.content.strip, node['Format'])
+      node && new(node.content.strip,
+                  node['Format'],
+                  name_qualifier: node['NameQualifier'],
+                  sp_name_qualifier: node['SPNameQualifier'])
     end
 
     def initialize(id = nil, format = nil, name_qualifier: nil, sp_name_qualifier: nil)

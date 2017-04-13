@@ -1,16 +1,23 @@
 require 'saml2/message'
+require 'saml2/status'
 
 module SAML2
   class StatusResponse < Message
-    module Status
-      SUCCESS = "urn:oasis:names:tc:SAML:2.0:status:Success".freeze
-    end
-
-    attr_accessor :in_response_to, :status_code
+    attr_accessor :in_response_to, :status
 
     def initialize
       super
-      @status_code = Status::SUCCESS
+      @status = Status.new
+    end
+
+    def from_xml(node)
+      super
+      @status = nil
+      remove_instance_variable(:@status)
+    end
+
+    def status
+      @status ||= Status.from_xml(xml.at_xpath('samlp:Status', Namespaces::ALL))
     end
 
     protected
@@ -20,9 +27,7 @@ module SAML2
 
       status_response.parent['InResponseTo'] = in_response_to if in_response_to
 
-      status_response['samlp'].Status do |status|
-        status['samlp'].StatusCode(Value: status_code)
-      end
+      status.build(status_response)
     end
   end
 end

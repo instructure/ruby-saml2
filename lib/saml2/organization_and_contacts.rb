@@ -18,13 +18,13 @@ module SAML2
 
     def organization
       unless instance_variable_defined?(:@organization)
-        @organization = Organization.from_xml(@root.at_xpath('md:Organization', Namespaces::ALL))
+        @organization = Organization.from_xml(xml.at_xpath('md:Organization', Namespaces::ALL))
       end
       @organization
     end
 
     def contacts
-      @contacts ||= load_object_array(@root, 'md:ContactPerson', Contact)
+      @contacts ||= load_object_array(xml, 'md:ContactPerson', Contact)
     end
 
     protected

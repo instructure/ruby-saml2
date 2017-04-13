@@ -1,7 +1,7 @@
 require 'saml2/base'
 
 module SAML2
-  class Contact
+  class Contact < Base
     module Type
       ADMINISTRATIVE = 'administrative'.freeze
       BILLING        = 'billing'.freeze
@@ -12,25 +12,23 @@ module SAML2
 
     attr_accessor :type, :company, :given_name, :surname, :email_addresses, :telephone_numbers
 
-    def self.from_xml(node)
-      return nil unless node
-
-      result = new(node['contactType'])
-      company = node.at_xpath('md:Company', Namespaces::ALL)
-      result.company = company && company.content && company.content.strip
-      given_name = node.at_xpath('md:GivenName', Namespaces::ALL)
-      result.given_name = given_name && given_name.content && given_name.content.strip
-      surname = node.at_xpath('md:SurName', Namespaces::ALL)
-      result.surname = surname && surname.content && surname.content.strip
-      result.email_addresses = Base.load_string_array(node, 'md:EmailAddress')
-      result.telephone_numbers = Base.load_string_array(node, 'md:TelephoneNumber')
-      result
-    end
-
     def initialize(type = Type::OTHER)
       @type = type
       @email_addresses = []
       @telephone_numbers = []
+    end
+
+    def from_xml(node)
+      self.type = node['contactType']
+      company = node.at_xpath('md:Company', Namespaces::ALL)
+      self.company = company && company.content && company.content.strip
+      given_name = node.at_xpath('md:GivenName', Namespaces::ALL)
+      self.given_name = given_name && given_name.content && given_name.content.strip
+      surname = node.at_xpath('md:SurName', Namespaces::ALL)
+      self.surname = surname && surname.content && surname.content.strip
+      self.email_addresses = load_string_array(node, 'md:EmailAddress')
+      self.telephone_numbers = load_string_array(node, 'md:TelephoneNumber')
+      self
     end
 
     def build(builder)

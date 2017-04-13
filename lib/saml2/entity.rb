@@ -26,34 +26,40 @@ module SAML2
       end
     end
 
-    class Group < Array
-      def self.from_xml(node)
-        node && new.from_xml(node)
+    class Group < Base
+      include Enumerable
+      [:each, :[]].each do |method|
+        class_eval <<-RUBY, __FILE__, __LINE__ + 1
+          def #{method}(*args, &block)
+            @entities.#{method}(*args, &block)
+          end
+        RUBY
       end
 
       def initialize
+        @entities = []
         @valid_until = nil
       end
 
       def from_xml(node)
-        @root = node
+        super
         remove_instance_variable(:@valid_until)
-        replace(Base.load_object_array(@root, "md:EntityDescriptor|md:EntitiesDescriptor",
+        @entities = Base.load_object_array(xml, "md:EntityDescriptor|md:EntitiesDescriptor",
                 'EntityDescriptor' => Entity,
-                'EntitiesDescriptor' => Group))
+                'EntitiesDescriptor' => Group)
       end
 
       def valid_schema?
-        Schemas.federation.valid?(@root.document)
+        Schemas.federation.valid?(xml.document)
       end
 
       def signature
         unless instance_variable_defined?(:@signature)
-          @signature = @root.at_xpath('dsig:Signature', Namespaces::ALL)
+          @signature = xml.at_xpath('dsig:Signature', Namespaces::ALL)
           signed_node = @signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
           # validating the schema will automatically add ID attributes, so check that first
-          @root.set_id_attribute('ID') unless @root.document.get_id(@root['ID'])
-          @signature = nil unless signed_node == "##{@root['ID']}"
+          xml.set_id_attribute('ID') unless xml.document.get_id(xml['ID'])
+          @signature = nil unless signed_node == "##{xml['ID']}"
         end
         @signature
       end
@@ -68,7 +74,7 @@ module SAML2
 
       def valid_until
         unless instance_variable_defined?(:@valid_until)
-          @valid_until = @root['validUntil'] && Time.parse(@root['validUntil'])
+          @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
         end
         @valid_until
       end
@@ -82,23 +88,22 @@ module SAML2
     end
 
     def from_xml(node)
-      @root = node
+      super
       remove_instance_variable(:@valid_until)
       @roles = nil
-      super
     end
 
     def valid_schema?
-      Schemas.federation.valid?(@root.document)
+      Schemas.federation.valid?(xml.document)
     end
 
     def entity_id
-      @entity_id || @root && @root['entityID']
+      @entity_id || xml && xml['entityID']
     end
 
     def valid_until
       unless instance_variable_defined?(:@valid_until)
-        @valid_until = @root['validUntil'] && Time.parse(@root['validUntil'])
+        @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
       end
       @valid_until
     end
@@ -112,8 +117,8 @@ module SAML2
     end
 
     def roles
-      @roles ||= load_object_array(@root, 'md:IDPSSODescriptor', IdentityProvider) +
-          load_object_array(@root, 'md:SPSSODescriptor', ServiceProvider)
+      @roles ||= load_object_array(xml, 'md:IDPSSODescriptor', IdentityProvider) +
+          load_object_array(xml, 'md:SPSSODescriptor', ServiceProvider)
     end
 
     def build(builder)

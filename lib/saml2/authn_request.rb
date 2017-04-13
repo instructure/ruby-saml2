@@ -24,7 +24,7 @@ module SAML2
     def valid_schema?
       return false unless super
       # Check for the correct root element
-      return false unless @root.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
+      return false unless xml.at_xpath('/samlp:AuthnRequest', Namespaces::ALL)
 
       true
     end
@@ -64,37 +64,37 @@ module SAML2
     end
 
     def name_id_policy
-      @name_id_policy ||= NameID::Policy.from_xml(@root.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
+      @name_id_policy ||= NameID::Policy.from_xml(xml.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
     end
 
     attr_reader :assertion_consumer_service, :attribute_consuming_service
 
     def assertion_consumer_service_url
-      @root['AssertionConsumerServiceURL']
+      xml['AssertionConsumerServiceURL']
     end
 
     def assertion_consumer_service_index
-      @root['AssertionConsumerServiceIndex'] && @root['AssertionConsumerServiceIndex'].to_i
+      xml['AssertionConsumerServiceIndex'] && xml['AssertionConsumerServiceIndex'].to_i
     end
 
     def attribute_consuming_service_index
-      @root['AttributeConsumerServiceIndex'] && @root['AttributeConsumerServiceIndex'].to_i
+      xml['AttributeConsumerServiceIndex'] && xml['AttributeConsumerServiceIndex'].to_i
     end
 
     def force_authn?
-      @root['ForceAuthn']
+      xml['ForceAuthn']
     end
 
     def passive?
-      @root['IsPassive']
+      xml['IsPassive']
     end
 
     def protocol_binding
-      @root['ProtocolBinding']
+      xml['ProtocolBinding']
     end
 
     def subject
-      @subject ||= Subject.from_xml(@root.at_xpath('saml:Subject', Namespaces::ALL))
+      @subject ||= Subject.from_xml(xml.at_xpath('saml:Subject', Namespaces::ALL))
     end
   end
 end

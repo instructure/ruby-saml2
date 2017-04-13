@@ -65,6 +65,7 @@ module SAML2
     end
 
     def from_xml(node)
+      super
       @name = node['Name']
       @friendly_name = node['FriendlyName']
       @name_format = node['NameFormat']
@@ -124,6 +125,7 @@ module SAML2
     end
 
     def from_xml(node)
+      super
       @attributes = node.xpath('saml:Attribute', Namespaces::ALL).map do |attr|
         Attribute.from_xml(attr)
       end

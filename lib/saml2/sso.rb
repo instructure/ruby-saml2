@@ -15,11 +15,11 @@ module SAML2
     end
 
     def single_logout_services
-      @single_logout_services ||= load_object_array(@root, 'md:SingleLogoutService', Endpoint)
+      @single_logout_services ||= load_object_array(xml, 'md:SingleLogoutService', Endpoint)
     end
 
     def name_id_formats
-      @name_id_formats ||= load_string_array(@root, 'md:NameIDFormat')
+      @name_id_formats ||= load_string_array(xml, 'md:NameIDFormat')
     end
 
     protected

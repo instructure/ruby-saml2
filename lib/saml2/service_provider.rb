@@ -19,14 +19,14 @@ module SAML2
 
     def assertion_consumer_services
       @assertion_consumer_services ||= begin
-        nodes = @root.xpath('md:AssertionConsumerService', Namespaces::ALL)
+        nodes = xml.xpath('md:AssertionConsumerService', Namespaces::ALL)
         Endpoint::Indexed::Array.from_xml(nodes)
       end
     end
 
     def attribute_consuming_services
       @attribute_consuming_services ||= begin
-        nodes = @root.xpath('md:AttributeConsumingService', Namespaces::ALL)
+        nodes = xml.xpath('md:AttributeConsumingService', Namespaces::ALL)
         AttributeConsumingService::Array.from_xml(nodes)
       end
     end

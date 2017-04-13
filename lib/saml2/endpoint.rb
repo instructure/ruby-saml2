@@ -18,6 +18,7 @@ module SAML2
     end
 
     def from_xml(node)
+      super
       @location = node['Location']
       @binding = node['Binding']
     end

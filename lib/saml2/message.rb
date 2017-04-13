@@ -75,24 +75,23 @@ module SAML2
     end
 
     def from_xml(node)
-      @root = node
+      super
       @id = nil
       @issue_instant = nil
-      self
     end
 
     def valid_schema?
-      return false unless Schemas.protocol.valid?(@root.document)
+      return false unless Schemas.protocol.valid?(xml.document)
 
       true
     end
 
     def issuer
-      @issuer ||= NameID.from_xml(@root.at_xpath('saml:Issuer', Namespaces::ALL))
+      @issuer ||= NameID.from_xml(xml.at_xpath('saml:Issuer', Namespaces::ALL))
     end
 
     def id
-      @id ||= @root['ID']
+      @id ||= xml['ID']
     end
 
     protected
