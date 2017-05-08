@@ -42,7 +42,24 @@ module SAML2
     end
 
     it "should find the NameID policy" do
-      expect(request.name_id_policy).to eq NameID::Policy.new(true, NameID::Format::PERSISTENT)
+      expect(request.name_id_policy).to eq NameID::Policy.new(true, NameID::Format::PERSISTENT, "moodle.bridge.feide.no")
+    end
+
+    it 'serializes valid XML' do
+      authn_request = AuthnRequest.new
+      authn_request.issuer = NameID.new("entity")
+      authn_request.protocol_binding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+      authn_request.assertion_consumer_service_url = 'https://somewhere/'
+      authn_request.name_id_policy = NameID::Policy.new(true, NameID::Format::UNSPECIFIED)
+      authn_request.requested_authn_context = RequestedAuthnContext.new
+      authn_request.requested_authn_context.class_ref = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
+      authn_request.requested_authn_context.comparison = :exact
+      authn_request.passive = true
+      xml = authn_request.to_s
+      authn_request = AuthnRequest.parse(xml)
+      expect(authn_request).to be_valid_schema
+      expect(authn_request.force_authn?).to eq nil
+      expect(authn_request.passive?).to eq true
     end
   end
 end

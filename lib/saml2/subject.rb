@@ -2,15 +2,15 @@ require 'saml2/name_id'
 require 'saml2/namespaces'
 
 module SAML2
-  class Subject
-    attr_accessor :name_id, :confirmation
+  class Subject < Base
+    attr_writer :name_id
+    attr_accessor :confirmation
 
-    def self.from_xml(node)
-      return nil unless node
-      subject = new
-      subject.name_id = NameID.from_xml(node.at_xpath('saml:NameID', Namespaces::ALL))
-
-      subject
+    def name_id
+      if xml && !instance_variable_defined?(:@name_id)
+        @name_id = NameID.from_xml(node.at_xpath('saml:NameID', Namespaces::ALL))
+      end
+      @name_id
     end
 
     def build(builder)
@@ -20,7 +20,7 @@ module SAML2
       end
     end
 
-    class Confirmation
+    class Confirmation < Base
       module Methods
         BEARER         = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'.freeze
         HOLDER_OF_KEY  = 'urn:oasis:names:tc:SAML:2.0:cm:holder-of-key'.freeze

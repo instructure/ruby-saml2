@@ -13,26 +13,48 @@ module SAML2
       X509_SUBJECT_NAME             = "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName".freeze
     end
 
-    class Policy
-      attr_reader :format
+    class Policy < Base
+      attr_writer :allow_create, :format, :sp_name_qualifier
 
-      def self.from_xml(node)
-        if node
-          allow_create = node['AllowCreate'].nil? ? nil : node['AllowCreate'] == 'true'
-          NameID::Policy.new(allow_create, node['Format'])
-        end
-      end
-
-      def initialize(allow_create, format)
-        @allow_create, @format = allow_create, format
+      def initialize(allow_create = nil, format = nil, sp_name_qualifier = nil)
+        @allow_create = allow_create if allow_create
+        @format = format if format
+        @sp_name_qualifier = sp_name_qualifier if sp_name_qualifier
       end
 
       def allow_create?
+        if xml && !instance_variable_defined?(:@allow_create)
+          @allow_create = xml['AllowCreate']&.== 'true'
+        end
         @allow_create
       end
 
+      def format
+        if xml && !instance_variable_defined?(:@format)
+          @format = xml['Format']
+        end
+        @format
+      end
+
+      def sp_name_qualifier
+        if xml && !instance_variable_defined?(:@sp_name_qualifier)
+          @sp_name_qualifier = xml['SPNameQualifier']
+        end
+        @sp_name_qualifier
+      end
+
       def ==(rhs)
-        format == rhs.format && allow_create? == rhs.allow_create?
+        allow_create? == rhs.allow_create? &&
+            format == rhs.format &&
+            sp_name_qualifier == rhs.sp_name_qualifier
+      end
+
+      def build(builder)
+        builder['samlp'].NameIDPolicy do |name_id_policy|
+          name_id_policy.parent['Format'] = format if format
+          name_id_policy.parent['SPNameQualifier'] = sp_name_qualifier if sp_name_qualifier
+          name_id_policy.parent['AllowCreate'] = allow_create? unless allow_create?.nil?
+        end
       end
     end
 
