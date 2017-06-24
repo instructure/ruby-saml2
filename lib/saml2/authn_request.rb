@@ -15,7 +15,7 @@ module SAML2
   class AuthnRequest < Request
     # deprecated; takes _just_ the SAMLRequest parameter's value
     def self.decode(authnrequest)
-      result, _relay_state = Bindings::HTTPRedirect.decode("http://host/?SAMLRequest=#{authnrequest}")
+      result, _relay_state = Bindings::HTTPRedirect.decode("http://host/?SAMLRequest=#{CGI.escape(authnrequest)}")
       return nil unless result.is_a?(AuthnRequest)
       result
     rescue CorruptMessage

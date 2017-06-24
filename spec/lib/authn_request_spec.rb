@@ -15,6 +15,12 @@ module SAML2
         authnrequest = AuthnRequest.decode('abc')
         expect(authnrequest.valid_schema?).to eq false
       end
+
+      it "properly handles authnrequests that have pluses in them" do
+        samlrequest = "hZJbU8IwEIX/Smbfe6H1mqE4COPIDGoHqg++hXShmWkTzKao/95QQNEHfN09J2f32/RvPpqabdCSMjqDXhgDQy1NqfQqg+fiLriCm0GfRFMnaz5sXaVn+NYiOeaNmviuk0FrNTeCFHEtGiTuJJ8PH6Y8CWO+tsYZaWpgQyK0zkeNjKa2QTtHu1ESn2fTDCrn1sSjSJqmabVyn6EUeiOobij0tWgbFREZYGOfr7Rw3cwHm+/8MWwHSKKpWSkN7M5Yid0CGSxFTQhsMs5ApCotqzKRWEmxqha91VVVxvIMy1TGl8qLKBdEaoM/NqIWJ5qc0C6DJO5dBvFFkJwVvXOepDy9DtPr+BVYvl/7VukdzlOMFjsR8fuiyIP8aV4AezmcxQtgfwTepdtj+qcfFgfkMPgHcD86Tvg++qN/cjLOTa3kJxvWtXkfWRTO83C2xQ5sI9zpIbYVVQbLTsrX273IoXYQDfapvz/X4As="
+        authnrequest = AuthnRequest.decode(samlrequest)
+        expect(authnrequest.valid_schema?).to eq true
+      end
     end
 
     it "should be valid" do
