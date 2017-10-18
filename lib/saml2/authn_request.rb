@@ -13,15 +13,6 @@ require 'saml2/subject'
 
 module SAML2
   class AuthnRequest < Request
-    # deprecated; takes _just_ the SAMLRequest parameter's value
-    def self.decode(authnrequest)
-      result, _relay_state = Bindings::HTTPRedirect.decode("http://host/?SAMLRequest=#{CGI.escape(authnrequest)}")
-      return nil unless result.is_a?(AuthnRequest)
-      result
-    rescue CorruptMessage
-      AuthnRequest.from_xml(Nokogiri::XML('<xml></xml>').root)
-    end
-
     attr_writer :assertion_consumer_service_index,
                 :assertion_consumer_service_url,
                 :attribute_consuming_service_index,
