@@ -33,16 +33,12 @@ module SAML2
       attr_reader :default
 
       def self.from_xml(nodes)
-        new(nodes.map { |node| name.split('::')[1..-2].inject(SAML2) { |mod, klass| mod.const_get(klass) }.from_xml(node) })
+        new(nodes.map { |node| name.split('::')[1..-2].inject(SAML2) { |mod, klass| mod.const_get(klass) }.from_xml(node) }).freeze
       end
 
-      def initialize(objects)
-        replace(objects.sort_by { |object| object.index || 0 })
-        @index = {}
-        each { |object| @index[object.index] = object }
-        @default = find { |object| object.default? } || first
-
-        freeze
+      def initialize(objects = nil)
+        replace(objects.sort_by { |object| object.index || 0 }) if objects
+        re_index
       end
 
       def [](index)
@@ -51,6 +47,19 @@ module SAML2
 
       def resolve(index)
         index ? self[index] : default
+      end
+
+      def <<(value)
+        super
+        re_index
+      end
+
+      protected
+
+      def re_index
+        @index = {}
+        each { |object| @index[object.index] = object }
+        @default = find { |object| object.default? } || first
       end
     end
 

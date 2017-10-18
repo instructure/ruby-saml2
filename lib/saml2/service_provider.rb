@@ -7,8 +7,8 @@ module SAML2
   class ServiceProvider < SSO
     def initialize
       super
-      @assertion_consumer_services = []
-      @attribute_consuming_services = []
+      @assertion_consumer_services = Endpoint::Indexed::Array.new
+      @attribute_consuming_services = AttributeConsumingService::Array.new
     end
 
     def from_xml(node)
