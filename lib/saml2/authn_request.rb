@@ -31,6 +31,21 @@ module SAML2
                 :protocol_binding
     attr_accessor :requested_authn_context
 
+    def self.initiate(issuer, identity_provider = nil,
+        assertion_consumer_service: nil,
+        service_provider: nil)
+      authn_request = new
+      authn_request.issuer = issuer
+      authn_request.destination = identity_provider.single_sign_on_services.first.location if identity_provider
+      authn_request.name_id_policy = NameID::Policy.new(true, NameID::Format::UNSPECIFIED)
+      assertion_consumer_service ||= service_provider.assertion_consumer_services.default if service_provider
+      if assertion_consumer_service
+        authn_request.protocol_binding = assertion_consumer_service.binding
+        authn_request.assertion_consumer_service_url = assertion_consumer_service.location
+      end
+      authn_request
+    end
+
     def valid_web_browser_sso_profile?
       return false unless issuer
       return false if issuer.format && issuer.format != NameID::Format::ENTITY

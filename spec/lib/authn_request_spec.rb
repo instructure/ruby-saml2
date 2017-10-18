@@ -52,11 +52,8 @@ module SAML2
     end
 
     it 'serializes valid XML' do
-      authn_request = AuthnRequest.new
-      authn_request.issuer = NameID.new("entity")
-      authn_request.protocol_binding = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-      authn_request.assertion_consumer_service_url = 'https://somewhere/'
-      authn_request.name_id_policy = NameID::Policy.new(true, NameID::Format::UNSPECIFIED)
+      authn_request = AuthnRequest.initiate(NameID.new("entity"),
+        assertion_consumer_service: Endpoint.new('https://somewhere/'))
       authn_request.requested_authn_context = RequestedAuthnContext.new
       authn_request.requested_authn_context.class_ref = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
       authn_request.requested_authn_context.comparison = :exact
