@@ -1,15 +1,16 @@
 require 'saml2/bindings/http_redirect'
+require 'saml2/bindings/http_post'
 
 module SAML2
   class Endpoint < Base
     module Bindings
-      HTTP_POST     = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST".freeze
+      HTTP_POST     = ::SAML2::Bindings::HTTP_POST::URN
       HTTP_REDIRECT = ::SAML2::Bindings::HTTPRedirect::URN
     end
 
     attr_reader :location, :binding
 
-    def initialize(location = nil, binding = Bindings::HTTP_POST)
+    def initialize(location = nil, binding = ::SAML2::Bindings::HTTP_POST::URN)
       @location, @binding = location, binding
     end
 
@@ -30,7 +31,7 @@ module SAML2
     class Indexed < Endpoint
       include IndexedObject
 
-      def initialize(location = nil, index = nil, is_default = nil, binding = Bindings::HTTP_POST)
+      def initialize(location = nil, index = nil, is_default = nil, binding = ::SAML2::Bindings::HTTP_POST::URN)
         super(location, binding)
         @index, @is_default = index, is_default
       end

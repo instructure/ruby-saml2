@@ -13,7 +13,7 @@ module SAML2
 
       sp = ServiceProvider.new
       sp.single_logout_services << Endpoint.new('https://sso.canvaslms.com/SAML2/Logout',
-                                                 Endpoint::Bindings::HTTP_REDIRECT)
+                                                 Bindings::HTTPRedirect::URN)
       sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login1', 0)
       sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login2', 1)
       sp.keys << Key.new('somedata', Key::Type::ENCRYPTION, [Key::EncryptionMethod.new])
