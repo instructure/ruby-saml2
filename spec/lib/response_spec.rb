@@ -63,5 +63,17 @@ module SAML2
       expect(response2.assertions.length).to eq 1
       expect(response2.assertions.first.subject.name_id.id).to eq 'jacob'
     end
+
+    it "doesn't validate a response with XSLT transforms" do
+      response = Response.parse(fixture("xslt-transform-response.xml"))
+      expect(response).to be_valid_schema
+      expect(response.assertions.first.valid_signature?(fingerprint: 'bc71f7bacb36011694405dd0e2beafcc069de45f')).to eq false
+    end
+
+    it "doesn't validate a response with external URI reference in the signature" do
+      response = Response.parse(fixture("external-uri-reference-response.xml"))
+      expect(response).to be_valid_schema
+      expect(response.assertions.first.valid_signature?(fingerprint: 'bc71f7bacb36011694405dd0e2beafcc069de45f')).to eq false
+    end
   end
 end

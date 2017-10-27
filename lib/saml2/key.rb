@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'openssl'
+
 require 'saml2/base'
 require 'saml2/namespaces'
 
