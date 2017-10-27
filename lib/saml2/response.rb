@@ -77,6 +77,133 @@ module SAML2
       remove_instance_variable(:@assertions)
     end
 
+    # Validates a response is well-formed, signed, and optionally decrypts it
+    #
+    # @param service_provider [Entity]
+    #   The metadata object for the {ServiceProvider} receiving this
+    #   {Response}. The first {ServiceProvider} in the {Entity} is used.
+    # @param identity_provider [Entity]
+    #   The metadata object for the {IdentityProvider} the {Response} is
+    #   being received from. The first {IdentityProvider} in the {Entity} is
+    #   used.
+    # @param verification_time optional [DateTime]
+    #   Validate timestamps (signing certificate validity, issued at, etc.) as of
+    #   this point in time.
+    def validate(service_provider:,
+                 identity_provider:,
+                 verification_time: Time.now.utc)
+      raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
+      raise ArgumentError, "service_provider should have at least one service_provider role" unless (sp = service_provider.service_providers.first)
+
+      # validate the schema
+      super()
+      return errors unless errors.empty?
+
+      # not finding the issuer is not exceptional
+      if identity_provider.nil?
+        errors << "could not find issuer of response"
+        return errors
+      end
+
+      # getting the wrong data type is exceptional, and we should raise an error
+      raise ArgumentError, "identity_provider should be an Entity object" unless identity_provider.is_a?(Entity)
+      raise ArgumentError, "identity_provider should have at least one identity_provider role" unless (idp = identity_provider.identity_providers.first)
+
+      certificates = idp.signing_keys.map(&:certificate)
+      if idp.fingerprints.empty? && certificates.empty?
+        errors << "could not find certificate to validate message"
+        return errors
+      end
+
+      if signed?
+        unless (signature_errors = validate_signature(fingerprint: idp.fingerprints, cert: certificates)).empty?
+          return errors.concat(signature_errors)
+        end
+        response_signed = true
+      end
+
+      find_decryption_key = ->(embedded_certificates) do
+        key = nil
+        embedded_certificates.each do |cert_info|
+          cert = case cert_info
+                   when OpenSSL::X509::Certificate; cert_info
+                   when Hash; sp.encryption_keys.map(&:certificate).find { |c| c.serial == cert_info[:serial] }
+                 end
+          next unless cert
+          key = sp.private_keys.find { |k| cert.check_private_key(k) }
+          break if key
+        end
+        if !key
+          # couldn't figure out which key to use; just try them all
+          next sp.private_keys
+        end
+        key
+      end
+
+      unless sp.private_keys.empty?
+        begin
+          decypted_anything = decrypt(&find_decryption_key)
+        rescue XMLSec::DecryptionError
+          errors << "unable to decrypt response"
+          return errors
+        end
+
+        if decypted_anything
+          # have to re-validate the schema, since we just replaced content
+          super()
+          return errors unless errors.empty?
+        end
+      end
+
+      unless status.success?
+        errors << "response is not successful: #{status}"
+        return errors
+      end
+
+      assertion = assertions.first
+      unless assertion
+        errors << "no assertion found"
+        return errors
+      end
+
+      if assertion.signed?
+        unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
+                                                                cert: certificates)).empty?
+          return errors.concat(signature_errors)
+        end
+        assertion_signed = true
+      end
+
+      # TODO: use assertion conditions
+      if assertion.issue_instant +  5 * 60 < verification_time ||
+          assertion.issue_instant - 5 * 60 > verification_time
+        errors << "assertion not recently issued"
+        return errors
+      end
+
+      if !response_signed && !assertion_signed
+        errors << "neither response nor assertion were signed"
+        return errors
+      end
+
+      unless sp.private_keys.empty?
+        begin
+          decypted_anything = assertion.decrypt(&find_decryption_key)
+        rescue XMLSec::DecryptionError
+          errors << "unable to decrypt assertion"
+          return errors
+        end
+
+        if decypted_anything
+          super()
+          return errors unless errors.empty?
+        end
+      end
+
+      # no error
+      errors
+    end
+
     # @return [Array<Assertion>]
     def assertions
       unless instance_variable_defined?(:@assertions)
@@ -88,16 +215,14 @@ module SAML2
     # (see Signable#sign)
     # Signs each assertion.
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
-      assertions.each { |assertion| assertion.sign(x509_certificate, private_key, algorithm_name) }
       # make sure we no longer pretty print this object
       @pretty = false
-      nil
-    end
 
-    protected
+      # if there are no assertions (encrypted?), just sign the response itself
+      return super if assertions.empty?
 
-    def encrypted_nodes
-      xml.xpath('saml:EncryptedAssertion/xenc:EncryptedData', Namespaces::ALL)
+      assertions.each { |assertion| assertion.sign(x509_certificate, private_key, algorithm_name) }
+      self
     end
 
     private

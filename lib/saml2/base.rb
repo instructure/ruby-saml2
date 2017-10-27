@@ -132,7 +132,6 @@ module SAML2
           end
         end
       end
-
       !encrypted_nodes.empty?
     end
 

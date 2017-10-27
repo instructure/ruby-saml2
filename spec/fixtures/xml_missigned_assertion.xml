@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" ID="_e5d6a82d-17b4-4bbb-9875-d76ba51fd4d6" Version="2.0" IssueInstant="2015-02-27T19:12:52Z" Destination=""><saml:Issuer xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion">issuer</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_57bea33f-2b75-4594-afd8-3ff6eddfafe4" Version="2.0" IssueInstant="2015-02-27T19:12:52Z"><saml:Issuer>issuer</saml:Issuer><saml:Subject><saml:NameID>subject</saml:NameID></saml:Subject><saml:AuthnStatement AuthnInstant="2015-02-27T19:12:52Z"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="eduPersonPrincipalName"><saml:AttributeValue>cody</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<Reference URI="#_57bea33f-2b75-4594-afd8-3ff6eddfafe4">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<DigestValue>oZBUEUDLHCTj6dYfHZGU2ilujLs=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>QATC6nOEfT2cxOkARTwqGMqzL8t0HjcXZCR7MSSriORm0QjX8xYl6eHVKmM0Ia9p
+kRVTXNrw9eYnAY6txOXLZJap11/DorP4lA6nad1qcai/fqHmScwd/mJsVS+1hTWV
+kRyIZV59rcwAAdOAEJ8iE+lfKjSg0cVHVKDxehIlIg0=</SignatureValue>
+<KeyInfo>
+<X509Data>
+<X509Certificate>MIIDYDCCAsmgAwIBAgIJAK4l0RpJVxtEMA0GCSqGSIb3DQEBBQUAMH4xCzAJBgNV
+BAYTAlVTMQswCQYDVQQIEwJVVDEMMAoGA1UEBxMDU0xDMRQwEgYDVQQKEwtJbnN0
+cnVjdHVyZTEMMAoGA1UECxMDT3BzMQwwCgYDVQQDEwNPcHMxIjAgBgkqhkiG9w0B
+CQEWE29wc0BpbnN0cnVjdHVyZS5jb20wHhcNMTExMTA1MTU0OTA4WhcNMTMxMTA0
+MTU0OTA4WjB+MQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxDDAKBgNVBAcTA1NM
+QzEUMBIGA1UEChMLSW5zdHJ1Y3R1cmUxDDAKBgNVBAsTA09wczEMMAoGA1UEAxMD
+T3BzMSIwIAYJKoZIhvcNAQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tMIGfMA0GCSqG
+SIb3DQEBAQUAA4GNADCBiQKBgQDNVWUJ89UARD2GBLow5+W1EW5LFgI2o4N0fAgJ
+EFV6KPbEokdWrzHlLmfaxdDyIK+QilQqdtg3hU96zIFp8Dk9xnxJNYo1iIzZllrA
++q95Dwf5sDTioD3IHF2GL0CO1BhA6FX1d3ZuAaIwCI7G4Dw1PjBaUzHr99S9iwBJ
+tHvD6QIDAQABo4HlMIHiMB0GA1UdDgQWBBTCgEaIGTcvWLIi26vv+hycCcYxBjCB
+sgYDVR0jBIGqMIGngBTCgEaIGTcvWLIi26vv+hycCcYxBqGBg6SBgDB+MQswCQYD
+VQQGEwJVUzELMAkGA1UECBMCVVQxDDAKBgNVBAcTA1NMQzEUMBIGA1UEChMLSW5z
+dHJ1Y3R1cmUxDDAKBgNVBAsTA09wczEMMAoGA1UEAxMDT3BzMSIwIAYJKoZIhvcN
+AQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tggkAriXRGklXG0QwDAYDVR0TBAUwAwEB
+/zANBgkqhkiG9w0BAQUFAAOBgQBWmVrGPhzKeyz7vkMdSSJZPnZa/KP9sOMzJikm
+7S26qjMnPiqRavnEy1EkN21AEkyZ3HzqtHgaelvusuA95sdBBG/8EAhtN9y6i6j7
+hTMo2gYwdIW/oW74ZjnuzGoHZUba3yPxV6aFoBB+rh2n22PCbfM1lgSwVPhsXz4G
+3CcHYg==</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature></saml:Assertion>
+
+  <saml:Assertion xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_57bea33f-2b75-4594-afd8-3ff6eddfafe5" Version="2.0" IssueInstant="2015-02-27T19:12:52Z"><saml:Issuer>issuer</saml:Issuer><saml:Subject><saml:NameID>subject</saml:NameID></saml:Subject><saml:AuthnStatement AuthnInstant="2015-02-27T19:12:52Z"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement><saml:AttributeStatement><saml:Attribute Name="eduPersonPrincipalName"><saml:AttributeValue>admin</saml:AttributeValue></saml:Attribute></saml:AttributeStatement><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+    <SignedInfo>
+      <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+      <SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+      <Reference URI="#_57bea33f-2b75-4594-afd8-3ff6eddfafe5">
+        <Transforms>
+          <Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+          <Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+        </Transforms>
+        <DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+        <DigestValue>oZBUEUDLHCTj6dYfHZGU2ilujLs=</DigestValue>
+      </Reference>
+    </SignedInfo>
+    <SignatureValue>QATC6nOEfT2cxOkARTwqGMqzL8t0HjcXZCR7MSSriORm0QjX8xYl6eHVKmM0Ia9p
+      kRVTXNrw9eYnAY6txOXLZJap11/DorP4lA6nad1qcai/fqHmScwd/mJsVS+1hTWV
+      kRyIZV59rcwAAdOAEJ8iE+lfKjSg0cVHVKDxehIlIg0=</SignatureValue>
+    <KeyInfo>
+      <X509Data>
+        <X509Certificate>MIIDYDCCAsmgAwIBAgIJAK4l0RpJVxtEMA0GCSqGSIb3DQEBBQUAMH4xCzAJBgNV
+          BAYTAlVTMQswCQYDVQQIEwJVVDEMMAoGA1UEBxMDU0xDMRQwEgYDVQQKEwtJbnN0
+          cnVjdHVyZTEMMAoGA1UECxMDT3BzMQwwCgYDVQQDEwNPcHMxIjAgBgkqhkiG9w0B
+          CQEWE29wc0BpbnN0cnVjdHVyZS5jb20wHhcNMTExMTA1MTU0OTA4WhcNMTMxMTA0
+          MTU0OTA4WjB+MQswCQYDVQQGEwJVUzELMAkGA1UECBMCVVQxDDAKBgNVBAcTA1NM
+          QzEUMBIGA1UEChMLSW5zdHJ1Y3R1cmUxDDAKBgNVBAsTA09wczEMMAoGA1UEAxMD
+          T3BzMSIwIAYJKoZIhvcNAQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tMIGfMA0GCSqG
+          SIb3DQEBAQUAA4GNADCBiQKBgQDNVWUJ89UARD2GBLow5+W1EW5LFgI2o4N0fAgJ
+          EFV6KPbEokdWrzHlLmfaxdDyIK+QilQqdtg3hU96zIFp8Dk9xnxJNYo1iIzZllrA
+          +q95Dwf5sDTioD3IHF2GL0CO1BhA6FX1d3ZuAaIwCI7G4Dw1PjBaUzHr99S9iwBJ
+          tHvD6QIDAQABo4HlMIHiMB0GA1UdDgQWBBTCgEaIGTcvWLIi26vv+hycCcYxBjCB
+          sgYDVR0jBIGqMIGngBTCgEaIGTcvWLIi26vv+hycCcYxBqGBg6SBgDB+MQswCQYD
+          VQQGEwJVUzELMAkGA1UECBMCVVQxDDAKBgNVBAcTA1NMQzEUMBIGA1UEChMLSW5z
+          dHJ1Y3R1cmUxDDAKBgNVBAsTA09wczEMMAoGA1UEAxMDT3BzMSIwIAYJKoZIhvcN
+          AQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tggkAriXRGklXG0QwDAYDVR0TBAUwAwEB
+          /zANBgkqhkiG9w0BAQUFAAOBgQBWmVrGPhzKeyz7vkMdSSJZPnZa/KP9sOMzJikm
+          7S26qjMnPiqRavnEy1EkN21AEkyZ3HzqtHgaelvusuA95sdBBG/8EAhtN9y6i6j7
+          hTMo2gYwdIW/oW74ZjnuzGoHZUba3yPxV6aFoBB+rh2n22PCbfM1lgSwVPhsXz4G
+          3CcHYg==</X509Certificate>
+      </X509Data>
+    </KeyInfo>
+  </Signature></saml:Assertion>
+
+</samlp:Response>

@@ -19,11 +19,22 @@ module SAML2
 
     attr_writer :supported_protocols, :keys
 
+    # Non-serialized field representing private keys for performing
+    # decryption/signing operations
+    # @return [Array<OpenSSL::PKey>]
+    attr_accessor :private_keys
+
+    # Non-serialized field representing fingerprints of certificates that
+    # you don't actually have the full certificate for.
+    attr_accessor :fingerprints
+
     def initialize
       super
       @supported_protocols = Set.new
       @supported_protocols << Protocols::SAML2
       @keys = []
+      @private_keys = []
+      @fingerprints = []
     end
 
     # (see Base#from_xml)

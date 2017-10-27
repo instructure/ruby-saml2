@@ -44,6 +44,7 @@ module SAML2
   class Message < Base
     include Signable
 
+    attr_reader :errors
     attr_writer :issuer, :destination
 
     class << self
@@ -93,6 +94,7 @@ module SAML2
 
     def initialize
       super
+      @errors = []
       @id = "_#{SecureRandom.uuid}"
       @issue_instant = Time.now.utc
     end
@@ -102,6 +104,11 @@ module SAML2
       super
       @id = nil
       @issue_instant = nil
+    end
+
+    def validate
+      @errors = Schemas.protocol.validate(xml.document)
+      errors
     end
 
     # If the XML is valid according to SAML XSDs.
@@ -117,7 +124,7 @@ module SAML2
     #   Ignored. The message's {issue_instant} is always used.
     def validate_signature(fingerprint: nil, cert: nil, verification_time: issue_instant)
       # verify the signature (certificate's validity) as of the time the message was generated
-      super(fingerprint: fingerprint, cert: cert, verification_time: issue_instant)
+      super(fingerprint: fingerprint, cert: cert, verification_time: verification_time)
     end
 
     # (see Signable#sign)

@@ -82,10 +82,11 @@ module SAML2
       end
     end
 
-    def initialize
-      super
+    # @param id [String] The Entity ID
+    def initialize(entity_id = nil)
+      super()
       @valid_until = nil
-      @entity_id = nil
+      @entity_id = entity_id
       @roles = []
       @id = "_#{SecureRandom.uuid}"
     end
@@ -151,6 +152,23 @@ module SAML2
 
         super
       end
+    end
+
+    # Validate a message is a valid response.
+    #
+    # @param message [Message]
+    # @param identity_provider [Entity]
+    def valid_response?(message,
+                        identity_provider,
+                        verification_time: Time.now.utc)
+      unless message.is_a?(Response)
+        message.errors << "not a Response object"
+        return false
+      end
+
+      message.validate(service_provider: self,
+                       identity_provider: identity_provider,
+                       verification_time: verification_time).empty?
     end
   end
 end
