@@ -2,6 +2,7 @@ require 'securerandom'
 require 'time'
 
 require 'saml2/base'
+require 'saml2/signable'
 
 module SAML2
   class InvalidMessage < RuntimeError
@@ -38,7 +39,8 @@ module SAML2
   # ancestor, but they have several things in common so it's useful to represent
   # that here
   class Message < Base
-    attr_reader :id, :issue_instant
+    include Signable
+
     attr_accessor :issuer, :destination
 
     class << self
@@ -86,12 +88,21 @@ module SAML2
       true
     end
 
-    def issuer
-      @issuer ||= NameID.from_xml(xml.at_xpath('saml:Issuer', Namespaces::ALL))
+    def validate_signature(fingerprint: nil, cert: nil, verification_time: nil)
+      # verify the signature (certificate's validity) as of the time the message was generated
+      super(fingerprint: fingerprint, cert: cert, verification_time: issue_instant)
     end
 
     def id
       @id ||= xml['ID']
+    end
+
+    def issue_instant
+      @issue_instant ||= Time.parse(xml['IssueInstant'])
+    end
+
+    def issuer
+      @issuer ||= NameID.from_xml(xml.at_xpath('saml:Issuer', Namespaces::ALL))
     end
 
     protected

@@ -4,10 +4,12 @@ require 'saml2/base'
 require 'saml2/identity_provider'
 require 'saml2/organization_and_contacts'
 require 'saml2/service_provider'
+require 'saml2/signable'
 
 module SAML2
   class Entity < Base
     include OrganizationAndContacts
+    include Signable
 
     attr_writer :entity_id
 
@@ -28,6 +30,8 @@ module SAML2
 
     class Group < Base
       include Enumerable
+      include Signable
+
       [:each, :[]].each do |method|
         class_eval <<-RUBY, __FILE__, __LINE__ + 1
           def #{method}(*args, &block)
@@ -51,25 +55,6 @@ module SAML2
 
       def valid_schema?
         Schemas.federation.valid?(xml.document)
-      end
-
-      def signature
-        unless instance_variable_defined?(:@signature)
-          @signature = xml.at_xpath('dsig:Signature', Namespaces::ALL)
-          signed_node = @signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
-          # validating the schema will automatically add ID attributes, so check that first
-          xml.set_id_attribute('ID') unless xml.document.get_id(xml['ID'])
-          @signature = nil unless signed_node == "##{xml['ID']}"
-        end
-        @signature
-      end
-
-      def signed?
-        !!signature
-      end
-
-      def valid_signature?(*args)
-        signature.verify_with(*args)
       end
 
       def valid_until

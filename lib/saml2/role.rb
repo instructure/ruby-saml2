@@ -1,8 +1,9 @@
 require 'set'
 
 require 'saml2/base'
-require 'saml2/organization_and_contacts'
 require 'saml2/key'
+require 'saml2/organization_and_contacts'
+require 'saml2/signable'
 
 module SAML2
   class Role < Base
@@ -11,6 +12,7 @@ module SAML2
     end
 
     include OrganizationAndContacts
+    include Signable
 
     attr_writer :supported_protocols, :keys
 

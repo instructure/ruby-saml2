@@ -51,8 +51,12 @@ module SAML2
       @certificate ||= OpenSSL::X509::Certificate.new(Base64.decode64(x509))
     end
 
+    def self.format_fingerprint(fingerprint)
+      fingerprint.downcase.gsub(/(\h{2})(?=\h)/, '\1:')
+    end
+
     def fingerprint
-      @fingerprint ||= Digest::SHA1.hexdigest(certificate.to_der).gsub(/(\h{2})(?=\h)/, '\1:')
+      @fingerprint ||= self.class.format_fingerprint(Digest::SHA1.hexdigest(certificate.to_der))
     end
 
     def build(builder)
