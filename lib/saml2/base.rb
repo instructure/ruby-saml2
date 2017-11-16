@@ -45,9 +45,11 @@ module SAML2
       end
     end
 
-    def self.load_object_array(node, element, klass)
+    def self.load_object_array(node, element, klass = nil)
       node.xpath(element, Namespaces::ALL).map do |element_node|
-        if klass.is_a?(Hash)
+        if klass.nil?
+          SAML2.const_get(element_node.name, false).from_xml(element_node)
+        elsif klass.is_a?(Hash)
           klass[element_node.name].from_xml(element_node)
         else
           klass.from_xml(element_node)
@@ -61,11 +63,12 @@ module SAML2
     end
 
     protected
+
     def load_string_array(node, element)
       self.class.load_string_array(node, element)
     end
 
-    def load_object_array(node, element, klass)
+    def load_object_array(node, element, klass = nil)
       self.class.load_object_array(node, element, klass)
     end
 

@@ -41,7 +41,7 @@ module SAML2
   class Message < Base
     include Signable
 
-    attr_accessor :issuer, :destination
+    attr_writer :issuer, :destination
 
     class << self
       def inherited(klass)
@@ -99,6 +99,13 @@ module SAML2
 
     def issue_instant
       @issue_instant ||= Time.parse(xml['IssueInstant'])
+    end
+
+    def destination
+      if xml && !instance_variable_defined?(:@destination)
+        @destination = xml['Destination']
+      end
+      @destination
     end
 
     def issuer

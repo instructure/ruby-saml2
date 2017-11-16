@@ -57,6 +57,18 @@ module SAML2
       @assertions = []
     end
 
+    def from_xml(node)
+      super
+      remove_instance_variable(:@assertions)
+    end
+
+    def assertions
+      unless instance_variable_defined?(:@assertions)
+        @assertions = load_object_array(xml, 'saml:Assertion', Assertion)
+      end
+      @assertions
+    end
+
     def sign(*args)
       assertions.each { |assertion| assertion.sign(*args) }
     end
@@ -71,7 +83,10 @@ module SAML2
         super(response)
 
         assertions.each do |assertion|
-          response.parent << assertion.to_xml
+          # we can't just call build, because it may already
+          # be signed as a separate message, so call to_xml to
+          # get the cached signed result
+          response.parent << assertion.to_xml.root
         end
       end
     end

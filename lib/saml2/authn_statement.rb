@@ -1,5 +1,7 @@
+require 'saml2/base'
+
 module SAML2
-  class AuthnStatement
+  class AuthnStatement < Base
     module Classes
       INTERNET_PROTOCOL            = "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol".freeze # IP address
       INTERNET_PROTOCOL_PASSWORD   = "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocolPassword".freeze # IP address, as well as username/password
@@ -13,10 +15,20 @@ module SAML2
       UNSPECIFIED                  = "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified".freeze
     end
 
-    attr_accessor :authn_instant, :authn_context_class_ref
+    attr_accessor :authn_instant, :authn_context_class_ref, :session_index, :session_not_on_or_after
+
+    def from_xml(node)
+      super
+      @authn_instant = Time.parse(node['AuthnInstant'])
+      @session_index = node['SessionIndex']
+      @session_not_on_or_after = Time.parse(node['SessionNotOnOrAfter']) if node['SessionNotOnOrAfter']
+      @authn_context_class_ref = node.at_xpath('saml:AuthnContext/saml:AuthnContextClassRef', Namespaces::ALL)&.content&.strip
+    end
 
     def build(builder)
       builder['saml'].AuthnStatement('AuthnInstant' => authn_instant.iso8601) do |authn_statement|
+        authn_statement.parent['SessionIndex'] = session_index if session_index
+        authn_statement.parent['SessionNotOnOrAfter'] = session_not_on_or_after.iso8601 if session_not_on_or_after
         authn_statement['saml'].AuthnContext do |authn_context|
           authn_context['saml'].AuthnContextClassRef(authn_context_class_ref) if authn_context_class_ref
         end

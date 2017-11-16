@@ -57,5 +57,11 @@ module SAML2
                               NameID.new('jacob', NameID::Format::PERSISTENT))
       expect(Schemas.protocol.validate(Nokogiri::XML(response.to_s))).to eq []
     end
+
+    it "parses a serialized assertion" do
+      response2 = Message.parse(response.to_s)
+      expect(response2.assertions.length).to eq 1
+      expect(response2.assertions.first.subject.name_id.id).to eq 'jacob'
+    end
   end
 end
