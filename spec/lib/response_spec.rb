@@ -42,14 +42,14 @@ module SAML2
       expect(Schemas.protocol.validate(response.to_xml)).to eq []
       # verifiable on the command line with:
       # xmlsec1 --verify --pubkey-cert-pem certificate.pem --privkey-pem privatekey.key --id-attr:ID urn:oasis:names:tc:SAML:2.0:assertion:Assertion response_signed.xml
-      expect(response.to_s).to eq fixture('response_signed.xml')
+      expect(response.to_s(pretty: false)).to eq fixture('response_signed.xml')
     end
 
     it "should generate a valid signature when attributes are present" do
       freeze_response
       response.assertions.first.statements << sp.attribute_consuming_services.default.create_statement('givenName' => 'cody')
       response.sign(fixture('certificate.pem'), fixture('privatekey.key'))
-      expect(response.to_s).to eq fixture('response_with_attribute_signed.xml')
+      expect(response.to_s(pretty: false)).to eq fixture('response_with_attribute_signed.xml')
     end
 
     it "should generate valid XML for IdP initiated response" do

@@ -29,8 +29,9 @@ module SAML2
       end
 
       it "doesn't allow deflate bombs" do
-        message = "\0" * 2 * 1024 * 1024
+        message = double()
         allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("\0" * 2 * 1024 * 1024)
         url = Bindings::HTTPRedirect.encode(message)
 
         expect { Bindings::HTTPRedirect.decode(url) }.to raise_error(MessageTooLarge)
@@ -47,16 +48,18 @@ module SAML2
       end
 
       it "validates encoding" do
-        message = "hi"
+        message = double()
         allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("hi")
         url = Bindings::HTTPRedirect.encode(message, relay_state: "abc")
         url << "&SAMLEncoding=garbage"
         expect { Bindings::HTTPRedirect.decode(url) }.to raise_error(UnsupportedEncoding)
       end
 
       it "returns relay state" do
-        message = "hi"
+        message = double()
         allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("hi")
         url = Bindings::HTTPRedirect.encode(message, relay_state: "abc")
         allow(Message).to receive(:parse).with("hi").and_return("parsed")
         message, relay_state = Bindings::HTTPRedirect.decode(url)
@@ -88,8 +91,9 @@ module SAML2
         end
 
         it "allows the caller to detect an unsigned message" do
-          message = "hi"
+          message = double()
           allow(message).to receive(:destination).and_return("http://somewhere/")
+          allow(message).to receive(:to_s).and_return("hi")
           url = Bindings::HTTPRedirect.encode(message)
           allow(Message).to receive(:parse).with("hi").and_return("parsed")
 
@@ -102,8 +106,9 @@ module SAML2
         end
 
         it "requires a signature if a key is passed" do
-          message = "hi"
+          message = double()
           allow(message).to receive(:destination).and_return("http://somewhere/")
+          allow(message).to receive(:to_s).and_return("hi")
           url = Bindings::HTTPRedirect.encode(message)
           allow(Message).to receive(:parse).with("hi").and_return("parsed")
 
@@ -127,15 +132,17 @@ module SAML2
 
     describe '.encode' do
       it 'works' do
-        message = "hi"
+        message = double()
         allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("hi")
         url = Bindings::HTTPRedirect.encode(message, relay_state: "abc")
         expect(url).to match(%r{^http://somewhere/\?SAMLResponse=(?:.*)&RelayState=abc})
       end
 
       it 'signs a message' do
-        message = "hi"
+        message = double()
         allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("hi")
         key = OpenSSL::PKey::RSA.new(fixture('privatekey.key'))
         url = Bindings::HTTPRedirect.encode(message, relay_state: "abc", private_key: key)
 

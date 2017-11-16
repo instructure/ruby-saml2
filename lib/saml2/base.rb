@@ -15,9 +15,19 @@ module SAML2
       @xml = node
     end
 
-    def to_s
-      # make sure to not FORMAT it - it breaks signatures!
-      to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
+    def to_s(pretty: true)
+      if xml
+        xml.to_s
+      elsif pretty
+        to_xml.to_s
+      else
+        # make sure to not FORMAT it - it breaks signatures!
+        to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
+      end
+    end
+
+    def inspect
+      "#<#{self.class.name} #{instance_variables.map { |iv| next if iv == :@xml; "#{iv}=#{instance_variable_get(iv).inspect}" }.compact.join(", ") }>"
     end
 
     def to_xml

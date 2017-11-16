@@ -107,7 +107,7 @@ module SAML2
             original_query.delete_if { |(k, v)| k == param }
           end
 
-          xml = message.to_s
+          xml = message.to_s(pretty: false)
           zstream = Zlib::Deflate.new(Zlib::BEST_COMPRESSION, -Zlib::MAX_WBITS)
           deflated = zstream.deflate(xml, Zlib::FINISH)
           zstream.close
