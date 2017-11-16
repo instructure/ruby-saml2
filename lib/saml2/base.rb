@@ -17,7 +17,7 @@ module SAML2
 
     def to_s
       # make sure to not FORMAT it - it breaks signatures!
-      to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML)
+      to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
     end
 
     def to_xml
