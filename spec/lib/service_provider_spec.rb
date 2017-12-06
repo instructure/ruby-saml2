@@ -14,10 +14,14 @@ module SAML2
       sp = ServiceProvider.new
       sp.single_logout_services << Endpoint.new('https://sso.canvaslms.com/SAML2/Logout',
                                                  Bindings::HTTPRedirect::URN)
-      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login1', 0)
-      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login2', 1)
+      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login1')
+      sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login2')
       sp.keys << Key.new('somedata', Key::Type::ENCRYPTION, [Key::EncryptionMethod.new])
       sp.keys << Key.new('somedata', Key::Type::SIGNING)
+      acs = AttributeConsumingService.new
+      acs.name[:en] = 'service'
+      acs.requested_attributes << RequestedAttribute.create('uid')
+      sp.attribute_consuming_services << acs
 
       entity.roles << sp
       expect(Schemas.metadata.validate(Nokogiri::XML(entity.to_s))).to eq []
@@ -38,13 +42,22 @@ module SAML2
       end
 
       it "should load the organization" do
-        expect(entity.organization.display_name).to eq 'Canvas'
+        expect(entity.organization.display_name.to_s).to eq 'Canvas'
       end
 
       it "should load contacts" do
         expect(entity.contacts.length).to eq 1
         expect(entity.contacts.first.type).to eq Contact::Type::TECHNICAL
         expect(entity.contacts.first.surname).to eq 'Administrator'
+      end
+
+      it "loads attribute_consuming_services" do
+        expect(sp.attribute_consuming_services.length).to eq 1
+        acs = sp.attribute_consuming_services.first
+        expect(acs.index).to eq 0
+        expect(acs.name.to_s).to eq 'service'
+        expect(acs.requested_attributes.length).to eq 1
+        expect(acs.requested_attributes.first.name).to eq 'urn:oid:2.5.4.42'
       end
     end
   end

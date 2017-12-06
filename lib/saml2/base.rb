@@ -42,6 +42,9 @@ module SAML2
       @document
     end
 
+    def build(builder)
+    end
+
     def self.load_string_array(node, element)
       node.xpath(element, Namespaces::ALL).map do |element_node|
         element_node.content&.strip

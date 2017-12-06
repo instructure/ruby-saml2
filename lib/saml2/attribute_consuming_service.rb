@@ -2,12 +2,30 @@ require 'active_support/core_ext/array/wrap'
 
 require 'saml2/attribute'
 require 'saml2/indexed_object'
+require 'saml2/localized_name'
 require 'saml2/namespaces'
 
 module SAML2
   class RequestedAttribute < Attribute
-    def initialize(name = nil, is_required = nil, name_format = nil)
-      super(name, nil, nil, name_format)
+    class << self
+      def namespace
+        'md'
+      end
+
+      def element
+        'RequestedAttribute'
+      end
+
+      def create(name, is_required = nil)
+        # use Attribute.create to get other subclasses to automatically fill out friendly_name
+        # and name_format, but still return a RequestedAttribute object
+        attribute = Attribute.create(name)
+        new(attribute.name, is_required, attribute.friendly_name, attribute.name_format)
+      end
+    end
+
+    def initialize(name = nil, is_required = nil, friendly_name = nil, name_format = nil)
+      super(name, nil, friendly_name, name_format)
       @is_required = is_required
     end
 
@@ -44,16 +62,19 @@ module SAML2
   class AttributeConsumingService < Base
     include IndexedObject
 
-    attr_reader :name, :requested_attributes
+    attr_reader :name, :description, :requested_attributes
 
     def initialize(name = nil, requested_attributes = [])
       super()
-      @name, @requested_attributes = name, requested_attributes
+      @name = LocalizedName.new('ServiceName', name)
+      @description = LocalizedName.new('ServiceDescription')
+      @requested_attributes = requested_attributes
     end
 
     def from_xml(node)
       super
-      @name = node['ServiceName']
+      name.from_xml(node.xpath('md:ServiceName', Namespaces::ALL))
+      description.from_xml(node.xpath('md:ServiceDescription', Namespaces::ALL))
       @requested_attributes = load_object_array(node, "md:RequestedAttribute", RequestedAttribute)
     end
 
@@ -96,6 +117,17 @@ module SAML2
       end
       return nil if attributes.empty?
       AttributeStatement.new(attributes)
+    end
+
+    def build(builder)
+      builder['md'].AttributeConsumingService do |attribute_consuming_service|
+        name.build(attribute_consuming_service)
+        description.build(attribute_consuming_service)
+        requested_attributes.each do |requested_attribute|
+          requested_attribute.build(attribute_consuming_service)
+        end
+      end
+      super
     end
   end
 end

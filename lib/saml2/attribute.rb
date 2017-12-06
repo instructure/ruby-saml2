@@ -32,8 +32,15 @@ module SAML2
       end
 
       def create(name, value = nil)
-
         (class_for(name) || self).new(name, value)
+      end
+
+      def namespace
+        'saml'
+      end
+
+      def element
+        'Attribute'
       end
 
       protected
@@ -52,7 +59,7 @@ module SAML2
     end
 
     def build(builder)
-      builder['saml'].Attribute('Name' => name) do |attribute|
+      builder[self.class.namespace].__send__(self.class.element, 'Name' => name) do |attribute|
         attribute.parent['FriendlyName'] = friendly_name if friendly_name
         attribute.parent['NameFormat'] = name_format if name_format
         Array.wrap(value).each do |value|

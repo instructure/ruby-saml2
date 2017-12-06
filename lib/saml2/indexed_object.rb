@@ -2,7 +2,7 @@ require 'saml2/base'
 
 module SAML2
   module IndexedObject
-    attr_reader :index
+    attr_accessor :index
 
     def initialize(*args)
       @is_default = nil
@@ -57,8 +57,13 @@ module SAML2
       protected
 
       def re_index
+        last_index = -1
         @index = {}
-        each { |object| @index[object.index] = object }
+        each do |object|
+          object.index ||= last_index + 1
+          last_index = object.index
+          @index[object.index] = object
+        end
         @default = find { |object| object.default? } || first
       end
     end

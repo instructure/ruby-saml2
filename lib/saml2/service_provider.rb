@@ -38,6 +38,10 @@ module SAML2
         assertion_consumer_services.each do |acs|
           acs.build(sp_sso_descriptor, 'AssertionConsumerService')
         end
+
+        attribute_consuming_services.each do |acs|
+          acs.build(sp_sso_descriptor)
+        end
       end
     end
   end

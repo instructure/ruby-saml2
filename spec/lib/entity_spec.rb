@@ -25,10 +25,10 @@ module SAML2
       end
 
       it "should parse the organization" do
-        expect(entity.organization.display_name).to eq 'Canvas'
-        expect(entity.organization.display_name('en')).to eq 'Canvas'
-        expect(entity.organization.display_name('es')).to be_nil
-        expect(entity.organization.display_name(:all)).to eq en: 'Canvas'
+        expect(entity.organization.display_name.to_s).to eq 'Canvas'
+        expect(entity.organization.display_name['en']).to eq 'Canvas'
+        expect(entity.organization.display_name['es']).to be_nil
+        expect(entity.organization.display_name[:all]).to eq en: 'Canvas'
       end
 
       it "validates metadata from ADFS containing lots of non-SAML schemas" do
