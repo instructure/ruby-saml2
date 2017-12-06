@@ -36,6 +36,13 @@ module SAML2
       end
     end
 
+    it "should sign correctly" do
+      entity = Entity.parse(fixture('service_provider.xml'))
+      entity.sign(fixture('certificate.pem'), fixture('privatekey.key'))
+      entity2 = Entity.parse(entity.to_s)
+      expect(entity2.valid_schema?).to eq true
+    end
+
     describe Entity::Group do
       it "should parse and validate" do
         group = Entity.parse(fixture('entities.xml'))

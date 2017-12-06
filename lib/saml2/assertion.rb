@@ -16,19 +16,6 @@ module SAML2
       @statements = nil
     end
 
-    def sign(x509_certificate, private_key, algorithm_name = :sha256)
-      to_xml
-
-      xml = @document.root
-      xml.set_id_attribute('ID')
-      xml.sign!(cert: x509_certificate, key: private_key, digest_alg: algorithm_name.to_s, signature_alg: "rsa-#{algorithm_name}", uri: "##{id}")
-      # the Signature element must be right after the Issuer, so put it there
-      issuer = xml.at_xpath("saml:Issuer", Namespaces::ALL)
-      signature = xml.at_xpath("dsig:Signature", Namespaces::ALL)
-      issuer.add_next_sibling(signature)
-      self
-    end
-
     def subject
       if xml && !instance_variable_defined?(:@subject)
         @subject = Subject.from_xml(xml.at_xpath('saml:Subject', Namespaces::ALL))

@@ -93,6 +93,17 @@ module SAML2
       super(fingerprint: fingerprint, cert: cert, verification_time: issue_instant)
     end
 
+    def sign(x509_certificate, private_key, algorithm_name = :sha256)
+      super
+
+      xml = @document.root
+      # the Signature element must be right after the Issuer, so put it there
+      issuer = xml.at_xpath("saml:Issuer", Namespaces::ALL)
+      signature = xml.at_xpath("dsig:Signature", Namespaces::ALL)
+      issuer.add_next_sibling(signature)
+      self
+    end
+
     def id
       @id ||= xml['ID']
     end

@@ -42,11 +42,13 @@ module SAML2
 
       def initialize
         @entities = []
+        @id = "_#{SecureRandom.uuid}"
         @valid_until = nil
       end
 
       def from_xml(node)
         super
+        @id = nil
         remove_instance_variable(:@valid_until)
         @entities = Base.load_object_array(xml, "md:EntityDescriptor|md:EntitiesDescriptor",
                 'EntityDescriptor' => Entity,
@@ -55,6 +57,10 @@ module SAML2
 
       def valid_schema?
         Schemas.federation.valid?(xml.document)
+      end
+
+      def id
+        @id ||= xml['ID']
       end
 
       def valid_until
@@ -70,10 +76,12 @@ module SAML2
       @valid_until = nil
       @entity_id = nil
       @roles = []
+      @id = "_#{SecureRandom.uuid}"
     end
 
     def from_xml(node)
       super
+      @id = nil
       remove_instance_variable(:@valid_until)
       @roles = nil
     end
@@ -84,6 +92,10 @@ module SAML2
 
     def entity_id
       @entity_id || xml && xml['entityID']
+    end
+
+    def id
+      @id ||= xml['ID']
     end
 
     def valid_until
@@ -111,6 +123,8 @@ module SAML2
                                      'xmlns:md' => Namespaces::METADATA,
                                      'xmlns:dsig' => Namespaces::DSIG,
                                      'xmlns:xenc' => Namespaces::XENC) do |entity_descriptor|
+        entity_descriptor.parent['ID'] = id if id
+
         roles.each do |role|
           role.build(entity_descriptor)
         end

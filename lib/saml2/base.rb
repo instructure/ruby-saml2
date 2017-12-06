@@ -35,6 +35,9 @@ module SAML2
         builder = Nokogiri::XML::Builder.new
         build(builder)
         @document = builder.doc
+        # if we're re-serializing a parsed document (i.e. after mutating/parsing it),
+        # forget the original document we parsed
+        @xml = nil
       end
       @document
     end

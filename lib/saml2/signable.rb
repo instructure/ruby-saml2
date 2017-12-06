@@ -52,5 +52,18 @@ module SAML2
     def valid_signature?(fingerprint: nil, cert: nil, verification_time: nil)
       validate_signature(fingerprint: fingerprint, cert: cert, verification_time: verification_time).empty?
     end
+
+    def sign(x509_certificate, private_key, algorithm_name = :sha256)
+      to_xml
+
+      xml = @document.root
+      xml.set_id_attribute('ID')
+      xml.sign!(cert: x509_certificate, key: private_key, digest_alg: algorithm_name.to_s, signature_alg: "rsa-#{algorithm_name}", uri: "##{id}")
+      # the Signature element must be the first element
+      signature = xml.at_xpath("dsig:Signature", Namespaces::ALL)
+      xml.children.first.add_previous_sibling(signature)
+
+      self
+    end
   end
 end
