@@ -49,7 +49,7 @@ module SAML2
       return false unless valid_web_browser_sso_profile?
 
       return false unless assertion_consumer_service_url
-      return false if protocol_binding && protocol_binding != Endpoint::Bindings::HTTP_POST
+      return false if protocol_binding && protocol_binding != SAML::Bindings::HTTP_POST::URN
       return false if subject
 
       true
