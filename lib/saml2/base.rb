@@ -11,11 +11,16 @@ module SAML2
 
     attr_reader :xml
 
+    def initialize
+      @pretty = true
+    end
+
     def from_xml(node)
       @xml = node
     end
 
-    def to_s(pretty: true)
+    def to_s(pretty: nil)
+      pretty = @pretty if pretty.nil?
       if xml
         xml.to_s
       elsif pretty

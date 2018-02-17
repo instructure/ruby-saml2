@@ -71,6 +71,9 @@ module SAML2
 
     def sign(*args)
       assertions.each { |assertion| assertion.sign(*args) }
+      # make sure we no longer pretty print this object
+      @pretty = false
+      nil
     end
 
     private

@@ -1,5 +1,7 @@
 require_relative '../../spec_helper'
 
+require 'openssl'
+
 module SAML2
   describe Bindings::HTTPRedirect do
     describe '.decode' do

@@ -72,6 +72,7 @@ module SAML2
     end
 
     def initialize
+      super
       @id = "_#{SecureRandom.uuid}"
       @issue_instant = Time.now.utc
     end
