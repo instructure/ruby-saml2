@@ -25,27 +25,28 @@ module SAML2
 
     # Evaluate these conditions.
     #
-    # @todo change to [true, false, nil] return
     # @param now optional [Time]
     # @param options
     #   Additional options to pass to specific {Condition}s
-    # @return [:valid, :invalid, :indeterminate]
+    # @return [Boolean, nil]
     #   It's only valid if every sub-condition is completely valid.
     #   If any sub-condition is invalid, the whole statement is invalid.
+    #   If the validity can't be determined due to an unsupported condition,
+    #   +nil+ will be returned (which is false-ish)
     def valid?(now: Time.now.utc, **options)
       options[:now] ||= now
-      return :invalid if not_before && now < not_before
-      return :invalid if not_on_or_after && now >= not_on_or_after
+      return false if not_before && now < not_before
+      return false if not_on_or_after && now >= not_on_or_after
 
-      result = :valid
+      result = true
       each do |condition|
         this_result = condition.valid?(**options)
         case this_result
-        when :invalid
-          return :invalid
-        when :indeterminate
-          result = :indeterminate
-        when :valid
+        when false
+          return false
+        when nil
+          result = nil
+        when true
         else
           raise "unknown validity of #{condition}"
         end
@@ -67,8 +68,9 @@ module SAML2
 
     # Any unknown condition
     class Condition < Base
+      # @return [nil]
       def valid?(_)
-        :indeterminate
+        nil
       end
     end
 
@@ -93,7 +95,7 @@ module SAML2
 
       # @param audience [String]
       def valid?(audience: nil, **_)
-        Array.wrap(self.audience).include?(audience) ? :valid : :invalid
+        Array.wrap(self.audience).include?(audience)
       end
 
       # (see Base#build)
@@ -107,8 +109,11 @@ module SAML2
     end
 
     class OneTimeUse < Condition
+      # The caller will need to see if this condition exists, and validate it
+      # using their own state store.
+      # @return [true]
       def valid?(_)
-        :valid
+        true
       end
 
       # (see Base#build)
