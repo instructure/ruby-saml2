@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
+require 'saml2/base'
 require 'saml2/namespaces'
 
 module SAML2
-  class NameID
+  class NameID < Base
     module Format
       EMAIL_ADDRESS                 = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
       ENTITY                        = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
@@ -77,13 +78,12 @@ module SAML2
     # @return [String, nil]
     attr_accessor :format, :name_qualifier, :sp_name_qualifier
 
-    # (see Base.from_xml)
-    # @todo actually inherit from {Base}, and use an instance method
-    def self.from_xml(node)
-      node && new(node.content.strip,
-                  node['Format'],
-                  name_qualifier: node['NameQualifier'],
-                  sp_name_qualifier: node['SPNameQualifier'])
+    # (see Base#from_xml)
+    def from_xml(node)
+      self.id = node.content.strip
+      self.format = node['Format']
+      self.name_qualifier = node['NameQualifier']
+      self.sp_name_qualifier = node['SPNameQualifier']
     end
 
     # @param id [String]
