@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'saml2/namespaces'
 
 module SAML2
   class NameID
     module Format
-      EMAIL_ADDRESS                 = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress".freeze
-      ENTITY                        = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity".freeze
-      KERBEROS                      = "urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos".freeze # name[/instance]@REALM
-      PERSISTENT                    = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent".freeze # opaque, pseudo-random, unique per SP-IdP pair
-      TRANSIENT                     = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient".freeze # opaque, will likely change
-      UNSPECIFIED                   = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified".freeze
-      WINDOWS_DOMAIN_QUALIFIED_NAME = "urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName".freeze # [DomainName\]UserName
-      X509_SUBJECT_NAME             = "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName".freeze
+      EMAIL_ADDRESS                 = "urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress"
+      ENTITY                        = "urn:oasis:names:tc:SAML:2.0:nameid-format:entity"
+      KERBEROS                      = "urn:oasis:names:tc:SAML:2.0:nameid-format:kerberos" # name[/instance]@REALM
+      PERSISTENT                    = "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent" # opaque, pseudo-random, unique per SP-IdP pair
+      TRANSIENT                     = "urn:oasis:names:tc:SAML:2.0:nameid-format:transient" # opaque, will likely change
+      UNSPECIFIED                   = "urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified"
+      WINDOWS_DOMAIN_QUALIFIED_NAME = "urn:oasis:names:tc:SAML:1.1:nameid-format:WindowsDomainQualifiedName" # [DomainName\]UserName
+      X509_SUBJECT_NAME             = "urn:oasis:names:tc:SAML:1.1:nameid-format:X509SubjectName"
     end
 
     class Policy < Base

@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'saml2/base'
 
 module SAML2
   class Contact < Base
     module Type
-      ADMINISTRATIVE = 'administrative'.freeze
-      BILLING        = 'billing'.freeze
-      OTHER          = 'other'.freeze
-      SUPPORT        = 'support'.freeze
-      TECHNICAL      = 'technical'.freeze
+      ADMINISTRATIVE = 'administrative'
+      BILLING        = 'billing'
+      OTHER          = 'other'
+      SUPPORT        = 'support'
+      TECHNICAL      = 'technical'
     end
 
     # @see Type

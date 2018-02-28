@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 module SAML2
   module Namespaces
-    DSIG     = "http://www.w3.org/2000/09/xmldsig#".freeze
-    METADATA = "urn:oasis:names:tc:SAML:2.0:metadata".freeze
-    SAML     = "urn:oasis:names:tc:SAML:2.0:assertion".freeze
-    SAMLP    = "urn:oasis:names:tc:SAML:2.0:protocol".freeze
-    XENC     = "http://www.w3.org/2001/04/xmlenc#".freeze
-    XS       = "http://www.w3.org/2001/XMLSchema".freeze
-    XSI      = "http://www.w3.org/2001/XMLSchema-instance".freeze
-    X500     = "urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500".freeze
+    DSIG     = "http://www.w3.org/2000/09/xmldsig#"
+    METADATA = "urn:oasis:names:tc:SAML:2.0:metadata"
+    SAML     = "urn:oasis:names:tc:SAML:2.0:assertion"
+    SAMLP    = "urn:oasis:names:tc:SAML:2.0:protocol"
+    XENC     = "http://www.w3.org/2001/04/xmlenc#"
+    XS       = "http://www.w3.org/2001/XMLSchema"
+    XSI      = "http://www.w3.org/2001/XMLSchema-instance"
+    X500     = "urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500"
 
     ALL = {
         'xmlns:dsig'  => DSIG,

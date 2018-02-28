@@ -1,33 +1,35 @@
+# frozen_string_literal: true
+
 module SAML2
   class Attribute
     class X500 < Attribute
-      GIVEN_NAME             = 'urn:oid:2.5.4.42'.freeze
-      SN = SURNAME           = 'urn:oid:2.5.4.4'.freeze
+      GIVEN_NAME             = 'urn:oid:2.5.4.42'
+      SN = SURNAME           = 'urn:oid:2.5.4.4'
       # https://www.ietf.org/rfc/rfc2798.txt
       module InetOrgPerson
-        DISPLAY_NAME         = 'urn:oid:2.16.840.1.113730.3.1.241'.freeze
-        EMPLOYEE_NUMBER      = 'urn:oid:2.16.840.1.113730.3.1.3'.freeze
-        EMPLOYEE_TYPE        = 'urn:oid:2.16.840.1.113730.3.1.4'.freeze
-        PREFERRED_LANGUAGE   = 'urn:oid:2.16.840.1.113730.3.1.39'.freeze
+        DISPLAY_NAME         = 'urn:oid:2.16.840.1.113730.3.1.241'
+        EMPLOYEE_NUMBER      = 'urn:oid:2.16.840.1.113730.3.1.3'
+        EMPLOYEE_TYPE        = 'urn:oid:2.16.840.1.113730.3.1.4'
+        PREFERRED_LANGUAGE   = 'urn:oid:2.16.840.1.113730.3.1.39'
       end
       # https://www.internet2.edu/media/medialibrary/2013/09/04/internet2-mace-dir-eduperson-201203.html
       module EduPerson
-        AFFILIATION          = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1'.freeze
-        ASSURANCE            = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.11'.freeze
-        ENTITLEMENT          = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7'.freeze
-        NICKNAME             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.2'.freeze
-        ORG_D_N              = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.3'.freeze
-        PRIMARY_AFFILIATION  = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.5'.freeze
-        PRIMARY_ORG_UNIT_D_N = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.8'.freeze
-        PRINCIPAL_NAME       = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6'.freeze
-        SCOPED_AFFILIATION   = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9'.freeze
-        TARGETED_I_D         = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10'.freeze
-        UNIT_D_N             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4'.freeze
+        AFFILIATION          = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1'
+        ASSURANCE            = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.11'
+        ENTITLEMENT          = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7'
+        NICKNAME             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.2'
+        ORG_D_N              = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.3'
+        PRIMARY_AFFILIATION  = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.5'
+        PRIMARY_ORG_UNIT_D_N = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.8'
+        PRINCIPAL_NAME       = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6'
+        SCOPED_AFFILIATION   = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9'
+        TARGETED_I_D         = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10'
+        UNIT_D_N             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4'
       end
       # http://www.ietf.org/rfc/rfc4519.txt
-      UID = USERID           = 'urn:oid:0.9.2342.19200300.100.1.1'.freeze
+      UID = USERID           = 'urn:oid:0.9.2342.19200300.100.1.1'
       # http://www.ietf.org/rfc/rfc4524.txt
-      MAIL                   = 'urn:oid:0.9.2342.19200300.100.1.3'.freeze
+      MAIL                   = 'urn:oid:0.9.2342.19200300.100.1.3'
 
       # Returns true if the param should be an {X500} Attribute.
       # @param name_or_node [String, Nokogiri::XML::Element]

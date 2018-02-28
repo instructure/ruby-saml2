@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml2/name_id'
 require 'saml2/namespaces'
 
@@ -52,9 +54,9 @@ module SAML2
 
     class Confirmation < Base
       module Methods
-        BEARER         = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'.freeze
-        HOLDER_OF_KEY  = 'urn:oasis:names:tc:SAML:2.0:cm:holder-of-key'.freeze
-        SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sender-vouches'.freeze
+        BEARER         = 'urn:oasis:names:tc:SAML:2.0:cm:bearer'
+        HOLDER_OF_KEY  = 'urn:oasis:names:tc:SAML:2.0:cm:holder-of-key'
+        SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sender-vouches'
       end
 
       # @see Methods

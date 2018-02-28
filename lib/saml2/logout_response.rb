@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml2/status_response'
 
 module SAML2

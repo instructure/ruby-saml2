@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml2/authn_request'
 require 'saml2/entity'
 require 'saml2/logout_request'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml2/base'
 require 'saml2/namespaces'
 

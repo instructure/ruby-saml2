@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'date'
 
 require 'active_support/core_ext/array/wrap'
@@ -8,9 +10,9 @@ require 'saml2/namespaces'
 module SAML2
   class Attribute < Base
     module NameFormats
-      BASIC       = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic".freeze
-      UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified".freeze
-      URI         = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri".freeze
+      BASIC       = "urn:oasis:names:tc:SAML:2.0:attrname-format:basic"
+      UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:attrname-format:unspecified"
+      URI         = "urn:oasis:names:tc:SAML:2.0:attrname-format:uri"
     end
 
     class << self

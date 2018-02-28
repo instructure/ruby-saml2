@@ -1,8 +1,10 @@
+# frozen_string_literal: true
+
 require 'saml2/base'
 
 module SAML2
   class Status < Base
-    SUCCESS      = "urn:oasis:names:tc:SAML:2.0:status:Success".freeze
+    SUCCESS      = "urn:oasis:names:tc:SAML:2.0:status:Success"
 
     # @return [String]
     attr_accessor :code, :message

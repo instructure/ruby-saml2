@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'saml2/contact'
 require 'saml2/organization'
 

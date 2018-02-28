@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'set'
 
 require 'saml2/base'
@@ -9,7 +11,7 @@ module SAML2
   # @abstract
   class Role < Base
     module Protocols
-      SAML2 = 'urn:oasis:names:tc:SAML:2.0:protocol'.freeze
+      SAML2 = 'urn:oasis:names:tc:SAML:2.0:protocol'
     end
 
     include OrganizationAndContacts

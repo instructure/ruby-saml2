@@ -1,16 +1,18 @@
+# frozen_string_literal: true
+
 require 'saml2/base'
 require 'saml2/namespaces'
 
 module SAML2
   class Key < Base
     module Type
-      ENCRYPTION = 'encryption'.freeze
-      SIGNING    = 'signing'.freeze
+      ENCRYPTION = 'encryption'
+      SIGNING    = 'signing'
     end
 
     class EncryptionMethod < Base
       module Algorithm
-        AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'.freeze
+        AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'
       end
 
       # @see Algorithm

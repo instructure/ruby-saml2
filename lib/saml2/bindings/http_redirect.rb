@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'base64'
 require 'uri'
 require 'zlib'
@@ -8,11 +10,11 @@ require 'saml2/message'
 module SAML2
   module Bindings
     module HTTPRedirect
-      URN ="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect".freeze
+      URN ="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
 
       module SigAlgs
-        DSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#dsa-sha1".freeze
-        RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1".freeze
+        DSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#dsa-sha1"
+        RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
 
         RECOGNIZED = [DSA_SHA1, RSA_SHA1].freeze
       end
@@ -73,7 +75,7 @@ module SAML2
           end
 
           zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-          xml = ''
+          xml = String.new
           begin
             # do it in 1K slices, so we can protect against bombs
             (0..deflated.bytesize / 1024).each do |i|

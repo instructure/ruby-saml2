@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'base64'
 
 module SAML2
   module Bindings
     module HTTP_POST
-      URN ="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST".freeze
+      URN ="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
 
       class << self
         # Decode and parse a Base64 encoded SAML message.
