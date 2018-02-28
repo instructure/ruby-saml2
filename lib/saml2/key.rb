@@ -1,23 +1,37 @@
+require 'saml2/base'
 require 'saml2/namespaces'
 
 module SAML2
-  class Key
+  class Key < Base
     module Type
       ENCRYPTION = 'encryption'.freeze
       SIGNING    = 'signing'.freeze
     end
 
-    class EncryptionMethod
+    class EncryptionMethod < Base
       module Algorithm
         AES128_CBC = 'http://www.w3.org/2001/04/xmlenc#aes128-cbc'.freeze
       end
 
-      attr_accessor :algorithm, :key_size
+      # @see Algorithm
+      # @return [String]
+      attr_accessor :algorithm
+      # @return [Integer]
+      attr_accessor :key_size
 
+      # @param algorithm [String]
+      # @param key_size [Integer]
       def initialize(algorithm = Algorithm::AES128_CBC, key_size = 128)
         @algorithm, @key_size = algorithm, key_size
       end
 
+      # (see Base#from_xml)
+      def from_xml(node)
+        self.algorithm = node['Algorithm']
+        self.key_size = node.at_xpath('xenc:KeySize', Namespaces::ALL)&.content&.to_i
+      end
+
+      # (see Base#build)
       def build(builder)
         builder['md'].EncryptionMethod('Algorithm' => algorithm) do |encryption_method|
           encryption_method['xenc'].KeySize(key_size) if key_size
@@ -25,18 +39,30 @@ module SAML2
       end
     end
 
-    attr_accessor :use, :x509, :encryption_methods
+    # @see Type
+    # @return [String]
+    attr_accessor :use
+    # @return [String] The PEM encoded certificate.
+    attr_reader :x509
+    # @return [Array<EncryptionMethod>]
+    attr_accessor :encryption_methods
 
-    def self.from_xml(node)
-      return nil unless node
-
-      x509 = node.at_xpath('dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate', Namespaces::ALL)
-      methods = node.xpath('xenc:EncryptionMethod', Namespaces::ALL)
-      new(x509 && x509.content.strip, node['use'], methods.map { |m| m['Algorithm'] })
+    # (see Base#from_xml)
+    def from_xml(node)
+      self.x509 = node.at_xpath('dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate', Namespaces::ALL)&.content&.strip
+      self.use = node['use']
+      self.encryption_methods = load_object_array(node, 'md:EncryptionMethod', EncryptionMethod)
     end
 
-    def initialize(x509, use = nil, encryption_methods = [])
-      @use, @x509, @encryption_methods = use, x509.gsub(/\w*-+(BEGIN|END) CERTIFICATE-+\w*/, "").strip, encryption_methods
+    # @param x509 [String] The PEM encoded certificate.
+    # @param use optional [String] See {Type}
+    # @param encryption_methods [Array<EncryptionMethod>]
+    def initialize(x509 = nil, use = nil, encryption_methods = [])
+      @use, self.x509, @encryption_methods = use, x509, encryption_methods
+    end
+
+    def x509=(value)
+      @x509 = value&.gsub(/\w*-+(BEGIN|END) CERTIFICATE-+\w*/, "")&.strip
     end
 
     def encryption?
@@ -47,18 +73,24 @@ module SAML2
       use.nil? || use == Type::SIGNING
     end
 
+    # @return [OpenSSL::X509::Certificate]
     def certificate
       @certificate ||= OpenSSL::X509::Certificate.new(Base64.decode64(x509))
     end
 
+    # Formats a fingerprint as all lowercase, with a : every two characters.
+    # @param fingerprint [String]
+    # @return [String]
     def self.format_fingerprint(fingerprint)
       fingerprint.downcase.gsub(/(\h{2})(?=\h)/, '\1:')
     end
 
+    # @return [String]
     def fingerprint
       @fingerprint ||= self.class.format_fingerprint(Digest::SHA1.hexdigest(certificate.to_der))
     end
 
+    # (see Base#build)
     def build(builder)
       builder['md'].KeyDescriptor do |key_descriptor|
         key_descriptor.parent['use'] = use if use

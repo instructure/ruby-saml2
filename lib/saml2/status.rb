@@ -4,12 +4,16 @@ module SAML2
   class Status < Base
     SUCCESS      = "urn:oasis:names:tc:SAML:2.0:status:Success".freeze
 
+    # @return [String]
     attr_accessor :code, :message
 
+    # @param code [String]
+    # @param message [String, nil]
     def initialize(code = SUCCESS, message = nil)
       @code, @message = code, message
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       self.code = node.at_xpath('samlp:StatusCode', Namespaces::ALL)['Value']
@@ -20,6 +24,7 @@ module SAML2
       code == SUCCESS
     end
 
+    # (see Base#build)
     def build(builder)
       builder['samlp'].Status do |status|
         status['samlp'].StatusCode(Value: code)

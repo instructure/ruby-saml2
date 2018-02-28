@@ -10,6 +10,12 @@ module SAML2
   class Response < StatusResponse
     attr_reader :assertions
 
+    # Respond to an {AuthnRequest}
+    # @param authn_request [AuthnRequest]
+    # @param issuer [NameID]
+    # @param name_id [NameID] The Subject
+    # @param attributes optional [Hash<String => String>, Array<Attribute>]
+    # @return [Response]
     def self.respond_to(authn_request, issuer, name_id, attributes = nil)
       response = initiate(nil, issuer, name_id)
       response.in_response_to = authn_request.id
@@ -26,6 +32,12 @@ module SAML2
       response
     end
 
+    # Begin an IdP Initiated login
+    # @param service_provider [ServiceProvider]
+    # @param issuer [NameID]
+    # @param name_id [NameID] The subject
+    # @param attributes optional [Hash<String => String>, Array<Attribute>]
+    # @return [Response]
     def self.initiate(service_provider, issuer, name_id, attributes = nil)
       response = new
       response.issuer = issuer
@@ -57,11 +69,13 @@ module SAML2
       @assertions = []
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       remove_instance_variable(:@assertions)
     end
 
+    # @return [Array<Assertion>]
     def assertions
       unless instance_variable_defined?(:@assertions)
         @assertions = load_object_array(xml, 'saml:Assertion', Assertion)
@@ -69,8 +83,10 @@ module SAML2
       @assertions
     end
 
-    def sign(*args)
-      assertions.each { |assertion| assertion.sign(*args) }
+    # (see Signable#sign)
+    # Signs each assertion.
+    def sign(x509_certificate, private_key, algorithm_name = :sha256)
+      assertions.each { |assertion| assertion.sign(x509_certificate, private_key, algorithm_name) }
       # make sure we no longer pretty print this object
       @pretty = false
       nil

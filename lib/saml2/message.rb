@@ -37,18 +37,23 @@ module SAML2
 
   # In the SAML Schema, Request and Response don't technically share a common
   # ancestor, but they have several things in common so it's useful to represent
-  # that here
+  # that in this gem as a common base class.
+  # @abstract
   class Message < Base
     include Signable
 
     attr_writer :issuer, :destination
 
     class << self
-      def inherited(klass)
-        # explicitly keep track of all messages in this base class
-        Message.known_messages[klass.name.sub(/^SAML2::/, '')] = klass
-      end
-
+      # Create an appropriate {Message} subclass instance to represent the
+      # given XML element.
+      #
+      # When called on a subclass, it behaves the same as {Base.from_xml}
+      #
+      # @param node [Nokogiri::XML::Element]
+      # @return [Message]
+      # @raise [UnknownMessage] If the element doesn't correspond to a known
+      #   SAML message type.
       def from_xml(node)
         return super unless self == Message
         klass = Message.known_messages[node.name]
@@ -56,6 +61,13 @@ module SAML2
         klass.from_xml(node)
       end
 
+      # Parses XML, and returns an appropriate {Message} subclass instance.
+      #
+      # @param xml [String, IO] Anything that can be passed to +Nokogiri::XML+.
+      # @return [Message]
+      # @raise [UnexpectedMessage]
+      #   If called on a subclass, will raise if the parsed message does not
+      #   match the class is was called on.
       def parse(xml)
         result = Message.from_xml(Nokogiri::XML(xml) { |config| config.strict }.root)
         raise UnexpectedMessage.new("Expected a #{self.name}, but got a #{result.class.name}") unless self == Message || result.class == self
@@ -69,6 +81,12 @@ module SAML2
       def known_messages
         @known_messages ||= {}
       end
+
+      def inherited(klass)
+        # explicitly keep track of all messages in this base class
+        Message.known_messages[klass.name.sub(/^SAML2::/, '')] = klass
+      end
+
     end
 
     def initialize
@@ -77,23 +95,30 @@ module SAML2
       @issue_instant = Time.now.utc
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @id = nil
       @issue_instant = nil
     end
 
+    # If the XML is valid according to SAML XSDs.
+    # @return [Boolean]
     def valid_schema?
       return false unless Schemas.protocol.valid?(xml.document)
 
       true
     end
 
-    def validate_signature(fingerprint: nil, cert: nil, verification_time: nil)
+    # (see Signable#validate_signature)
+    # @param verification_time
+    #   Ignored. The message's {issue_instant} is always used.
+    def validate_signature(fingerprint: nil, cert: nil, verification_time: issue_instant)
       # verify the signature (certificate's validity) as of the time the message was generated
       super(fingerprint: fingerprint, cert: cert, verification_time: issue_instant)
     end
 
+    # (see Signable#sign)
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
       super
 
@@ -105,14 +130,17 @@ module SAML2
       self
     end
 
+    # @return [String]
     def id
       @id ||= xml['ID']
     end
 
+    # @return [Time]
     def issue_instant
       @issue_instant ||= Time.parse(xml['IssueInstant'])
     end
 
+    # @return [String, nil]
     def destination
       if xml && !instance_variable_defined?(:@destination)
         @destination = xml['Destination']
@@ -120,6 +148,7 @@ module SAML2
       @destination
     end
 
+    # @return [NameID, nil]
     def issuer
       @issuer ||= NameID.from_xml(xml.at_xpath('saml:Issuer', Namespaces::ALL))
     end

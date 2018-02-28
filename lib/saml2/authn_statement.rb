@@ -15,8 +15,17 @@ module SAML2
       UNSPECIFIED                  = "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified".freeze
     end
 
-    attr_accessor :authn_instant, :authn_context_class_ref, :session_index, :session_not_on_or_after
+    # @return [Time]
+    attr_accessor :authn_instant
+    # One of the values in {Classes}.
+    # @return [String, nil]
+    attr_accessor :authn_context_class_ref
+    # @return [String, nil]
+    attr_accessor :session_index
+    # @return [Time, nil]
+    attr_accessor :session_not_on_or_after
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @authn_instant = Time.parse(node['AuthnInstant'])
@@ -25,6 +34,7 @@ module SAML2
       @authn_context_class_ref = node.at_xpath('saml:AuthnContext/saml:AuthnContextClassRef', Namespaces::ALL)&.content&.strip
     end
 
+    # (see Base#build)
     def build(builder)
       builder['saml'].AuthnStatement('AuthnInstant' => authn_instant.iso8601) do |authn_statement|
         authn_statement.parent['SessionIndex'] = session_index if session_index

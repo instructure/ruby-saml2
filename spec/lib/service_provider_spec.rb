@@ -59,6 +59,11 @@ module SAML2
         expect(acs.requested_attributes.length).to eq 1
         expect(acs.requested_attributes.first.name).to eq 'urn:oid:2.5.4.42'
       end
+
+      it "loads the key info" do
+        expect(sp.keys.first.encryption_methods.first.algorithm).to eq Key::EncryptionMethod::Algorithm::AES128_CBC
+        expect(sp.keys.first.encryption_methods.first.key_size).to eq 128
+      end
     end
   end
 end

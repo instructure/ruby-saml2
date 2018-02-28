@@ -11,8 +11,13 @@ module SAML2
     include OrganizationAndContacts
     include Signable
 
+    # @return [String]
     attr_writer :entity_id
 
+    # Parse a metadata file, and return an appropriate object.
+    #
+    # @param xml [String, IO] Anything that can be passed to +Nokogiri::XML+
+    # @return [Entity, Group, nil]
     def self.parse(xml)
       document = Nokogiri::XML(xml)
 
@@ -46,6 +51,7 @@ module SAML2
         @valid_until = nil
       end
 
+      # (see Base#from_xml)
       def from_xml(node)
         super
         @id = nil
@@ -55,14 +61,17 @@ module SAML2
                 'EntitiesDescriptor' => Group)
       end
 
+      # (see Message#valid_schema?)
       def valid_schema?
         Schemas.federation.valid?(xml.document)
       end
 
+      # (see Message#id)
       def id
         @id ||= xml['ID']
       end
 
+      # @return [Time, nil]
       def valid_until
         unless instance_variable_defined?(:@valid_until)
           @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
@@ -79,6 +88,7 @@ module SAML2
       @id = "_#{SecureRandom.uuid}"
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @id = nil
@@ -86,18 +96,22 @@ module SAML2
       @roles = nil
     end
 
+    # (see Message#valid_schema?)
     def valid_schema?
       Schemas.federation.valid?(xml.document)
     end
 
+    # @return [String]
     def entity_id
       @entity_id || xml && xml['entityID']
     end
 
+    # (see Message#id)
     def id
       @id ||= xml['ID']
     end
 
+    # @return [Time, nil]
     def valid_until
       unless instance_variable_defined?(:@valid_until)
         @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
@@ -105,19 +119,23 @@ module SAML2
       @valid_until
     end
 
+    # @return [Array<IdentityProvider>]
     def identity_providers
       roles.select { |r| r.is_a?(IdentityProvider) }
     end
 
+    # @return [Array<ServiceProvider>]
     def service_providers
       roles.select { |r| r.is_a?(ServiceProvider) }
     end
 
+    # @return [Array<Role>]
     def roles
       @roles ||= load_object_array(xml, 'md:IDPSSODescriptor', IdentityProvider) +
           load_object_array(xml, 'md:SPSSODescriptor', ServiceProvider)
     end
 
+    # (see Base#build)
     def build(builder)
       builder['md'].EntityDescriptor('entityID' => entity_id,
                                      'xmlns:md' => Namespaces::METADATA,

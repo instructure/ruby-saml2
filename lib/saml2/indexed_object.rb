@@ -2,17 +2,18 @@ require 'saml2/base'
 
 module SAML2
   module IndexedObject
+    # @return [Integer]
     attr_accessor :index
 
-    def initialize(*args)
+    def initialize(*)
       @is_default = nil
       super
     end
 
     def eql?(rhs)
       index == rhs.index &&
-          default? == rhs.default? &&
-          super
+        default? == rhs.default? &&
+        super
     end
 
     def default?
@@ -23,13 +24,18 @@ module SAML2
       !@is_default.nil?
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       @index = node['index'] && node['index'].to_i
       @is_default = node['isDefault'] && node['isDefault'] == 'true'
       super
     end
 
+    # Keeps an Array of {IndexedObject}s in their +index+ed order.
     class Array < ::Array
+      # Returns the first object which is set as the default, or the first
+      # object if none are set as the default.
+      # @return [IndexedObject]
       attr_reader :default
 
       def self.from_xml(nodes)
@@ -68,6 +74,7 @@ module SAML2
       end
     end
 
+    # (see Base#build)
     def build(builder, *)
       super
       builder.parent.children.last['index'] = index
@@ -75,6 +82,7 @@ module SAML2
     end
 
     private
+
     def self.included(klass)
       klass.const_set(:Array, Array.dup)
     end

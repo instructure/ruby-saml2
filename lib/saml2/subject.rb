@@ -10,11 +10,13 @@ module SAML2
       @confirmations = []
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @confirmations = nil
     end
 
+    # @return [NameID]
     def name_id
       if xml && !instance_variable_defined?(:@name_id)
         @name_id = NameID.from_xml(xml.at_xpath('saml:NameID', Namespaces::ALL))
@@ -22,18 +24,23 @@ module SAML2
       @name_id
     end
 
+    # @return [Confirmation, nil]
     def confirmation
       Array.wrap(confirmations).first
     end
 
+    # @return [Confirmation, nil]
     def confirmation=(value)
-      @confirmations = [value]
+      @confirmations = value.nil? ? [] : [value]
+      confirmation
     end
 
+    # @return [Confirmation, Array<Confirmation>]
     def confirmations
       @confirmations ||= load_object_array(xml, 'saml:SubjectConfirmation', Confirmation)
     end
 
+    # (see Base#build)
     def build(builder)
       builder['saml'].Subject do |subject|
         name_id.build(subject) if name_id
@@ -50,8 +57,15 @@ module SAML2
         SENDER_VOUCHES = 'urn:oasis:names:tc:SAML:2.0:cm:sender-vouches'.freeze
       end
 
-      attr_accessor :method, :not_before, :not_on_or_after, :recipient, :in_response_to
+      # @see Methods
+      # @return [String]
+      attr_accessor :method
+      # @return [Time, nil]
+      attr_accessor :not_before, :not_on_or_after
+      # @return [String, nil]
+      attr_accessor :recipient, :in_response_to
 
+      # (see Base#from_xml)
       def from_xml(node)
         super
         self.method = node['Method']
@@ -64,6 +78,7 @@ module SAML2
         end
       end
 
+      # (see Base#build)
       def build(builder)
         builder['saml'].SubjectConfirmation('Method' => method) do |subject_confirmation|
           if in_response_to ||

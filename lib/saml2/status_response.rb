@@ -3,19 +3,23 @@ require 'saml2/status'
 
 module SAML2
   class StatusResponse < Message
-    attr_accessor :in_response_to, :status
+    # @return [String]
+    attr_accessor :in_response_to
+    attr_writer :status
 
     def initialize
       super
       @status = Status.new
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @status = nil
       remove_instance_variable(:@status)
     end
 
+    # @return [Status]
     def status
       @status ||= Status.from_xml(xml.at_xpath('samlp:Status', Namespaces::ALL))
     end

@@ -14,14 +14,7 @@ module SAML2
     end
 
     class << self
-      def subclasses
-        @subclasses ||= []
-      end
-
-      def inherited(klass)
-        subclasses << klass
-      end
-
+      # (see Base.from_xml)
       def from_xml(node)
         # pass through for subclasses
         return super unless self == Attribute
@@ -31,19 +24,42 @@ module SAML2
         klass ? klass.from_xml(node) : super
       end
 
+      # Create an appropriate object to represent an attribute.
+      #
+      # This will create the most appropriate object (i.e. an
+      # {Attribute::X500} if possible) to represent this attribute,
+      # based on its name.
+      # @param name [String]
+      #   The attribute name. This can be a friendly name, or a URI.
+      # @param value optional
+      #   The attribute value.
+      # @return [Attribute]
       def create(name, value = nil)
         (class_for(name) || self).new(name, value)
       end
 
+      # The XML namespace that this attribute class serializes as.
+      # @return ['saml']
       def namespace
         'saml'
       end
 
+      # The XML element that this attribute class serializes as.
+      # @return ['Attribute']
       def element
         'Attribute'
       end
 
       protected
+
+      def subclasses
+        @subclasses ||= []
+      end
+
+      def inherited(klass)
+        subclasses << klass
+      end
+
 
       def class_for(name_or_node)
         subclasses.find do |klass|
@@ -52,12 +68,24 @@ module SAML2
       end
     end
 
-    attr_accessor :name, :friendly_name, :name_format, :value
+    # @return [String]
+    attr_accessor :name
+    # @return [String, nil]
+    attr_accessor :friendly_name, :name_format
+    # @return [Object, nil]
+    attr_accessor :value
 
+    # Create a new generic Attribute
+    #
+    # @param name [String]
+    # @param value optional [Object, nil]
+    # @param friendly_name optional [String, nil]
+    # @param name_format optional [String, nil]
     def initialize(name = nil, value = nil, friendly_name = nil, name_format = nil)
       @name, @value, @friendly_name, @name_format = name, value, friendly_name, name_format
     end
 
+    # (see Base#build)
     def build(builder)
       builder[self.class.namespace].__send__(self.class.element, 'Name' => name) do |attribute|
         attribute.parent['FriendlyName'] = friendly_name if friendly_name
@@ -71,6 +99,7 @@ module SAML2
       end
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @name = node['Name']
@@ -87,6 +116,7 @@ module SAML2
     end
 
     private
+
     XS_TYPES = {
       lookup_qname('xs:boolean', Namespaces::ALL) =>
         [[TrueClass, FalseClass], nil, ->(v) { %w{true 1}.include?(v) ? true : false }],

@@ -10,14 +10,22 @@ module SAML2
       TECHNICAL      = 'technical'.freeze
     end
 
-    attr_accessor :type, :company, :given_name, :surname, :email_addresses, :telephone_numbers
+    # @see Type
+    # @return [String]
+    attr_accessor :type
+    # @return [String, nil]
+    attr_accessor :company, :given_name, :surname
+    # @return [Array<String>]
+    attr_accessor :email_addresses, :telephone_numbers
 
+    # @param type [String]
     def initialize(type = Type::OTHER)
       @type = type
       @email_addresses = []
       @telephone_numbers = []
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       self.type = node['contactType']
       company = node.at_xpath('md:Company', Namespaces::ALL)
@@ -31,6 +39,7 @@ module SAML2
       self
     end
 
+    # (see Base#build)
     def build(builder)
       builder['md'].ContactPerson('contactType' => type) do |contact_person|
         contact_person['md'].Company(company) if company

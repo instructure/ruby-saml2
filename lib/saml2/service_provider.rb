@@ -11,12 +11,14 @@ module SAML2
       @attribute_consuming_services = AttributeConsumingService::Array.new
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @assertion_consumer_services = nil
       @attribute_consuming_services = nil
     end
 
+    # @return [Endpoint::Indexed::Array]
     def assertion_consumer_services
       @assertion_consumer_services ||= begin
         nodes = xml.xpath('md:AssertionConsumerService', Namespaces::ALL)
@@ -24,6 +26,7 @@ module SAML2
       end
     end
 
+    # @return [AttributeConsumingService::Array]
     def attribute_consuming_services
       @attribute_consuming_services ||= begin
         nodes = xml.xpath('md:AttributeConsumingService', Namespaces::ALL)
@@ -31,6 +34,7 @@ module SAML2
       end
     end
 
+    # (see Base#build)
     def build(builder)
       builder['md'].SPSSODescriptor do |sp_sso_descriptor|
         super(sp_sso_descriptor)

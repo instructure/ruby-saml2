@@ -6,6 +6,7 @@ require 'saml2/organization_and_contacts'
 require 'saml2/signable'
 
 module SAML2
+  # @abstract
   class Role < Base
     module Protocols
       SAML2 = 'urn:oasis:names:tc:SAML:2.0:protocol'.freeze
@@ -23,29 +24,36 @@ module SAML2
       @keys = []
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       super
       @supported_protocols = nil
       @keys = nil
     end
 
+    # @see Protocols
+    # @return [Array<String>]
     def supported_protocols
       @supported_protocols ||= xml['protocolSupportEnumeration'].split
     end
 
+    # @return [Array<Key>]
     def keys
       @keys ||= load_object_array(xml, 'md:KeyDescriptor', Key)
     end
 
+    # @return [Array<Key>]
     def signing_keys
       keys.select { |key| key.signing? }
     end
 
+    # @return [Array<Key>]
     def encryption_keys
       keys.select { |key| key.encryption? }
     end
 
     protected
+
     # should be called from inside the role element
     def build(builder)
       builder.parent['protocolSupportEnumeration'] = supported_protocols.to_a.join(' ')

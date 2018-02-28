@@ -18,6 +18,28 @@ module SAML2
       end
 
       class << self
+        # Decode, validate signature, and parse a compressed and Base64 encoded
+        # SAML message.
+        #
+        # A signature, if present, will be verified only if +public_key+ is
+        # passed.
+        #
+        # @param url [String]
+        #   The full URL to decode. Will check for both +SAMLRequest+ and
+        #   +SAMLResponse+ params.
+        # @param public_key optional [Array<OpenSSL::PKey>, OpenSSL::PKey, Proc]
+        #   Keys to use to check the signature. If a +Proc+ is provided, it is
+        #   called with the parsed {Message}, and the +SigAlg+ in order for the
+        #   caller to find an appropriate key based on the {Message}'s issuer.
+        # @param public_key_used optional [Proc]
+        #   Is called with the actual key that was used to validate the
+        #   signature.
+        # @return [[Message, String]]
+        #   The Message and the RelayState.
+        # @raise [UnsignedMessage] If a public_key is provided, but the message
+        #   is not signed.
+        # @yield [message, sig_alg]
+        #   The same as a +Proc+ provided to +public_key+. Deprecated.
         def decode(url, public_key: nil, public_key_used: nil)
           uri = begin
             URI.parse(url)
@@ -69,6 +91,7 @@ module SAML2
           # if a block is provided, it's to fetch the proper certificate
           # based on the contents of the message
           public_key ||= yield(message, sig_alg) if block_given?
+          public_key = public_key.call(message, sig_alg) if public_key.is_a?(Proc)
           if public_key
             raise UnsignedMessage unless signature
             raise UnsupportedSignatureAlgorithm unless SigAlgs::RECOGNIZED.include?(sig_alg)
@@ -98,6 +121,17 @@ module SAML2
           [message, relay_state]
         end
 
+        # Encode a SAML message into Base64, compressed query params.
+        #
+        # @param message [Message]
+        #   Note that the base URI is taken from {Message#destination}.
+        # @param relay_state optional [String]
+        # @param private_key optional [OpenSSL::PKey::RSA]
+        #   A key to use to sign the encoded message.
+        # @return [String]
+        #   The full URI to redirect to, including +RelayState+, and
+        #   +SAMLRequest+ vs. +SAMLResponse+ chosen appropriately, and
+        #   +Signature+ + +SigAlg+ query params if signing.
         def encode(message, relay_state: nil, private_key: nil)
           result = URI.parse(message.destination)
           original_query = URI.decode_www_form(result.query) if result.query

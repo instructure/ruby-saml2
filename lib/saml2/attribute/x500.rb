@@ -29,6 +29,8 @@ module SAML2
       # http://www.ietf.org/rfc/rfc4524.txt
       MAIL                   = 'urn:oid:0.9.2342.19200300.100.1.3'.freeze
 
+      # Returns true if the param should be an {X500} Attribute.
+      # @param name_or_node [String, Nokogiri::XML::Element]
       def self.recognizes?(name_or_node)
         if name_or_node.is_a?(Nokogiri::XML::Element)
           !!name_or_node.at_xpath("@x500:Encoding", Namespaces::ALL)
@@ -37,6 +39,14 @@ module SAML2
         end
       end
 
+      # Create a new X.500 attribute.
+      #
+      # The name format will always be set to URI.
+      #
+      # @param name [String]
+      #   Either an OID or a known friendly name. The opposite value will be
+      #   inferred automatically.
+      # @param value optional [Object, nil]
       def initialize(name = nil, value = nil)
         # if they pass an OID, infer the friendly name
         friendly_name = OIDS[name]
@@ -51,6 +61,7 @@ module SAML2
         super(name, value, friendly_name, NameFormats::URI)
       end
 
+      # (see Base#build)
       def build(builder)
         super
         attr = builder.parent.last_element_child

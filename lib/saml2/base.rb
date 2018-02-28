@@ -1,7 +1,12 @@
 require 'saml2/namespaces'
 
 module SAML2
+  # @abstract
   class Base
+    # Create an appropriate object to represent the given XML element.
+    #
+    # @param node [Nokogiri::XML::Element, nil]
+    # @return [Base, nil]
     def self.from_xml(node)
       return nil unless node
       result = new
@@ -9,16 +14,31 @@ module SAML2
       result
     end
 
+    # @return [Nokogiri::XML::Element]
     attr_reader :xml
 
     def initialize
       @pretty = true
     end
 
+    # Parse an XML element into this object.
+    #
+    # @param node [Nokogiri::XML::Element]
+    # @return [void]
     def from_xml(node)
       @xml = node
     end
 
+    # Returns the XML of this object as a string.
+    #
+    # If this object came from parsing XML, it will always return it with the
+    # same formatting as it was parsed.
+    #
+    # @param pretty optional [true, false, nil]
+    #   +true+ forces it to format it for easy reading. +nil+ will prefer to
+    #   format it pretty, but won't if e.g. it has been signed, and pretty
+    #   formatting would break the signature.
+    # @return [String]
     def to_s(pretty: nil)
       pretty = @pretty if pretty.nil?
       if xml
@@ -31,10 +51,19 @@ module SAML2
       end
     end
 
+    # Inspect the object
+    #
+    # The +@xml+ instance variable is omitted, keeping this useful. However, if
+    # an object lazily parses sub-objects, then their instance variables will
+    # not be created until their attribute is accessed.
+    # @return [String]
     def inspect
       "#<#{self.class.name} #{instance_variables.map { |iv| next if iv == :@xml; "#{iv}=#{instance_variable_get(iv).inspect}" }.compact.join(", ") }>"
     end
 
+    # Serialize this object to XML
+    #
+    # @return [Nokogiri::XML::Document]
     def to_xml
       unless instance_variable_defined?(:@document)
         builder = Nokogiri::XML::Builder.new
@@ -47,6 +76,10 @@ module SAML2
       @document
     end
 
+    # Serialize this object to XML, as part of a larger document
+    #
+    # @param builder [Nokogiri::XML::Builder] The builder helper object to serialize to.
+    # @return [void]
     def build(builder)
     end
 
@@ -55,6 +88,7 @@ module SAML2
         element_node.content&.strip
       end
     end
+
 
     def self.load_object_array(node, element, klass = nil)
       node.xpath(element, Namespaces::ALL).map do |element_node|

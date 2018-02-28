@@ -16,6 +16,11 @@ module SAML2
       end
     end
 
+    # @param lang [String, Symbol, :all, nil]
+    #   The language to retrieve the localized string for.
+    #   +:all+ will return the hash itself, and +nil+ will return the first
+    #   localized string regardless of language.
+    # @return [String]
     def [](lang)
       case lang
       when :all
@@ -27,6 +32,7 @@ module SAML2
       end
     end
 
+    # @return [String] The first localized string regardless of language
     def to_s
       self[nil].to_s
     end

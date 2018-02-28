@@ -2,6 +2,11 @@ require 'saml2/status_response'
 
 module SAML2
   class LogoutResponse < StatusResponse
+    # @param logout_request [LogoutRequest]
+    # @param sso [SSO]
+    # @param issuer [NameID]
+    # @param status_code [String]
+    # @return [LogoutResponse]
     def self.respond_to(logout_request, sso, issuer, status_code = Status::SUCCESS)
       logout_response = new
       logout_response.issuer = issuer
@@ -10,6 +15,8 @@ module SAML2
       logout_response.status.code = status_code
       logout_response
     end
+
+    private
 
     def build(builder)
       builder['samlp'].LogoutResponse(

@@ -14,14 +14,20 @@ module SAML2
     end
 
     class Policy < Base
-      attr_writer :allow_create, :format, :sp_name_qualifier
+      # @return [Boolean, nil]
+      attr_writer :allow_create
+      attr_writer :format, :sp_name_qualifier
 
+      # @param allow_create optional [Boolean]
+      # @param format optional [String]
+      # @param sp_name_qualifier optional [String]
       def initialize(allow_create = nil, format = nil, sp_name_qualifier = nil)
         @allow_create = allow_create if allow_create
         @format = format if format
         @sp_name_qualifier = sp_name_qualifier if sp_name_qualifier
       end
 
+      # @return [Boolean, nil]
       def allow_create?
         if xml && !instance_variable_defined?(:@allow_create)
           @allow_create = xml['AllowCreate']&.== 'true'
@@ -29,6 +35,8 @@ module SAML2
         @allow_create
       end
 
+      # @see Format
+      # @return [String, nil]
       def format
         if xml && !instance_variable_defined?(:@format)
           @format = xml['Format']
@@ -36,6 +44,7 @@ module SAML2
         @format
       end
 
+      # @return [String, nil]
       def sp_name_qualifier
         if xml && !instance_variable_defined?(:@sp_name_qualifier)
           @sp_name_qualifier = xml['SPNameQualifier']
@@ -43,12 +52,15 @@ module SAML2
         @sp_name_qualifier
       end
 
+      # @param rhs [Policy]
+      # @return [Boolean]
       def ==(rhs)
         allow_create? == rhs.allow_create? &&
             format == rhs.format &&
             sp_name_qualifier == rhs.sp_name_qualifier
       end
 
+      # (see Base#build)
       def build(builder)
         builder['samlp'].NameIDPolicy do |name_id_policy|
           name_id_policy.parent['Format'] = format if format
@@ -58,8 +70,13 @@ module SAML2
       end
     end
 
-    attr_accessor :id, :format, :name_qualifier, :sp_name_qualifier
+    # @return [String]
+    attr_accessor :id
+    # @return [String, nil]
+    attr_accessor :format, :name_qualifier, :sp_name_qualifier
 
+    # (see Base.from_xml)
+    # @todo actually inherit from {Base}, and use an instance method
     def self.from_xml(node)
       node && new(node.content.strip,
                   node['Format'],
@@ -67,11 +84,17 @@ module SAML2
                   sp_name_qualifier: node['SPNameQualifier'])
     end
 
+    # @param id [String]
+    # @param format optional [String]
+    # @param name_qualifier optional [String]
+    # @param sp_name_qualifier optional [String]
     def initialize(id = nil, format = nil, name_qualifier: nil, sp_name_qualifier: nil)
       @id, @format, @name_qualifier, @sp_name_qualifier =
           id, format, name_qualifier, sp_name_qualifier
     end
 
+    # @param rhs [NameID]
+    # @return [Boolean]
     def ==(rhs)
       id == rhs.id &&
           format == rhs.format &&
@@ -79,6 +102,7 @@ module SAML2
           sp_name_qualifier == rhs.sp_name_qualifier
     end
 
+    # (see Base#build)
     def build(builder, element: nil)
       args = {}
       args['Format'] = format if format

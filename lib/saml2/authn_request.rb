@@ -16,12 +16,22 @@ module SAML2
     attr_writer :assertion_consumer_service_index,
                 :assertion_consumer_service_url,
                 :attribute_consuming_service_index,
-                :force_authn,
                 :name_id_policy,
-                :passive,
                 :protocol_binding
+    # @return [Boolean, nil]
+    attr_writer :force_authn, :passive
+    # @return [RequestedAuthnContext, nil]
     attr_accessor :requested_authn_context
 
+    # Initiate a SAML SSO flow, from a service provider to an identity
+    # provider.
+    # @todo go over these params, and use kwargs. Maybe pass Entity instead
+    #   of ServiceProvider.
+    # @param issuer [NameID]
+    # @param identity_provider [IdentityProvider]
+    # @param assertion_consumer_service [Endpoint::Indexed]
+    # @param service_provider [ServiceProvider]
+    # @return [AuthnRequest]
     def self.initiate(issuer, identity_provider = nil,
         assertion_consumer_service: nil,
         service_provider: nil)
@@ -37,6 +47,7 @@ module SAML2
       authn_request
     end
 
+    # @see https://docs.oasis-open.org/security/saml/v2.0/saml-profiles-2.0-os.pdf section 4.1
     def valid_web_browser_sso_profile?
       return false unless issuer
       return false if issuer.format && issuer.format != NameID::Format::ENTITY
@@ -44,6 +55,7 @@ module SAML2
       true
     end
 
+    # @see https://saml2int.org/profile/current/#section82
     def valid_interoperable_profile?
       # It's a subset of Web Browser SSO profile
       return false unless valid_web_browser_sso_profile?
@@ -55,6 +67,14 @@ module SAML2
       true
     end
 
+    # Populate {#assertion_consumer_service} and {#attribute_consuming_service}
+    # attributes.
+    #
+    # Given {ServiceProvider} metadata, resolve the index/urls in this object to actual
+    # objects.
+    #
+    # @param service_provider [ServiceProvider]
+    # @return [Boolean]
     def resolve(service_provider)
       # TODO: check signature if present
 
@@ -71,6 +91,7 @@ module SAML2
       true
     end
 
+    # @return [NameID::Policy, nil]
     def name_id_policy
       if xml && !instance_variable_defined?(:@name_id_policy)
         @name_id_policy = NameID::Policy.from_xml(xml.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
@@ -78,8 +99,14 @@ module SAML2
       @name_id_policy
     end
 
-    attr_reader :assertion_consumer_service, :attribute_consuming_service
+    # Must call {#resolve} before accessing.
+    # @return [AssertionConsumerService, nil]
+    attr_reader :assertion_consumer_service
+    # Must call {#resolve} before accessing.
+    # @return [AttributeConsumingService, nil]
+    attr_reader :attribute_consuming_service
 
+    # @return [Integer, nil]
     def assertion_consumer_service_index
       if xml && !instance_variable_defined?(:@assertion_consumer_service_index)
         @assertion_consumer_service_index = xml['AssertionConsumerServiceIndex']&.to_i
@@ -87,6 +114,7 @@ module SAML2
       @assertion_consumer_service_index
     end
 
+    # @return [String, nil]
     def assertion_consumer_service_url
       if xml && !instance_variable_defined?(:@assertion_consumer_service_url)
         @assertion_consumer_service_url = xml['AssertionConsumerServiceURL']
@@ -94,6 +122,7 @@ module SAML2
       @assertion_consumer_service_url
     end
 
+    # @return [Integer, nil]
     def attribute_consuming_service_index
       if xml && !instance_variable_defined?(:@attribute_consuming_service_index)
         @attribute_consuming_service_index = xml['AttributeConsumingServiceIndex']&.to_i
@@ -101,6 +130,7 @@ module SAML2
       @attribute_consuming_service_index
     end
 
+    # @return [true, false, nil]
     def force_authn?
       if xml && !instance_variable_defined?(:@force_authn)
         @force_authn = xml['ForceAuthn']&.== 'true'
@@ -108,6 +138,7 @@ module SAML2
       @force_authn
     end
 
+    # @return [true, false, nil]
     def passive?
       if xml && !instance_variable_defined?(:@passive)
         @passive = xml['IsPassive']&.== 'true'
@@ -115,6 +146,7 @@ module SAML2
       @passive
     end
 
+    # @return [String, nil]
     def protocol_binding
       if xml && !instance_variable_defined?(:@protocol_binding)
         @protocol_binding = xml['ProtocolBinding']
@@ -122,6 +154,7 @@ module SAML2
       @protocol_binding
     end
 
+    # @return [Subject, nil]
     def subject
       if xml && !instance_variable_defined?(:@subject)
         @subject = Subject.from_xml(xml.at_xpath('saml:Subject', Namespaces::ALL))
@@ -129,6 +162,7 @@ module SAML2
       @subject
     end
 
+    # (see Base#build)
     def build(builder)
       builder['samlp'].AuthnRequest(
           'xmlns:samlp' => Namespaces::SAMLP,

@@ -3,9 +3,14 @@ require 'saml2/request'
 
 module SAML2
   class LogoutRequest < Request
-    attr_accessor :name_id, :session_index
+    attr_writer :name_id, :session_index
 
-    def self.initiate(sso, issuer, name_id, session_index = nil)
+    # @param sso [SSO]
+    # @param issuer [NameID]
+    # @param name_id [NameID]
+    # @param session_index optional [String, Array<String>]
+    # @return [LogoutRequest]
+    def self.initiate(sso, issuer, name_id, session_index = [])
       logout_request = new
       logout_request.issuer = issuer
       logout_request.destination = sso.single_logout_services.first.location
@@ -15,10 +20,12 @@ module SAML2
       logout_request
     end
 
+    # @return [NameID]
     def name_id
       @name_id ||= (NameID.from_xml(xml.at_xpath('saml:NameID', Namespaces::ALL)) if xml)
     end
 
+    # @return [String, Array<String>]
     def session_index
       @session_index ||= (load_string_array(xml,'samlp:SessionIndex') if xml)
     end

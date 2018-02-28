@@ -2,6 +2,7 @@ require 'saml2/key'
 
 module SAML2
   module Signable
+    # @return [Nokogiri::XML::Element, nil]
     def signature
       unless instance_variable_defined?(:@signature)
         @signature = xml.at_xpath('dsig:Signature', Namespaces::ALL)
@@ -19,6 +20,7 @@ module SAML2
       @signature
     end
 
+    # @return [Key, nil]
     def signing_key
       @signing_key ||= Key.from_xml(signature)
     end
@@ -27,6 +29,17 @@ module SAML2
       !!signature
     end
 
+    # Validate the signature on this object.
+    #
+    # Either +fingerprint+ or +cert+ must be provided.
+    #
+    # @param fingerprint optional [Array<String>, String]
+    #   SHA1 fingerprints of trusted certificates. If provided, they will be
+    #   checked against the {#signing_key} embedded in the {#signature}, and if
+    #   a match is found, the certificate embedded in the signature will be
+    #   added to the list of certificates used for verifying the signature.
+    # @param cert optional [Array<String>, String]
+    # @return [Array<String>] An empty array on success, details of errors on failure.
     def validate_signature(fingerprint: nil, cert: nil, verification_time: nil)
       return ["not signed"] unless signed?
 
@@ -49,10 +62,25 @@ module SAML2
       end
     end
 
+    # Check if the signature on this object is valid.
+    #
+    # Either +fingerprint+ or +cert+ must be provided.
+    #
+    # @param (see #validate_signature)
+    # @return [Boolean]
     def valid_signature?(fingerprint: nil, cert: nil, verification_time: nil)
       validate_signature(fingerprint: fingerprint, cert: cert, verification_time: verification_time).empty?
     end
 
+    # Sign this object.
+    #
+    # @param x509_certificate [String]
+    #   The certificate corresponding to +private_key+, to be embedded in the
+    #   signature.
+    # @param private_key [String]
+    #   The key to use to sign.
+    # @param algorithm_name [Symbol]
+    # @return [self]
     def sign(x509_certificate, private_key, algorithm_name = :sha256)
       to_xml
 

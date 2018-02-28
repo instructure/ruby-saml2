@@ -10,12 +10,14 @@ module SAML2
       @contacts = []
     end
 
+    # (see Base#from_xml)
     def from_xml(node)
       remove_instance_variable(:@organization)
       @contacts = nil
       super
     end
 
+    # @return [Organization, nil]
     def organization
       unless instance_variable_defined?(:@organization)
         @organization = Organization.from_xml(xml.at_xpath('md:Organization', Namespaces::ALL))
@@ -23,6 +25,7 @@ module SAML2
       @organization
     end
 
+    # @return [Array<Contact>]
     def contacts
       @contacts ||= load_object_array(xml, 'md:ContactPerson', Contact)
     end
