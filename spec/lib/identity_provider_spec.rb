@@ -14,7 +14,7 @@ module SAML2
       idp = IdentityProvider.new
       idp.name_id_formats << NameID::Format::PERSISTENT
       idp.single_sign_on_services << Endpoint.new('https://sso.canvaslms.com/SAML2/Login')
-      idp.keys << Key.new('somedata', Key::Type::SIGNING)
+      idp.keys << KeyDescriptor.new('somedata', KeyDescriptor::Type::SIGNING)
 
       entity.roles << idp
       expect(Schemas.metadata.validate(Nokogiri::XML(entity.to_s))).to eq []

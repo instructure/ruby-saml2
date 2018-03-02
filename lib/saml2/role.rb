@@ -39,17 +39,17 @@ module SAML2
       @supported_protocols ||= xml['protocolSupportEnumeration'].split
     end
 
-    # @return [Array<Key>]
+    # @return [Array<KeyDescriptor>]
     def keys
-      @keys ||= load_object_array(xml, 'md:KeyDescriptor', Key)
+      @keys ||= load_object_array(xml, 'md:KeyDescriptor', KeyDescriptor)
     end
 
-    # @return [Array<Key>]
+    # @return [Array<KeyDescriptor>]
     def signing_keys
       keys.select { |key| key.signing? }
     end
 
-    # @return [Array<Key>]
+    # @return [Array<KeyDescriptor>]
     def encryption_keys
       keys.select { |key| key.encryption? }
     end

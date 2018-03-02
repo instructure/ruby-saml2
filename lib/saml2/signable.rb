@@ -22,9 +22,9 @@ module SAML2
       @signature
     end
 
-    # @return [Key, nil]
+    # @return [KeyInfo, nil]
     def signing_key
-      @signing_key ||= Key.from_xml(signature)
+      @signing_key ||= KeyInfo.from_xml(signature)
     end
 
     def signed?
@@ -49,7 +49,7 @@ module SAML2
       # see if any given fingerprints match the certificate embedded in the XML;
       # if so, extract the certificate, and add it to the allowed certificates list
       Array(fingerprint)&.each do |fp|
-        certs << signing_key.certificate if signing_key&.fingerprint == Key.format_fingerprint(fp)
+        certs << signing_key.certificate if signing_key&.fingerprint == KeyInfo.format_fingerprint(fp)
       end
       certs = certs.uniq
       return ["no certificate found"] if certs.empty?

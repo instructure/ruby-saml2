@@ -16,8 +16,8 @@ module SAML2
                                                  Bindings::HTTPRedirect::URN)
       sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login1')
       sp.assertion_consumer_services << Endpoint::Indexed.new('https://sso.canvaslms.com/SAML2/Login2')
-      sp.keys << Key.new('somedata', Key::Type::ENCRYPTION, [Key::EncryptionMethod.new])
-      sp.keys << Key.new('somedata', Key::Type::SIGNING)
+      sp.keys << KeyDescriptor.new('somedata', KeyDescriptor::Type::ENCRYPTION, [KeyDescriptor::EncryptionMethod.new])
+      sp.keys << KeyDescriptor.new('somedata', KeyDescriptor::Type::SIGNING)
       acs = AttributeConsumingService.new
       acs.name[:en] = 'service'
       acs.requested_attributes << RequestedAttribute.create('uid')
@@ -61,7 +61,7 @@ module SAML2
       end
 
       it "loads the key info" do
-        expect(sp.keys.first.encryption_methods.first.algorithm).to eq Key::EncryptionMethod::Algorithm::AES128_CBC
+        expect(sp.keys.first.encryption_methods.first.algorithm).to eq KeyDescriptor::EncryptionMethod::Algorithm::AES128_CBC
         expect(sp.keys.first.encryption_methods.first.key_size).to eq 128
       end
     end
