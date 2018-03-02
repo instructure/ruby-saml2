@@ -15,8 +15,9 @@ module SAML2
       module SigAlgs
         DSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#dsa-sha1"
         RSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#rsa-sha1"
+        RSA_SHA256 = "http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"
 
-        RECOGNIZED = [DSA_SHA1, RSA_SHA1].freeze
+        RECOGNIZED = [DSA_SHA1, RSA_SHA1, RSA_SHA256].freeze
       end
 
       class << self
@@ -111,7 +112,8 @@ module SAML2
             valid_signature = false
             # there could be multiple certificates to try
             Array(public_key).each do |key|
-              if key.verify(OpenSSL::Digest::SHA1.new, signature, base_string)
+              hash = (sig_alg == SigAlgs::RSA_SHA256 ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
+              if key.verify(hash.new, signature, base_string)
                 # notify the caller which certificate was used
                 public_key_used&.call(key)
                 valid_signature = true
@@ -130,11 +132,15 @@ module SAML2
         # @param relay_state optional [String]
         # @param private_key optional [OpenSSL::PKey::RSA]
         #   A key to use to sign the encoded message.
+        # @param sig_alg optional [String]
+        #   The signing algorithm to use. Defaults to RSA-SHA1, as it's the
+        #   most compatible, and explicitly mentioned in the SAML specs, but
+        #   you may want to use RSA-SHA256. Values must come from {SigAlgs}.
         # @return [String]
         #   The full URI to redirect to, including +RelayState+, and
         #   +SAMLRequest+ vs. +SAMLResponse+ chosen appropriately, and
         #   +Signature+ + +SigAlg+ query params if signing.
-        def encode(message, relay_state: nil, private_key: nil)
+        def encode(message, relay_state: nil, private_key: nil, sig_alg: SigAlgs::RSA_SHA1)
           result = URI.parse(message.destination)
           original_query = URI.decode_www_form(result.query) if result.query
           original_query ||= []
@@ -153,9 +159,12 @@ module SAML2
           query << [message.is_a?(Request) ? 'SAMLRequest' : 'SAMLResponse', base64]
           query << ['RelayState', relay_state] if relay_state
           if private_key
-            query << ['SigAlg', SigAlgs::RSA_SHA1]
+            raise ArgumentError, "Unsupported signature algorithm #{sig_alg}" unless SigAlgs::RECOGNIZED.include?(sig_alg)
+
+            query << ['SigAlg', sig_alg]
             base_string = URI.encode_www_form(query)
-            signature = private_key.sign(OpenSSL::Digest::SHA1.new, base_string)
+            hash = (sig_alg == SigAlgs::RSA_SHA256 ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
+            signature = private_key.sign(hash.new, base_string)
             query << ['Signature', Base64.strict_encode64(signature)]
           end
 

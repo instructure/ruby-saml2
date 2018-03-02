@@ -146,15 +146,36 @@ module SAML2
         allow(message).to receive(:destination).and_return("http://somewhere/")
         allow(message).to receive(:to_s).and_return("hi")
         key = OpenSSL::PKey::RSA.new(fixture('privatekey.key'))
-        url = Bindings::HTTPRedirect.encode(message, relay_state: "abc", private_key: key)
+        url = Bindings::HTTPRedirect.encode(message,
+                                            relay_state: "abc",
+                                            private_key: key)
 
         # verify the signature
         allow(Message).to receive(:parse).with("hi").and_return("parsed")
         Bindings::HTTPRedirect.decode(url) do |_message, sig_alg|
-          expect(sig_alg).not_to be_nil
+          expect(sig_alg).to eq Bindings::HTTPRedirect::SigAlgs::RSA_SHA1
           OpenSSL::X509::Certificate.new(fixture('certificate.pem')).public_key
         end
       end
+
+      it 'signs a message with RSA-SHA256' do
+        message = double()
+        allow(message).to receive(:destination).and_return("http://somewhere/")
+        allow(message).to receive(:to_s).and_return("hi")
+        key = OpenSSL::PKey::RSA.new(fixture('privatekey.key'))
+        url = Bindings::HTTPRedirect.encode(message,
+                                            relay_state: "abc",
+                                            private_key: key,
+                                            sig_alg: Bindings::HTTPRedirect::SigAlgs::RSA_SHA256)
+
+        # verify the signature
+        allow(Message).to receive(:parse).with("hi").and_return("parsed")
+        Bindings::HTTPRedirect.decode(url) do |_message, sig_alg|
+          expect(sig_alg).to eq Bindings::HTTPRedirect::SigAlgs::RSA_SHA256
+          OpenSSL::X509::Certificate.new(fixture('certificate.pem')).public_key
+        end
+      end
+
     end
   end
 end
