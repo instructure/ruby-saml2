@@ -85,6 +85,57 @@ module SAML2
     def build(builder)
     end
 
+    # Decrypt (in-place) encrypted portions of this object
+    #
+    # Either the +keys+ parameter, or a block that returns key(s), should be
+    # provided.
+    #
+    # @param keys optional [Array<OpenSSL::PKey, String>, OpenSSL::PKey, String, nil]
+    # @yield Optional block to fetch the necessary keys, given information
+    #   contained in the encrypted elements of which certificates it was
+    #   encrypted for.
+    # @yieldparam allowed_certs [Array<OpenSSL::X509::Certificate, Hash, String, nil>]
+    #   An array of certificates describing who the node was encrypted for.
+    #   Identified by an X.509 Certificate, a hash with +:issuer+ and +:serial+
+    #   keys, or a string of SubjectName.
+    # @yieldreturn [Array<OpenSSL::PKey, String>, OpenSSL::PKey, String, nil]
+    # @return [Boolean] If any nodes were present.
+    def decrypt(keys = nil)
+      encrypted_nodes = self.encrypted_nodes
+      encrypted_nodes.each do |node|
+        this_nodes_keys = keys
+        if keys.nil?
+          allowed_certs = node.xpath("dsig:KeyInfo/xenc:EncryptedKey/dsig:KeyInfo/dsig:X509Data", SAML2::Namespaces::ALL).map do |x509data|
+            if (cert = x509data.at_xpath("dsig:X509Certificate", SAML2::Namespaces::ALL)&.content&.strip)
+              OpenSSL::X509::Certificate.new(Base64.decode64(cert))
+            elsif (issuer_serial = x509data.at_xpath("dsig:X509IssuerSerial", SAML2::Namespaces::ALL))
+              {
+                  issuer: issuer_serial.at_xpath("dsig:X509IssuerName", SAML2::Namespaces::ALL).content.strip,
+                  serial: issuer_serial.at_xpath("dsig:X509SerialNumber", SAML2::Namespaces::ALL).content.strip.to_i,
+              }
+            elsif (subject_name = x509data.at_xpath("dsig:X509SubjectName", SAML2::Namespaces::ALL)&.content&.strip)
+              subject_name
+            end
+          end
+          this_nodes_keys = yield allowed_certs
+        end
+        this_nodes_keys = Array(this_nodes_keys)
+        raise ArgumentError("no decryption key provided or found") if this_nodes_keys.empty?
+
+        old_node = node.parent
+        this_nodes_keys.each_with_index do |key, i|
+          begin
+            old_node.replace(node.decrypt_with(key: key))
+          rescue XMLSec::DecryptionError
+            # swallow errors on all but the last key
+            raise if i - 1 == this_nodes_keys.length
+          end
+        end
+      end
+
+      !encrypted_nodes.empty?
+    end
+
     def self.load_string_array(node, element)
       node.xpath(element, Namespaces::ALL).map do |element_node|
         element_node.content&.strip
@@ -117,6 +168,10 @@ module SAML2
 
     def load_object_array(node, element, klass = nil)
       self.class.load_object_array(node, element, klass)
+    end
+
+    def encrypted_nodes
+      xml.xpath('//xenc:EncryptedData', Namespaces::ALL)
     end
 
     def self.split_qname(qname)

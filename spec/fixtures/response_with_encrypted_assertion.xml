@@ -1,0 +1,58 @@
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+                ID="_9a15e699-2d04-4ba7-a521-cfa4dcd21f44" Version="2.0" IssueInstant="2015-02-12T22:51:29Z"
+                Destination="https://siteadmin.test.instructure.com/saml_consume"
+                InResponseTo="_bec424fa5103428909a30ff1e31168327f79474984">
+  <saml:Issuer>issuer</saml:Issuer>
+  <samlp:Status>
+    <samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/>
+  </samlp:Status>
+  <saml:EncryptedAssertion>
+    <EncryptedData xmlns="http://www.w3.org/2001/04/xmlenc#" Type="http://www.w3.org/2001/04/xmlenc#Element">
+      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc"/>
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <EncryptedKey xmlns="http://www.w3.org/2001/04/xmlenc#">
+          <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-1_5"/>
+          <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+            <KeyName/>
+          </KeyInfo>
+          <CipherData>
+            <CipherValue>TyII9BENRVZpAFr5D4pVan4bfLdHW0BhnTZElAcq2beO7tYeV7yQH3LxyCy/eWYz
+              2AF69eFTPMFHSDqRKyHwqAeM2tfAQxgQmDTXWMESBND8CmgRLU4r5I0aV0gfLlfA
+              JmCeYavG8SbySnJ+WMNle/AAx9z3iN95+yIrZJ03HV/V7CXU1N3Dc84UAjRS3JNs
+              VO9woqtQd/Yq89wnrl8plfGTlzQChKlpZiY4eENBo432dA97ixjPfqnceBXE8oRt
+              LX2YrM1g1NazpWk2qHcxC/J7YBHbrY+pwUlMYL6KG6Et460lXX35dU5/R5avVZhP
+              DkzURwKKRC0BRfMDSuznAQ==</CipherValue>
+          </CipherData>
+        </EncryptedKey>
+      </KeyInfo>
+      <CipherData>
+        <CipherValue>wb+NaImnUFi7gdRSTIIK7H9Req2SLC0K2ayQURsSYLRnlMwoNOxK2JLj52hy2a1/
+          5PD2456UEM9u6M/CfsLkAp4pa0eOuluSiXB0zPaBYsdfQyzyGfWnzIzqNBIJT4Kv
+          BxmBrL/JY+ZXCArw16Z4gcS1xYL2afx67Q1bdlzEZwBPW5el8IsVMA0gob3Bmr7E
+          nEP13R2OQppdqHhV5Fl7LnARJoeXVLwB2ZG3SwxVvdOJzNKBGQdudU8eDeZVm6Le
+          dR0viMhKN2lI6L2UxOdDaziO+Zzz4kJUQGT5sf3M84dmx6QJcY/0JIQ8Ybb7T7Pz
+          IRtEkeANdDgV9gGA+mIuJZyxTazPStMGl7bbwqC1EPsXKXFxIy6Nki1lvrOfUc2K
+          Jn+ee5mr6NppiwD6g2Fv9OzJWFSJxn5RyYswgw5jydaZOFBDPBFysNb/0Rd8fYk5
+          ona1pTe/9tCws++faXWt2vVYIa3n4qOvWadW/Np71MGFZN/Peg/L218OoMCgXB4k
+          AC48GOLsHKIQ4ea+wnAaeyzYG2DZUzvmg9CH8KhtbSm/qt5MxMjt/2lC1RcBK7+l
+          onJUmTx0EXlr2MdOg4GO2B8veW8BA5VFPTQOjBCP5yyILUyeNR9HzxHnEIU5NI5h
+          EUqWaNngGTHYTsmcwI0OeLzI4KIn3Hb7B5OncAr/hD5Y8ar565hIY15BVN3JaDKs
+          pqLqVvU1VvgopIO4KyRnqNtWTqTflRbgm6TVJ0rZtmiizMD4GLgNWc18zlyBouJi
+          07INnTKhqOX6PAmb88kaelSMr9Dq/DpLpW2My594RCVApVAwo1ZSvzmrpy0jfW8/
+          L2O+Xb3GCzJuu5xyS5GUfENS2hq+RQgq27IXW6OUNfr2utaUZesCCGxLBzAtTZpz
+          g80vpYanezGJl0DsF+1L21rvcErwPphvFwWbukyug9ngVzzZfEh7vRbX1Gn+Humr
+          1c3cppkDxPdROzaFmMmo4QA71u0u3GhTO6mansAnQpwzaYwBjCIybkzlVJN9DFaL
+          0Q3xfaHi+6dVNHJFTd/cx0qUXetSCmO5dwWK5Z26RoZIZyrVfIYNpNGYh1vIWlj3
+          LH4BLgzTMiYP15reKtHANuxy4SU6ulAJ2DrODwUwq0dsKnBzZCeWSt4M7zwAc4mj
+          bFTgDcNZGIKkwdizzAZmmTx3hYNp7llyZP3bEGOc3Aadgzj87srI0KpAcOt+aFCw
+          nTr02e+7DFKrOwIlrUeVk3GQ1gpbl+W1iHbixv0LGRVg5KphJ2zNlrunIbvTEZWq
+          Z0wBvsV+PQEcZUkOaif9wHseq8crJEa2KQS5IHKvHJxC9MCTtmTKN99JIVjI4Ytf
+          43/pu6Sg9jzN67WcsLEoN4ykTo5a6XRBEEvO2tPehh9b0e+VCeL/wSkQ2sYqiGhR
+          BLSbO+5vXRf54iKIkv9/lUSRL+ihc9Balz+6q+dLwu8OKELprsXrXPcX6oQFVmu6
+          gnNXGR0BqVuSSZvp/mYicaOJDnNkPhiiBNzanfXhjZNuBLKtP3smxWWD7CogRdPl
+          a9dhOZAX0wvIbjDUkFB32SUnSoh7oTU3Jcg/RjRY+TxDBnh2f3/R3jm5HXm/sifM
+          6xBwqisHA4cPi9bcY1Ig6w==</CipherValue>
+      </CipherData>
+    </EncryptedData>
+  </saml:EncryptedAssertion>
+</samlp:Response>

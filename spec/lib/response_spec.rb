@@ -75,5 +75,14 @@ module SAML2
       expect(response).to be_valid_schema
       expect(response.assertions.first.valid_signature?(fingerprint: 'bc71f7bacb36011694405dd0e2beafcc069de45f')).to eq false
     end
+
+    it "can decrypt an EncryptedAssertion" do
+      # verifiable on the command line with:
+      # xmlsec1 decrypt --privkey-pem privatekey.key response_with_encrypted_assertion.xml
+      response = Response.parse(fixture("response_with_encrypted_assertion.xml"))
+      expect(response.decrypt(fixture("privatekey.key"))).to eq true
+      expect(response.assertions.length).to eq 1
+      expect(response.assertions.first.subject.name_id.id).to eq 'jacob'
+    end
   end
 end

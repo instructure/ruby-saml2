@@ -94,6 +94,12 @@ module SAML2
       nil
     end
 
+    protected
+
+    def encrypted_nodes
+      xml.xpath('saml:EncryptedAssertion/xenc:EncryptedData', Namespaces::ALL)
+    end
+
     private
 
     def build(builder)
