@@ -31,6 +31,11 @@ module SAML2
       @conditions ||= Conditions.from_xml(xml.at_xpath('saml:Conditions', Namespaces::ALL))
     end
 
+    # @return [Array<AttributeStatement>]
+    def attribute_statements
+      statements.select { |s| s.is_a?(AttributeStatement) }
+    end
+
     # @return [Array<AuthnStatement, AttributeStatement>]
     def statements
       @statements ||= load_object_array(xml, 'saml:AuthnStatement|saml:AttributeStatement')

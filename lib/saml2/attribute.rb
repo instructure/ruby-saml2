@@ -170,6 +170,38 @@ module SAML2
       end
     end
 
+    # Convert the {AttributeStatement} to a {Hash}
+    #
+    # Repeated attributes become an array.
+    #
+    # @param name optional [:name, :friendly_name]
+    #   Which name field to use as keys to the hash
+    def to_h(name = :friendly_name)
+      result = {}
+      attributes.each do |attribute|
+        key = attribute.send(name)
+        # fall back to name on missing friendly name;
+        # no need for the opposite, because name is required
+        key ||= attribute.name if name == :friendly_name
+
+        prior_value = result[key]
+        result[key] = if prior_value
+          value = Array.wrap(prior_value)
+          # repeated key; convert to array
+          if attribute.value.is_a?(Array)
+            # both values are arrays; concatenate them
+            prior_value.concat(attribute.value)
+          else
+            value << attribute.value
+          end
+          value
+        else
+          attribute.value
+        end
+      end
+      result
+    end
+
     def build(builder)
       builder['saml'].AttributeStatement('xmlns:xs' => Namespaces::XS,
                                          'xmlns:xsi' => Namespaces::XSI) do |statement|

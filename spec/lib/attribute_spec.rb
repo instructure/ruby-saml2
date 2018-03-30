@@ -94,4 +94,14 @@ XML
     end
 
   end
+
+  describe AttributeStatement do
+    describe "#to_h" do
+      it "works" do
+        attr_statement = Response.parse(fixture("response_with_attribute_signed.xml")).assertions.first.attribute_statements.first
+        expect(attr_statement.to_h).to eq('givenName' => 'cody')
+        expect(attr_statement.to_h(:name)).to eq("urn:oid:2.5.4.42" => 'cody')
+      end
+    end
+  end
 end
