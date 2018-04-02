@@ -19,12 +19,12 @@ module SAML2
         ENTITLEMENT          = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7'
         NICKNAME             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.2'
         ORG_D_N              = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.3'
+        ORG_UNIT_D_N         = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4'
         PRIMARY_AFFILIATION  = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.5'
         PRIMARY_ORG_UNIT_D_N = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.8'
         PRINCIPAL_NAME       = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6'
         SCOPED_AFFILIATION   = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9'
         TARGETED_I_D         = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10'
-        UNIT_D_N             = 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4'
       end
       # http://www.ietf.org/rfc/rfc4519.txt
       UID = USERID           = 'urn:oid:0.9.2342.19200300.100.1.1'
@@ -35,7 +35,8 @@ module SAML2
       # @param name_or_node [String, Nokogiri::XML::Element]
       def self.recognizes?(name_or_node)
         if name_or_node.is_a?(Nokogiri::XML::Element)
-          !!name_or_node.at_xpath("@x500:Encoding", Namespaces::ALL)
+          !!name_or_node.at_xpath("@x500:Encoding", Namespaces::ALL) ||
+              name_or_node['NameFormat'] == NameFormats::URI && OIDS.include?(name_or_node['Name'])
         else
           FRIENDLY_NAMES.include?(name_or_node) || OIDS.include?(name_or_node)
         end
@@ -61,6 +62,14 @@ module SAML2
         end
 
         super(name, value, friendly_name, NameFormats::URI)
+      end
+
+      # (see Base.from_xml)
+      def from_xml(node)
+        super
+        # infer the friendly name if not provided
+        self.friendly_name ||= OIDS[name]
+        self
       end
 
       # (see Base#build)

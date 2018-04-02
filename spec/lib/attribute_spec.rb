@@ -102,6 +102,13 @@ XML
         expect(attr_statement.to_h).to eq('givenName' => 'cody')
         expect(attr_statement.to_h(:name)).to eq("urn:oid:2.5.4.42" => 'cody')
       end
+
+      it "infers friendly names if possible" do
+        attr_statement = Response.parse(fixture("test3-response.xml")).assertions.first.attribute_statements.first
+        expect(attr_statement.to_h).to eq({
+            'eduPersonAffiliation' => 'member',
+            'eduPersonPrincipalName' => 'student@example.edu'})
+      end
     end
   end
 end
