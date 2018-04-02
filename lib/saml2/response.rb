@@ -109,6 +109,11 @@ module SAML2
       raise ArgumentError, "identity_provider should be an Entity object" unless identity_provider.is_a?(Entity)
       raise ArgumentError, "identity_provider should have at least one identity_provider role" unless (idp = identity_provider.identity_providers.first)
 
+      unless identity_provider.entity_id == issuer.id
+        errors << "received unexpected message from '#{issuer.id}'; expected it to be from '#{identity_provider.entity_id}'"
+        return errors
+      end
+
       certificates = idp.signing_keys.map(&:certificate)
       if idp.fingerprints.empty? && certificates.empty?
         errors << "could not find certificate to validate message"
@@ -174,11 +179,19 @@ module SAML2
         assertion_signed = true
       end
 
-      # TODO: use assertion conditions
-      if assertion.issue_instant +  5 * 60 < verification_time ||
-          assertion.issue_instant - 5 * 60 > verification_time
-        errors << "assertion not recently issued"
-        return errors
+      # only do our own issue instant validation if the assertion
+      # doesn't mandate any
+      unless assertion.conditions.not_on_or_after
+        if assertion.issue_instant +  5 * 60 < verification_time ||
+            assertion.issue_instant - 5 * 60 > verification_time
+          errors << "assertion not recently issued"
+          return errors
+        end
+      end
+
+      unless (condition_errors = assertion.conditions.validate(verification_time: verification_time,
+                                                               audience: service_provider.entity_id)).empty?
+        return errors.concat(condition_errors)
       end
 
       if !response_signed && !assertion_signed

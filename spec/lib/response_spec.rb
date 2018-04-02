@@ -129,10 +129,25 @@ module SAML2
         expect(response.errors).to eq []
       end
 
+      it "checks the issuer" do
+        response = Response.parse(fixture("response_signed.xml"))
+        idp_entity.entity_id = 'someoneelse'
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
+        expect(response.errors).to eq ["received unexpected message from 'issuer'; expected it to be from 'someoneelse'"]
+      end
+
       it "complains about old message" do
         response = Response.parse(fixture("response_signed.xml"))
         sp_entity.valid_response?(response, idp_entity)
-        expect(response.errors).to eq ["assertion not recently issued"]
+        expect(response.errors.length).to eq 1
+        expect(response.errors.first).to match (/not_on_or_after .* is earlier than/)
+      end
+
+      it "complains about mismatched audience restriction" do
+        response = Response.parse(fixture("response_signed.xml"))
+        sp_entity.entity_id = 'someoneelse'
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
+        expect(response.errors).to eq ["audience someoneelse not in allowed list of http://siteadmin.instructure.com/saml2"]
       end
 
       it "complains about no signature" do

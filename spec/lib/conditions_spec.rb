@@ -6,10 +6,10 @@ module SAML2
       expect(Conditions.new.valid?).to eq true
     end
 
-    it "should be valid with unknown condition" do
+    it "should be invalid with unknown condition" do
       conditions = Conditions.new
       conditions << Conditions::Condition.new
-      expect(conditions.valid?).to eq nil
+      expect(conditions.valid?).to eq false
     end
 
     it "should be valid with timestamps" do

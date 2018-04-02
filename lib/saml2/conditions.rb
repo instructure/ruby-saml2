@@ -22,38 +22,46 @@ module SAML2
       @not_before = Time.parse(node['NotBefore']) if node['NotBefore']
       @not_on_or_after = Time.parse(node['NotOnOrAfter']) if node['NotOnOrAfter']
 
-      replace(node.children.map { |restriction| self.class.const_get(restriction.name, false).from_xml(restriction) })
+      replace(node.element_children.map do |restriction|
+        klass = if self.class.const_defined?(restriction.name, false)
+          self.class.const_get(restriction.name, false)
+        else
+          Condition
+        end
+        klass.from_xml(restriction)
+      end)
     end
 
     # Evaluate these conditions.
     #
-    # @param now optional [Time]
+    # @param verification_time optional [Time]
     # @param options
     #   Additional options to pass to specific {Condition}s
-    # @return [Boolean, nil]
+    # @return [Array<>]
     #   It's only valid if every sub-condition is completely valid.
     #   If any sub-condition is invalid, the whole statement is invalid.
     #   If the validity can't be determined due to an unsupported condition,
     #   +nil+ will be returned (which is false-ish)
-    def valid?(now: Time.now.utc, **options)
-      options[:now] ||= now
-      return false if not_before && now < not_before
-      return false if not_on_or_after && now >= not_on_or_after
-
-      result = true
-      each do |condition|
-        this_result = condition.valid?(**options)
-        case this_result
-        when false
-          return false
-        when nil
-          result = nil
-        when true
-        else
-          raise "unknown validity of #{condition}"
-        end
+    def validate(verification_time: Time.now.utc, **options)
+      options[:verification_time] ||= verification_time
+      errors = []
+      if not_before && verification_time < not_before
+        errors << "not_before #{not_before} is later than now (#{verification_time})"
       end
-      result
+      if not_on_or_after && verification_time >= not_on_or_after
+        errors << "not_on_or_after #{not_on_or_after} is earlier than now (#{verification_time})"
+      end
+
+      each do |condition|
+        errors.concat(condition.validate(**options))
+      end
+      errors
+    end
+
+    # Use validate instead.
+    # @deprecated
+    def valid?(now: Time.now.utc, **options)
+      validate(verification_time: now, **options).empty?
     end
 
     # (see Base#build)
@@ -70,9 +78,13 @@ module SAML2
 
     # Any unknown condition
     class Condition < Base
-      # @return [nil]
-      def valid?(_)
-        nil
+      # @return []
+      def validate(_)
+        ["unable to validate #{xml&.name || 'unrecognized'} condition"]
+      end
+
+      def valid?(*args)
+        validate(*args).empty?
       end
     end
 
@@ -96,8 +108,11 @@ module SAML2
       end
 
       # @param audience [String]
-      def valid?(audience: nil, **_)
-        Array.wrap(self.audience).include?(audience)
+      def validate(audience: nil, **_)
+        unless Array.wrap(self.audience).include?(audience)
+          return ["audience #{audience} not in allowed list of #{Array.wrap(self.audience).join(', ')}"]
+        end
+        []
       end
 
       # (see Base#build)
@@ -113,9 +128,9 @@ module SAML2
     class OneTimeUse < Condition
       # The caller will need to see if this condition exists, and validate it
       # using their own state store.
-      # @return [true]
-      def valid?(_)
-        true
+      # @return [[]]
+      def validate(_)
+        []
       end
 
       # (see Base#build)
