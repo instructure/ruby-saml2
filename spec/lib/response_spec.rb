@@ -229,6 +229,31 @@ module SAML2
         expect(response.errors.map(&:to_s)).to eq ["2:0: ERROR: Element '{http://www.w3.org/2000/09/xmldsig#}Signature': This element is not expected.",
                                                   "43:0: ERROR: Element '{http://www.w3.org/2000/09/xmldsig#}Signature': This element is not expected."]
       end
+
+      it "errors on expired certificate" do
+        response = Response.parse(fixture("test6-response.xml"))
+        idp_entity.entity_id = 'http://simplesamlphp.dev/simplesaml/saml2/idp/metadata.php'
+        idp_entity.identity_providers.first.keys.clear
+        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
+
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse("2012-08-03T20:07:15Z"))
+        expect(response.errors.length).to eq 1
+        expect(response.errors.first).to match(/error occurred during signature verification.*certificate has expired/)
+      end
+
+      it "ignores expired certificate when requested" do
+        response = Response.parse(fixture("test6-response.xml"))
+        sp_entity.entity_id = 'http://shard-2.canvas.dev/saml2'
+        idp_entity.entity_id = 'http://simplesamlphp.dev/simplesaml/saml2/idp/metadata.php'
+        idp_entity.identity_providers.first.keys.clear
+        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
+
+        sp_entity.valid_response?(response, idp_entity,
+                                  verification_time: Time.parse("2014-09-16T22:15:53Z"),
+                                  allow_expired_certificate: true)
+        expect(response.errors).to eq []
+      end
+
     end
   end
 end

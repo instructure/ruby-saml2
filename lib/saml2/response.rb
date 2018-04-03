@@ -91,7 +91,8 @@ module SAML2
     #   this point in time.
     def validate(service_provider:,
                  identity_provider:,
-                 verification_time: Time.now.utc)
+                 verification_time: Time.now.utc,
+                 allow_expired_certificate: false)
       raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
       raise ArgumentError, "service_provider should have at least one service_provider role" unless (sp = service_provider.service_providers.first)
 
@@ -121,7 +122,9 @@ module SAML2
       end
 
       if signed?
-        unless (signature_errors = validate_signature(fingerprint: idp.fingerprints, cert: certificates)).empty?
+        unless (signature_errors = validate_signature(fingerprint: idp.fingerprints,
+                                                      cert: certificates,
+                                                      allow_expired_certificate: allow_expired_certificate)).empty?
           return errors.concat(signature_errors)
         end
         response_signed = true
@@ -173,7 +176,8 @@ module SAML2
 
       if assertion.signed?
         unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
-                                                                cert: certificates)).empty?
+                                                                cert: certificates,
+                                                                allow_expired_certificate: allow_expired_certificate)).empty?
           return errors.concat(signature_errors)
         end
         assertion_signed = true

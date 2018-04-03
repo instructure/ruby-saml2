@@ -122,9 +122,15 @@ module SAML2
     # (see Signable#validate_signature)
     # @param verification_time
     #   Ignored. The message's {issue_instant} is always used.
-    def validate_signature(fingerprint: nil, cert: nil, verification_time: issue_instant)
+    def validate_signature(fingerprint: nil,
+                           cert: nil,
+                           verification_time: issue_instant,
+                           allow_expired_certificate: false)
       # verify the signature (certificate's validity) as of the time the message was generated
-      super(fingerprint: fingerprint, cert: cert, verification_time: verification_time)
+      super(fingerprint: fingerprint,
+            cert: cert,
+            verification_time: verification_time,
+            allow_expired_certificate: allow_expired_certificate)
     end
 
     # (see Signable#sign)

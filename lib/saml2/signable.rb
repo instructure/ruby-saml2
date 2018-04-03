@@ -42,8 +42,15 @@ module SAML2
     #   a match is found, the certificate embedded in the signature will be
     #   added to the list of certificates used for verifying the signature.
     # @param cert optional [Array<String>, String]
+    # @param allow_expired_certificate [Boolean]
+    #   If set to true, verification_time will be adjusted to be just within the
+    #   certificate's expiration time, so that an expired certificate error will
+    #   not be thrown.
     # @return [Array<String>] An empty array on success, details of errors on failure.
-    def validate_signature(fingerprint: nil, cert: nil, verification_time: nil)
+    def validate_signature(fingerprint: nil,
+                           cert: nil,
+                           verification_time: nil,
+                           allow_expired_certificate: false)
       return ["not signed"] unless signed?
 
       certs = Array(cert)
@@ -55,6 +62,9 @@ module SAML2
       end
       certs = certs.uniq
       return ["no trusted certificate found"] if certs.empty?
+      if allow_expired_certificate && signing_key
+        verification_time = signing_key.certificate.not_after - 1
+      end
 
       begin
         result = signature.verify_with(certs: certs, verification_time: verification_time)
