@@ -46,6 +46,7 @@ module SAML2
       return ["not signed"] unless signed?
 
       certs = Array(cert)
+      certs = certs.dup if certs.equal?(cert)
       # see if any given fingerprints match the certificate embedded in the XML;
       # if so, extract the certificate, and add it to the allowed certificates list
       Array(fingerprint)&.each do |fp|
