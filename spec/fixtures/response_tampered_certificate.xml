@@ -1,0 +1,25 @@
+<samlp:Response xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol" xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" ID="_9a15e699-2d04-4ba7-a521-cfa4dcd21f44" Version="2.0" IssueInstant="2015-02-12T22:51:29Z" Destination="https://siteadmin.test.instructure.com/saml_consume" InResponseTo="_bec424fa5103428909a30ff1e31168327f79474984"><saml:Issuer>issuer</saml:Issuer><samlp:Status><samlp:StatusCode Value="urn:oasis:names:tc:SAML:2.0:status:Success"/></samlp:Status><saml:Assertion ID="_cdfc3faf-90ad-462f-880d-677483210684" Version="2.0" IssueInstant="2015-02-12T22:51:29Z"><saml:Issuer>issuer</saml:Issuer><Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+<SignedInfo>
+<CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+<Reference URI="#_cdfc3faf-90ad-462f-880d-677483210684">
+<Transforms>
+<Transform Algorithm="http://www.w3.org/2000/09/xmldsig#enveloped-signature"/>
+<Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</Transforms>
+<DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+<DigestValue>HFJ1RMKtE+J23K/mQqdClLWsdjwboU9M+uTX+PcN/LU=</DigestValue>
+</Reference>
+</SignedInfo>
+<SignatureValue>oRUU3idevSgM2QCidYqLAL5Ki2H8qxvkIVw9yNrbv9Mg2D7126wPMerWyKeP+ops
+6ploHMV0MQRyEFA+4PJ3ZsBU1daVSt3plh+6Szm5zIhWUEc3HhvQirv5IP1lfcxQ
+IopKnpiZkH9QMLolCLMIfCbOIuIfmssmsEagU/S3aoRVgZLA/x15z2hNEiB+tMqr
+Elc7i5V81ztnEx47yJhf/mAiZcnLqpnbpJ9XN4NF43QSgkRNU4vCQsx0zA6gj9MB
+D5h/CKy7KMn+LtaLkHIfv6Y//xN+61PrQ7sr5FIsCGg9XBvXC3PrwEVdADx4/dZO
+JrJ/DBFeEc8K1KSMXm5qrQ==</SignatureValue>
+<KeyInfo>
+<X509Data>
+<X509Certificate>MIICgTCCAeoCCQCbOlrWDdX7FTANBgkqhkiG9w0BAQUFADCBhDELMAkGA1UEBhMCTk8xGDAWBgNVBAgTD0FuZHJlYXMgU29sYmVyZzEMMAoGA1UEBxMDRm9vMRAwDgYDVQQKEwdVTklORVRUMRgwFgYDVQQDEw9mZWlkZS5lcmxhbmcubm8xITAfBgkqhkiG9w0BCQEWEmFuZHJlYXNAdW5pbmV0dC5ubzAeFw0wNzA2MTUxMjAxMzVaFw0wNzA4MTQxMjAxMzVaMIGEMQswCQYDVQQGEwJOTzEYMBYGA1UECBMPQW5kcmVhcyBTb2xiZXJnMQwwCgYDVQQHEwNGb28xEDAOBgNVBAoTB1VOSU5FVFQxGDAWBgNVBAMTD2ZlaWRlLmVybGFuZy5ubzEhMB8GCSqGSIb3DQEJARYSYW5kcmVhc0B1bmluZXR0Lm5vMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDivbhR7P516x/S3BqKxupQe0LONoliupiBOesCO3SHbDrl3+q9IbfnfmE04rNuMcPsIxB161TdDpIesLCn7c8aPHISKOtPlAeTZSnb8QAu7aRjZq3+PbrP5uW3TcfCGPtKTytHOge/OlJbo078dVhXQ14d1EDwXJW1rRXuUt4C8QIDAQABMA0GCSqGSIb3DQEBBQUAA4GBACDVfp86HObqY+e8BUoWQ9+VMQx1ASDohBjwOsg2WykUqRXF+dLfcUH9dWR63CtZIKFDbStNomPnQz7nbK+onygwBspVEbnHuUihZq3ZUdmumQqCw4Uvs/1Uvq3orOo/WJVhTyvLgFVK2QarQ4/67OZfHd7R+POBXhophSMv1ZOo</X509Certificate>
+</X509Data>
+</KeyInfo>
+</Signature><saml:Subject><saml:NameID Format="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">jacob</saml:NameID><saml:SubjectConfirmation Method="urn:oasis:names:tc:SAML:2.0:cm:bearer"><saml:SubjectConfirmationData NotOnOrAfter="2015-02-12T22:54:29Z" Recipient="https://siteadmin.test.instructure.com/saml_consume" InResponseTo="_bec424fa5103428909a30ff1e31168327f79474984"/></saml:SubjectConfirmation></saml:Subject><saml:Conditions NotBefore="2015-02-12T22:51:24Z" NotOnOrAfter="2015-02-12T22:51:59Z"><saml:AudienceRestriction><saml:Audience>http://siteadmin.instructure.com/saml2</saml:Audience></saml:AudienceRestriction></saml:Conditions><saml:AuthnStatement AuthnInstant="2015-02-12T22:51:29Z"><saml:AuthnContext><saml:AuthnContextClassRef>urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified</saml:AuthnContextClassRef></saml:AuthnContext></saml:AuthnStatement></saml:Assertion></samlp:Response>

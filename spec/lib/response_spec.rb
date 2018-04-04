@@ -156,6 +156,23 @@ module SAML2
         expect(response.errors).to eq ["neither response nor assertion were signed"]
       end
 
+      it "complains if the signature has been tampered with" do
+        response = Response.parse(fixture("response_tampered_signature.xml"))
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
+        expect(response.errors).to eq ["signature is invalid"]
+      end
+
+      it "complains if the trusted certificate isn't what signed the response" do
+        idp_entity.identity_providers.first.keys.clear
+        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
+
+        response = Response.parse(fixture("response_tampered_certificate.xml"))
+        sp_entity.valid_response?(response, idp_entity,
+                                  verification_time: Time.parse('2015-02-12T22:51:30Z'),
+                                  allow_expired_certificate: true)
+        expect(response.errors).to eq ["signature is invalid"]
+      end
+
       it "complains when we don't have any trusted keys" do
         response = Response.parse(fixture("response_signed.xml"))
         idp_entity.identity_providers.first.keys.clear
@@ -238,7 +255,7 @@ module SAML2
 
         sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse("2012-08-03T20:07:15Z"))
         expect(response.errors.length).to eq 1
-        expect(response.errors.first).to match(/error occurred during signature verification.*certificate has expired/)
+        expect(response.errors.first).to match(/certificate has expired/)
       end
 
       it "ignores expired certificate when requested" do

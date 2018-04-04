@@ -62,13 +62,31 @@ module SAML2
       end
       certs = certs.uniq
       return ["no trusted certificate found"] if certs.empty?
-      if allow_expired_certificate && signing_key
-        verification_time = signing_key.certificate.not_after - 1
+
+      verify_certificate = true
+      if signing_key
+        signing_cert = signing_key.certificate
+        if allow_expired_certificate
+          verification_time = signing_cert.not_after - 1
+        end
+
+        # we explicitly trust the signing certificate, but it's not self-signed;
+        # xmlsec is weird and decides not to trust it in that case, so we skip
+        # certificate verification by xmlsec, and do it ourselves
+        if certs.include?(signing_cert) &&  signing_cert.issuer != signing_cert.subject
+          verification_time ||= Time.now.utc
+          return ["certificate has expired"] if verification_time > signing_cert.not_after
+          return ["certificate is not yet valid"] if verification_time < signing_cert.not_before
+
+          verify_certificate = false
+        end
       end
 
       begin
-        result = signature.verify_with(certs: certs, verification_time: verification_time)
-        result ? [] : ["signature does not match"]
+        result = signature.verify_with(certs: certs,
+                                       verification_time: verification_time,
+                                       verify_certificates: verify_certificate)
+        result ? [] : ["signature is invalid"]
       rescue XMLSec::VerificationError => e
         [e.message]
       end
