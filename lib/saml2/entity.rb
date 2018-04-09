@@ -154,6 +154,14 @@ module SAML2
       end
     end
 
+    # Generates an AuthnRequest
+    # @param identity_provider [Entity] The metadata of the IdP to send the message to.
+    def initiate_authn_request(identity_provider)
+      AuthnRequest.initiate(SAML2::NameID.new(entity_id),
+                            identity_provider.identity_providers.first,
+                            service_provider: service_providers.first)
+    end
+
     # Validate a message is a valid response.
     #
     # @param message [Message]
