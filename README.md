@@ -8,9 +8,9 @@ Ruby SAML2 Library
 About
 -----
 
-This library is for building a custom SAML 2.0 IdP with minimal headache.
+This library is for building a custom SAML 2.0 SP or IdP with minimal headache.
 A simple example of a Rails controller that just passes on an already
-authenticated user to a single SP.
+authenticated user to a single SP:
 
 
 ```ruby
@@ -74,7 +74,56 @@ end
 
 ```
 
+An example of a basic SP (obtain idp_metadata.xml from your IdP; craft your own sp_metadata.xml):
+
+```ruby
+require 'saml2'
+
+class SamlSpController < ApplicationController
+  class << self
+    def idp_metadata
+      @idp_metadata ||= SAML2::Entity.parse(Rails.root.join('config/saml/idp_metadata.xml'))
+    end
+
+    def sp_metadata
+      @sp_metadata ||= SAML2::Entity.parse(Rails.root.join('config/saml/sp_metadata.xml'))
+    end
+  end
+
+  def new
+    authn_request = self.class.sp_metadata.initiate_authn_request(self.class.idp_metadata)
+    redirect_to SAML2::Bindings::HTTPRedirect.encode(authn_request)
+  end
+
+  def create
+    response, _relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    unless self.class.sp_metadata.valid_response?(response, self.class.idp_metadata)
+      logger.error("Failed to validate SAML response: #{response.errors}")
+      raise ActionController::RoutingError.new('Not Found')
+    end
+
+    reset_session
+    session[:username] = response.assertions.first.subject.name_id.id
+    logger.info("Logged in as #{session[:username]}")
+
+    redirect_to root_url
+  end
+
+  def metadata
+    render xml: self.class.sp_metadata.to_xml
+  end
+end
+```
+
+And then in your routes.rb:
+
+```ruby
+  get 'login' => 'saml_sp#new'
+  post 'login' => 'saml_sp#create'
+  get 'SAML2' => 'saml_sp#metadata'
+```
+
 Copyright
 -----------
 
-Copyright (c) 2015 Instructure, Inc. See LICENSE for details.
+Copyright (c) 2015-present Instructure, Inc. See LICENSE for details.
