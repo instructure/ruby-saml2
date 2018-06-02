@@ -11,6 +11,7 @@ module SAML2
 
     # (see Base.from_xml)
     def self.from_xml(node)
+      return nil unless node
       result = new
       result.from_xml(node)
       result

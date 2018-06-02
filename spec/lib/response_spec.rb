@@ -109,6 +109,11 @@ module SAML2
       expect(response.assertions.first.subject.name_id.id).to eq 'testuser@example.com'
     end
 
+    it "doesn't choke on missing Conditions" do
+      response = Response.parse(fixture("noconditions_response.xml"))
+      expect(response.assertions.first.conditions).to eq nil
+    end
+
     describe "#validate" do
       let (:idp_entity) do
         idp_entity = Entity.new("issuer")

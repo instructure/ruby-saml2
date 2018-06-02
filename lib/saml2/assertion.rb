@@ -14,8 +14,8 @@ module SAML2
 
     def from_xml(node)
       super
-      @conditions = nil
       @statements = nil
+      remove_instance_variable(:@conditions)
     end
 
     # @return [Subject, nil]
@@ -28,7 +28,10 @@ module SAML2
 
     # @return [Conditions]
     def conditions
-      @conditions ||= Conditions.from_xml(xml.at_xpath('saml:Conditions', Namespaces::ALL))
+      if !instance_variable_defined?(:@conditions) && xml
+        @conditions = Conditions.from_xml(xml.at_xpath('saml:Conditions', Namespaces::ALL))
+      end
+      @conditions
     end
 
     # @return [Array<AuthnStatement]
@@ -55,7 +58,7 @@ module SAML2
 
         subject.build(assertion)
 
-        conditions.build(assertion)
+        conditions.build(assertion) if conditions
 
         statements.each { |stmt| stmt.build(assertion) }
       end

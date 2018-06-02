@@ -185,7 +185,7 @@ module SAML2
 
       # only do our own issue instant validation if the assertion
       # doesn't mandate any
-      unless assertion.conditions.not_on_or_after
+      unless assertion.conditions&.not_on_or_after
         if assertion.issue_instant +  5 * 60 < verification_time ||
             assertion.issue_instant - 5 * 60 > verification_time
           errors << "assertion not recently issued"
@@ -193,8 +193,9 @@ module SAML2
         end
       end
 
-      unless (condition_errors = assertion.conditions.validate(verification_time: verification_time,
-                                                               audience: service_provider.entity_id)).empty?
+      if assertion.conditions &&
+          !(condition_errors = assertion.conditions.validate(verification_time: verification_time,
+                                                             audience: service_provider.entity_id)).empty?
         return errors.concat(condition_errors)
       end
 
