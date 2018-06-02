@@ -110,6 +110,7 @@ module SAML2
       raise ArgumentError, "identity_provider should be an Entity object" unless identity_provider.is_a?(Entity)
       raise ArgumentError, "identity_provider should have at least one identity_provider role" unless (idp = identity_provider.identity_providers.first)
 
+      issuer = self.issuer || assertions.first&.issuer
       unless identity_provider.entity_id == issuer&.id
         errors << "received unexpected message from '#{issuer&.id}'; expected it to be from '#{identity_provider.entity_id}'"
         return errors
