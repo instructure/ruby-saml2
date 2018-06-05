@@ -19,6 +19,7 @@ module SAML2
       super
       @status = nil
       remove_instance_variable(:@status)
+      @in_response_to = node['InResponseTo']
     end
 
     # @return [Status]
