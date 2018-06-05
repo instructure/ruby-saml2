@@ -46,10 +46,10 @@ module SAML2
     def validate(verification_time: Time.now.utc, **options)
       options[:verification_time] ||= verification_time
       errors = []
-      if not_before && verification_time < not_before
+      if not_before && verification_time < not_before - 5
         errors << "not_before #{not_before} is later than now (#{verification_time})"
       end
-      if not_on_or_after && verification_time >= not_on_or_after
+      if not_on_or_after && verification_time >= not_on_or_after + 5
         errors << "not_on_or_after #{not_on_or_after} is earlier than now (#{verification_time})"
       end
 
