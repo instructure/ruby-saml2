@@ -278,6 +278,12 @@ module SAML2
         expect(response.errors).to eq []
       end
 
+      it "doesn't break the signature by decrypting elements first" do
+        response = Response.parse(fixture("response_with_signed_assertion_and_encrypted_subject.xml"))
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
+        expect(response.errors).to eq []
+        expect(response.assertions.first.subject.name_id.id).to eq 'jacob'
+      end
     end
   end
 end

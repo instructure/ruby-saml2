@@ -131,6 +131,18 @@ module SAML2
         response_signed = true
       end
 
+      assertion = assertions.first
+
+      # this might be nil, if the assertion was encrypted
+      if assertion&.signed?
+        unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
+                                                                cert: certificates,
+                                                                allow_expired_certificate: allow_expired_certificate)).empty?
+          return errors.concat(signature_errors)
+        end
+        assertion_signed = true
+      end
+
       find_decryption_key = ->(embedded_certificates) do
         key = nil
         embedded_certificates.each do |cert_info|
@@ -160,6 +172,8 @@ module SAML2
         if decypted_anything
           # have to re-validate the schema, since we just replaced content
           super()
+          # also clear this cached value so that we can see cached assertions
+          remove_instance_variable(:@assertions)
           return errors unless errors.empty?
         end
       end
@@ -169,13 +183,15 @@ module SAML2
         return errors
       end
 
-      assertion = assertions.first
+      assertion ||= assertions.first
       unless assertion
         errors << "no assertion found"
         return errors
       end
 
-      if assertion.signed?
+      # if we didn't previously check the assertion's signature (because it was encrypted)
+      # check it now
+      if assertion.signed? && !assertion_signed
         unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
                                                                 cert: certificates,
                                                                 allow_expired_certificate: allow_expired_certificate)).empty?
