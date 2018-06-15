@@ -169,7 +169,8 @@ module SAML2
     def valid_response?(message,
                         identity_provider,
                         verification_time: Time.now.utc,
-                        allow_expired_certificate: false)
+                        allow_expired_certificate: false,
+                        verify_certificate: true)
       unless message.is_a?(Response)
         message.errors << "not a Response object"
         return false
@@ -178,7 +179,8 @@ module SAML2
       message.validate(service_provider: self,
                        identity_provider: identity_provider,
                        verification_time: verification_time,
-                       allow_expired_certificate: allow_expired_certificate).empty?
+                       allow_expired_certificate: allow_expired_certificate,
+                       verify_certificate: verify_certificate).empty?
     end
   end
 end

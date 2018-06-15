@@ -50,7 +50,8 @@ module SAML2
     def validate_signature(fingerprint: nil,
                            cert: nil,
                            verification_time: nil,
-                           allow_expired_certificate: false)
+                           allow_expired_certificate: false,
+                           verify_certificate: true)
       return ["not signed"] unless signed?
 
       certs = Array(cert)
@@ -63,7 +64,10 @@ module SAML2
       certs = certs.uniq
       return ["no trusted certificate found"] if certs.empty?
 
-      verify_certificate = true
+      if verify_certificate == false && signing_key&.certificate
+        key = signing_key.certificate.public_key.to_s
+      end
+
       if signing_key
         signing_cert = signing_key.certificate
         if allow_expired_certificate
@@ -81,9 +85,11 @@ module SAML2
           verify_certificate = false
         end
       end
+      certs = nil if key # we're using a key explicitly, ignoring the certs
 
       begin
-        result = signature.verify_with(certs: certs,
+        result = signature.verify_with(key: key,
+                                       certs: certs,
                                        verification_time: verification_time,
                                        verify_certificates: verify_certificate)
         result ? [] : ["signature is invalid"]

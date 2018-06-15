@@ -125,12 +125,14 @@ module SAML2
     def validate_signature(fingerprint: nil,
                            cert: nil,
                            verification_time: issue_instant,
-                           allow_expired_certificate: false)
+                           allow_expired_certificate: false,
+                           verify_certificate: true)
       # verify the signature (certificate's validity) as of the time the message was generated
       super(fingerprint: fingerprint,
             cert: cert,
             verification_time: verification_time,
-            allow_expired_certificate: allow_expired_certificate)
+            allow_expired_certificate: allow_expired_certificate,
+            verify_certificate: verify_certificate)
     end
 
     # (see Signable#sign)

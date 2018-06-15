@@ -92,7 +92,8 @@ module SAML2
     def validate(service_provider:,
                  identity_provider:,
                  verification_time: Time.now.utc,
-                 allow_expired_certificate: false)
+                 allow_expired_certificate: false,
+                 verify_certificate: true)
       raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
       raise ArgumentError, "service_provider should have at least one service_provider role" unless (sp = service_provider.service_providers.first)
 
@@ -125,7 +126,8 @@ module SAML2
       if signed?
         unless (signature_errors = validate_signature(fingerprint: idp.fingerprints,
                                                       cert: certificates,
-                                                      allow_expired_certificate: allow_expired_certificate)).empty?
+                                                      allow_expired_certificate: allow_expired_certificate,
+                                                      verify_certificate: verify_certificate)).empty?
           return errors.concat(signature_errors)
         end
         response_signed = true
@@ -137,7 +139,8 @@ module SAML2
       if assertion&.signed?
         unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
                                                                 cert: certificates,
-                                                                allow_expired_certificate: allow_expired_certificate)).empty?
+                                                                allow_expired_certificate: allow_expired_certificate,
+                                                                verify_certificate: verify_certificate)).empty?
           return errors.concat(signature_errors)
         end
         assertion_signed = true
@@ -194,7 +197,8 @@ module SAML2
       if assertion.signed? && !assertion_signed
         unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
                                                                 cert: certificates,
-                                                                allow_expired_certificate: allow_expired_certificate)).empty?
+                                                                allow_expired_certificate: allow_expired_certificate,
+                                                                verify_certificate: verify_certificate)).empty?
           return errors.concat(signature_errors)
         end
         assertion_signed = true
