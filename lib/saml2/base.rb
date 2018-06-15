@@ -33,18 +33,20 @@ module SAML2
 
     # Returns the XML of this object as a string.
     #
-    # If this object came from parsing XML, it will always return it with the
-    # same formatting as it was parsed.
-    #
     # @param pretty optional [true, false, nil]
     #   +true+ forces it to format it for easy reading. +nil+ will prefer to
     #   format it pretty, but won't if e.g. it has been signed, and pretty
-    #   formatting would break the signature.
+    #   formatting would break the signature. If this object came from parsing
+    #   XML, it will default to exactly what it was parsed as.
     # @return [String]
     def to_s(pretty: nil)
       pretty = @pretty if pretty.nil?
       if xml
-        xml.to_s
+        if pretty
+          xml.to_s
+        else
+          xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
+        end
       elsif pretty
         to_xml.to_s
       else
