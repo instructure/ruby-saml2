@@ -190,7 +190,7 @@ module SAML2
           # repeated key; convert to array
           if attribute.value.is_a?(Array)
             # both values are arrays; concatenate them
-            prior_value.concat(attribute.value)
+            value.concat(attribute.value)
           else
             value << attribute.value
           end
