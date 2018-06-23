@@ -28,6 +28,18 @@ XML
       expect(attr.name_format).to eq Attribute::NameFormats::URI
     end
 
+    it "recognizes and X500 attribute without a NameFormat" do
+      xml = <<-XML
+        <saml:Attribute xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion" Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6"><saml:AttributeValue xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="xs:string">user@domain</saml:AttributeValue></saml:Attribute>
+      XML
+      attr = Attribute.from_xml(Nokogiri::XML(xml).root)
+      expect(attr).to be_instance_of Attribute::X500
+      expect(attr.value).to eq "user@domain"
+      expect(attr.name).to eq Attribute::X500::EduPerson::PRINCIPAL_NAME
+      expect(attr.friendly_name).to eq 'eduPersonPrincipalName'
+      expect(attr.name_format).to eq nil
+    end
+
     it "should serialize an X500 attribute correctly" do
       attr = Attribute.create('eduPersonPrincipalName', 'user@domain')
       expect(attr).to be_instance_of Attribute::X500

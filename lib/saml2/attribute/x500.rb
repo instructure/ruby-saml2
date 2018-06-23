@@ -36,7 +36,8 @@ module SAML2
       def self.recognizes?(name_or_node)
         if name_or_node.is_a?(Nokogiri::XML::Element)
           !!name_or_node.at_xpath("@x500:Encoding", Namespaces::ALL) ||
-              name_or_node['NameFormat'] == NameFormats::URI && OIDS.include?(name_or_node['Name'])
+              (name_or_node['NameFormat'] == NameFormats::URI || name_or_node['NameFormat'].nil?) &&
+              OIDS.include?(name_or_node['Name'])
         else
           FRIENDLY_NAMES.include?(name_or_node) || OIDS.include?(name_or_node)
         end
