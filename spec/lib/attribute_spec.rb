@@ -111,13 +111,16 @@ XML
     describe "#to_h" do
       it "works" do
         attr_statement = Response.parse(fixture("response_with_attribute_signed.xml")).assertions.first.attribute_statements.first
-        expect(attr_statement.to_h).to eq('givenName' => 'cody')
+        expect(attr_statement.to_h(:friendly_name)).to eq('givenName' => 'cody')
         expect(attr_statement.to_h(:name)).to eq("urn:oid:2.5.4.42" => 'cody')
+        expect(attr_statement.to_h(:both)).to eq('givenName' => 'cody', "urn:oid:2.5.4.42" => 'cody')
       end
 
       it "infers friendly names if possible" do
         attr_statement = Response.parse(fixture("test3-response.xml")).assertions.first.attribute_statements.first
         expect(attr_statement.to_h).to eq({
+            'urn:oid:1.3.6.1.4.1.5923.1.1.1.1' => 'member',
+            'urn:oid:1.3.6.1.4.1.5923.1.1.1.6' => 'student@example.edu',
             'eduPersonAffiliation' => 'member',
             'eduPersonPrincipalName' => 'student@example.edu'})
       end
@@ -135,7 +138,7 @@ XML
 </saml2:AttributeStatement>
         XML
 
-        expect(attr_statement.to_h).to eq({
+        expect(attr_statement.to_h(:friendly_name)).to eq({
             'eduPersonScopedAffiliation' => ['02', 'employee@school.edu', 'students@school.edu']
                                           })
       end

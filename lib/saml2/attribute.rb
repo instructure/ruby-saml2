@@ -174,9 +174,13 @@ module SAML2
     #
     # Repeated attributes become an array.
     #
-    # @param name optional [:name, :friendly_name]
-    #   Which name field to use as keys to the hash
-    def to_h(name = :friendly_name)
+    # @param name optional [:name, :friendly_name, :both]
+    #   Which name field to use as keys to the hash. If :both
+    #   is specified, attributes may be duplicated under both
+    #   names.
+    def to_h(name = :both)
+      return to_h(:friendly_name).merge(to_h(:name)) if name == :both
+
       result = {}
       attributes.each do |attribute|
         key = attribute.send(name)
