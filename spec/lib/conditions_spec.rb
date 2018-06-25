@@ -64,5 +64,9 @@ module SAML2
     it "should be valid with an array" do
       expect(Conditions::AudienceRestriction.new(['expected', 'actual']).valid?(audience: 'actual')).to eq true
     end
+
+    it "is valid when ignored" do
+      expect(Conditions::AudienceRestriction.new('expected').valid?(audience: 'actual', ignore_audience_condition: true)).to eq true
+    end
   end
 end

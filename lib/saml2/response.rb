@@ -89,11 +89,19 @@ module SAML2
     # @param verification_time optional [DateTime]
     #   Validate timestamps (signing certificate validity, issued at, etc.) as of
     #   this point in time.
+    # @param allow_expired_certificate optional [true, false]
+    #   Allow signing certificate to be expired.
+    # @param verify_certificate optional [true, false]
+    #   Don't validate the trust chain or validity dates of the signing
+    #   certificate.
+    # @param ignore_audience_condition optional [true, false]
+    #   Don't validate any Audience conditions.
     def validate(service_provider:,
                  identity_provider:,
                  verification_time: nil,
                  allow_expired_certificate: false,
-                 verify_certificate: true)
+                 verify_certificate: true,
+                 ignore_audience_condition: false)
       raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
       raise ArgumentError, "service_provider should have at least one service_provider role" unless (sp = service_provider.service_providers.first)
 
@@ -223,7 +231,8 @@ module SAML2
 
       if assertion.conditions &&
           !(condition_errors = assertion.conditions.validate(verification_time: verification_time,
-                                                             audience: service_provider.entity_id)).empty?
+                                                             audience: service_provider.entity_id,
+                                                             ignore_audience_condition: ignore_audience_condition)).empty?
         return errors.concat(condition_errors)
       end
 

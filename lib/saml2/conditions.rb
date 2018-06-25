@@ -109,7 +109,9 @@ module SAML2
       end
 
       # @param audience [String]
-      def validate(audience: nil, **_)
+      def validate(audience: nil, ignore_audience_condition: false, **_)
+        return [] if ignore_audience_condition
+
         unless Array.wrap(self.audience).include?(audience)
           return ["audience #{audience} not in allowed list of #{Array.wrap(self.audience).join(', ')}"]
         end
