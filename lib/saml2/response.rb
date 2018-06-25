@@ -91,7 +91,7 @@ module SAML2
     #   this point in time.
     def validate(service_provider:,
                  identity_provider:,
-                 verification_time: Time.now.utc,
+                 verification_time: nil,
                  allow_expired_certificate: false,
                  verify_certificate: true)
       raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
@@ -100,6 +100,13 @@ module SAML2
       # validate the schema
       super()
       return errors unless errors.empty?
+
+      if verification_time.nil?
+        verification_time = Time.now.utc
+        # they issued it in the (near) future according to our clock;
+        # use their clock instead
+        verification_time = issue_instant if issue_instant > verification_time && issue_instant < verification_time + 5 * 60
+      end
 
       # not finding the issuer is not exceptional
       if identity_provider.nil?
