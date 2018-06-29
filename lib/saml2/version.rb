@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module SAML2
-  VERSION = '2.2.12'
+  VERSION = '3.0.0'
 end
