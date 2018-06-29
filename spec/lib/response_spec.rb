@@ -104,8 +104,7 @@ module SAML2
 
       # the signature is still valid (we have to set a weird verification time because the response
       # was signed with an expired signature)
-      expect(response.validate_signature(fingerprint: 'afe71c28ef740bc87425be13a2263d37971da1f9',
-                                         verification_time: Time.parse("2007-07-14 12:01:34Z"))).to eq []
+      expect(response.validate_signature(fingerprint: 'afe71c28ef740bc87425be13a2263d37971da1f9')).to eq []
 
       # the comment is ignored, but doesn't truncate the nameid
       expect(response.assertions.first.subject.name_id.id).to eq 'testuser@example.com'
@@ -175,8 +174,7 @@ module SAML2
 
         response = Response.parse(fixture("response_tampered_certificate.xml"))
         sp_entity.valid_response?(response, idp_entity,
-                                  verification_time: Time.parse('2015-02-12T22:51:30Z'),
-                                  allow_expired_certificate: true)
+                                  verification_time: Time.parse('2015-02-12T22:51:30Z'))
         expect(response.errors).to eq ["signature is invalid"]
       end
 
@@ -193,7 +191,7 @@ module SAML2
         idp_entity.identity_providers.first.keys << KeyDescriptor.new(fixture("othercertificate.pem"))
         sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
         expect(response.errors.length).to eq 1
-        expect(response.errors.first).to start_with('error occurred during signature verification')
+        expect(response.errors.first).to eq("no trusted signing key found")
       end
 
       it "validates signature by fingerprint" do
@@ -211,7 +209,7 @@ module SAML2
         idp_entity.identity_providers.first.fingerprints << "1c:37:7d:30:c1:83:18:ea:20:8b:dc:d5:35:b6:16:85:17:58:f7:ca"
 
         sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-12T22:51:30Z'))
-        expect(response.errors).to eq ["no trusted certificate found"]
+        expect(response.errors).to eq ["no trusted signing key found"]
       end
 
       it "protects against xml signature wrapping attacks targeting nameid" do
@@ -252,43 +250,6 @@ module SAML2
         sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2015-02-27T19:12:52Z'))
         expect(response.errors.map(&:to_s)).to eq ["2:0: ERROR: Element '{http://www.w3.org/2000/09/xmldsig#}Signature': This element is not expected.",
                                                   "43:0: ERROR: Element '{http://www.w3.org/2000/09/xmldsig#}Signature': This element is not expected."]
-      end
-
-      it "errors on expired certificate" do
-        response = Response.parse(fixture("test6-response.xml"))
-        idp_entity.entity_id = 'http://simplesamlphp.dev/simplesaml/saml2/idp/metadata.php'
-        idp_entity.identity_providers.first.keys.clear
-        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
-
-        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse("2012-08-03T20:07:15Z"))
-        expect(response.errors.length).to eq 1
-        expect(response.errors.first).to match(/certificate has expired/)
-      end
-
-      it "ignores expired certificate when requested" do
-        response = Response.parse(fixture("test6-response.xml"))
-        sp_entity.entity_id = 'http://shard-2.canvas.dev/saml2'
-        idp_entity.entity_id = 'http://simplesamlphp.dev/simplesaml/saml2/idp/metadata.php'
-        idp_entity.identity_providers.first.keys.clear
-        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
-
-        sp_entity.valid_response?(response, idp_entity,
-                                  verification_time: Time.parse("2014-09-16T22:15:53Z"),
-                                  allow_expired_certificate: true)
-        expect(response.errors).to eq []
-      end
-
-      it "ignores invalid certificate when requested" do
-        response = Response.parse(fixture("test6-response.xml"))
-        sp_entity.entity_id = 'http://shard-2.canvas.dev/saml2'
-        idp_entity.entity_id = 'http://simplesamlphp.dev/simplesaml/saml2/idp/metadata.php'
-        idp_entity.identity_providers.first.keys.clear
-        idp_entity.identity_providers.first.fingerprints << "afe71c28ef740bc87425be13a2263d37971da1f9"
-
-        sp_entity.valid_response?(response, idp_entity,
-                                  verification_time: Time.parse("2014-09-16T22:15:53Z"),
-                                  verify_certificate: false)
-        expect(response.errors).to eq []
       end
 
       it "doesn't break the signature by decrypting elements first" do

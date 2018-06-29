@@ -34,24 +34,24 @@ module SAML2
 
     # Validate the signature on this object.
     #
-    # Either +fingerprint+ or +cert+ must be provided.
+    # At least one of +key+, +fingerprint+ or +cert+ must be provided.
     #
+    # @param key optional [String, OpenSSL::PKey::PKey]
+    #   The exact public key to use. +fingerprint+ and +cert+ are ignored.
     # @param fingerprint optional [Array<String>, String]
     #   SHA1 fingerprints of trusted certificates. If provided, they will be
     #   checked against the {#signing_key} embedded in the {#signature}, and if
     #   a match is found, the certificate embedded in the signature will be
     #   added to the list of certificates used for verifying the signature.
     # @param cert optional [Array<String>, String]
-    # @param allow_expired_certificate [Boolean]
-    #   If set to true, verification_time will be adjusted to be just within the
-    #   certificate's expiration time, so that an expired certificate error will
-    #   not be thrown.
+    #   A single or array of trusted certificates. If provided, they will be
+    #   check against the {#signing_key} embedded in the {#signature}, and if
+    #   a match of public keys only is found, that key will be considered trusted
+    #   and used to verify the signature.
     # @return [Array<String>] An empty array on success, details of errors on failure.
-    def validate_signature(fingerprint: nil,
-                           cert: nil,
-                           verification_time: nil,
-                           allow_expired_certificate: false,
-                           verify_certificate: true)
+    def validate_signature(key: nil,
+                           fingerprint: nil,
+                           cert: nil)
       return ["not signed"] unless signed?
 
       certs = Array(cert)
@@ -59,39 +59,22 @@ module SAML2
       # see if any given fingerprints match the certificate embedded in the XML;
       # if so, extract the certificate, and add it to the allowed certificates list
       Array(fingerprint).each do |fp|
-        certs << signing_key.certificate if signing_key&.fingerprint == KeyInfo.format_fingerprint(fp)
+        certs << signing_key.certificate if signing_key&.fingerprint == SAML2::KeyInfo.format_fingerprint(fp)
       end
       certs = certs.uniq
-      return ["no trusted certificate found"] if certs.empty?
 
-      if verify_certificate == false && signing_key&.certificate
-        key = signing_key.certificate.public_key.to_s
+      trusted_keys = certs.map do |cert|
+        cert = cert.is_a?(String) ? OpenSSL::X509::Certificate.new(cert) : cert
+        cert.public_key.to_s
+      end
+      if signing_key&.certificate && trusted_keys.include?(signing_key.certificate.public_key.to_s)
+        key ||= signing_key.certificate.public_key.to_s
       end
 
-      if signing_key
-        signing_cert = signing_key.certificate
-        if allow_expired_certificate
-          verification_time = signing_cert.not_after - 1
-        end
-
-        # we explicitly trust the signing certificate, but it's not self-signed;
-        # xmlsec is weird and decides not to trust it in that case, so we skip
-        # certificate verification by xmlsec, and do it ourselves
-        if certs.include?(signing_cert) &&  signing_cert.issuer != signing_cert.subject
-          verification_time ||= Time.now.utc
-          return ["certificate has expired"] if verification_time > signing_cert.not_after
-          return ["certificate is not yet valid"] if verification_time < signing_cert.not_before
-
-          verify_certificate = false
-        end
-      end
-      certs = nil if key # we're using a key explicitly, ignoring the certs
+      return ["no trusted signing key found"] if key.nil?
 
       begin
-        result = signature.verify_with(key: key,
-                                       certs: certs,
-                                       verification_time: verification_time,
-                                       verify_certificates: verify_certificate)
+        result = signature.verify_with(key: key)
         result ? [] : ["signature is invalid"]
       rescue XMLSec::VerificationError => e
         [e.message]
@@ -104,8 +87,8 @@ module SAML2
     #
     # @param (see #validate_signature)
     # @return [Boolean]
-    def valid_signature?(fingerprint: nil, cert: nil, verification_time: nil)
-      validate_signature(fingerprint: fingerprint, cert: cert, verification_time: verification_time).empty?
+    def valid_signature?(fingerprint: nil, cert: nil)
+      validate_signature(fingerprint: fingerprint, cert: cert).empty?
     end
 
     # Sign this object.
