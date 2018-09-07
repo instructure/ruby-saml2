@@ -31,11 +31,12 @@ module SAML2
       @certificate ||= OpenSSL::X509::Certificate.new(Base64.decode64(x509))
     end
 
-    # Formats a fingerprint as all lowercase, with a : every two characters.
+    # Formats a fingerprint as all lowercase, with a : every two characters,
+    # stripping all non-hexadecimal characters.
     # @param fingerprint [String]
     # @return [String]
     def self.format_fingerprint(fingerprint)
-      fingerprint.downcase.gsub(/(\h{2})(?=\h)/, '\1:')
+      fingerprint.downcase.gsub(/[^0-9a-f]/, '').gsub(/(\h{2})(?=\h)/, '\1:')
     end
 
     # @return [String]
