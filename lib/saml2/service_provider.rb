@@ -7,8 +7,12 @@ require 'saml2/sso'
 
 module SAML2
   class ServiceProvider < SSO
+    attr_writer :authn_requests_signed, :want_assertions_signed
+
     def initialize
       super
+      @authn_requests_signed = nil
+      @want_assertions_signed = nil
       @assertion_consumer_services = Endpoint::Indexed::Array.new
       @attribute_consuming_services = AttributeConsumingService::Array.new
     end
@@ -18,6 +22,22 @@ module SAML2
       super
       @assertion_consumer_services = nil
       @attribute_consuming_services = nil
+    end
+
+    # @return [Boolean, nil]
+    def authn_requests_signed?
+      unless instance_variable_defined?(:@authn_requests_signed)
+        @authn_requests_signed = xml['AuthnRequestsSigned'] && xml['AuthnRequestsSigned'] == 'true'
+      end
+      @authn_requests_signed
+    end
+
+    # @return [Boolean, nil]
+    def want_assertions_signed?
+      unless instance_variable_defined?(:@want_assertions_signed)
+        @want_assertions_signed = xml['WantAssertionsSigned'] && xml['WantAssertionsSigned'] == 'true'
+      end
+      @want_assertions_signed
     end
 
     # @return [Endpoint::Indexed::Array]
@@ -41,6 +61,9 @@ module SAML2
       builder['md'].SPSSODescriptor do |sp_sso_descriptor|
         super(sp_sso_descriptor)
 
+        sp_sso_descriptor['AuthnRequestsSigned'] = authn_requests_signed? unless authn_requests_signed?.nil?
+        sp_sso_descriptor['WantAssertionsSigned'] = want_assertions_signed? unless authn_requests_signed?.nil?
+
         assertion_consumer_services.each do |acs|
           acs.build(sp_sso_descriptor, 'AssertionConsumerService')
         end
@@ -52,3 +75,4 @@ module SAML2
     end
   end
 end
+
