@@ -82,11 +82,11 @@ require 'saml2'
 class SamlSpController < ApplicationController
   class << self
     def idp_metadata
-      @idp_metadata ||= SAML2::Entity.parse(Rails.root.join('config/saml/idp_metadata.xml'))
+      @idp_metadata ||= SAML2::Entity.parse(File.open(Rails.root.join('config/saml/idp_metadata.xml')))
     end
 
     def sp_metadata
-      @sp_metadata ||= SAML2::Entity.parse(Rails.root.join('config/saml/sp_metadata.xml'))
+      @sp_metadata ||= SAML2::Entity.parse(File.open(Rails.root.join('config/saml/sp_metadata.xml')))
     end
   end
 
