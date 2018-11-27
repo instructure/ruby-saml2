@@ -68,9 +68,9 @@
     </AttributeConsumingService>
   </SPSSODescriptor>
   <Organization>
-    <OrganizationName xml:lang="en">Canvas</OrganizationDisplayName>
+    <OrganizationName xml:lang="en">Canvas</OrganizationName>
     <OrganizationDisplayName xml:lang="en">Canvas</OrganizationDisplayName>
-    <OrganizationURL xml:lang="en">https://www.canvaslms.com/</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">https://www.canvaslms.com/</OrganizationURL>
   </Organization>
   <ContactPerson contactType="technical">
     <SurName>Administrator</SurName>
