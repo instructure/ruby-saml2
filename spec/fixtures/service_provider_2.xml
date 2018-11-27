@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" validUntil="2018-11-15T15:40:52Z" cacheDuration="PT604800S" entityID="http://localhost:3001/">
+  <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEKzCCAxOgAwIBAgIJAPuxHXVDuOfZMA0GCSqGSIb3DQEBCwUAMIGrMQswCQYDVQQGEwJVUzENMAsGA1UECAwEVXRhaDEXMBUGA1UEBwwOU2FsdCBMYWtlIENpdHkxGTAXBgNVBAoMEEluc3RydWN0dXJlLCBJbmMxEzARBgNVBAsMCk9wZXJhdGlvbnMxIDAeBgNVBAMMF0NhbnZhcyBTQU1MIENlcnRpZmljYXRlMSIwIAYJKoZIhvcNAQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tMB4XDTE3MDQwODIxMDQwNVoXDTE5MDQyMjIxMDQwNVowgasxCzAJBgNVBAYTAlVTMQ0wCwYDVQQIDARVdGFoMRcwFQYDVQQHDA5TYWx0IExha2UgQ2l0eTEZMBcGA1UECgwQSW5zdHJ1Y3R1cmUsIEluYzETMBEGA1UECwwKT3BlcmF0aW9uczEgMB4GA1UEAwwXQ2FudmFzIFNBTUwgQ2VydGlmaWNhdGUxIjAgBgkqhkiG9w0BCQEWE29wc0BpbnN0cnVjdHVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOokl8TPWm4LL6rqEnPjL0t5QWw76WOTA9JzLJxjKwtIWlGAlyRQ+gEmD5vaFAzoYl62BIm2yCy+EdUR9D/3X9Hq+22ysy7pWj8rdaJeQ1XAX2xMlphZhMHnKdKBfDxLMaIEKQg942xBTkY3yeDsc8YezR0sSBToumQs23PVnIq7u1U+UAry0Q33ovmJRV50kQk3Qccl6omSDXezUIB+LYqI2ghoIo/+XfHaPepHWj3XnXKBGtlDIpUbgVIbqdHcsE9uRHK6YfeiWqX+fW0h8rcn5z3cj5awzYJ8kkGKACS6TNccfFCouMoKskBB4ot2WBuIKEyJNqg7kn/wlCzsoHAgMBAAGjUDBOMB0GA1UdDgQWBBQ3lOrDsVPyDFZyZhjbbLZpdStYODAfBgNVHSMEGDAWgBQ3lOrDsVPyDFZyZhjbbLZpdStYODAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBymkrTdaGCS5wSswAKwHmrTdZQdD4ksXszvQKZEiLtenoDyE7JomCME1a5BaGuDjaDBbVEO8StAEjQeCoGCkW0tkqBfgwSNGaIZp7SXcMSHN866D1r7whwjAXSehVSf1LSXYyMh2wcgbKVZB71EP8hIG37fl5dcCZJ+qhnExTf+EXgf3MwuE3eTnuiXem2F0lz1Vj8vkef+qr9wdSHoZ/L9Xje03wYSAT0J2KlbkUZNb/me6ZxeOWMWbCsYu4+OBfcWi+n2KDSFd6xI4DLm0685DP4hzlycGDiUmOHrt/ZpZEVBs1d/ooxfZhs6dCEUyUnSQJDMGy5cRRcanOu2OwE</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIIEKzCCAxOgAwIBAgIJAPuxHXVDuOfZMA0GCSqGSIb3DQEBCwUAMIGrMQswCQYDVQQGEwJVUzENMAsGA1UECAwEVXRhaDEXMBUGA1UEBwwOU2FsdCBMYWtlIENpdHkxGTAXBgNVBAoMEEluc3RydWN0dXJlLCBJbmMxEzARBgNVBAsMCk9wZXJhdGlvbnMxIDAeBgNVBAMMF0NhbnZhcyBTQU1MIENlcnRpZmljYXRlMSIwIAYJKoZIhvcNAQkBFhNvcHNAaW5zdHJ1Y3R1cmUuY29tMB4XDTE3MDQwODIxMDQwNVoXDTE5MDQyMjIxMDQwNVowgasxCzAJBgNVBAYTAlVTMQ0wCwYDVQQIDARVdGFoMRcwFQYDVQQHDA5TYWx0IExha2UgQ2l0eTEZMBcGA1UECgwQSW5zdHJ1Y3R1cmUsIEluYzETMBEGA1UECwwKT3BlcmF0aW9uczEgMB4GA1UEAwwXQ2FudmFzIFNBTUwgQ2VydGlmaWNhdGUxIjAgBgkqhkiG9w0BCQEWE29wc0BpbnN0cnVjdHVyZS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDOokl8TPWm4LL6rqEnPjL0t5QWw76WOTA9JzLJxjKwtIWlGAlyRQ+gEmD5vaFAzoYl62BIm2yCy+EdUR9D/3X9Hq+22ysy7pWj8rdaJeQ1XAX2xMlphZhMHnKdKBfDxLMaIEKQg942xBTkY3yeDsc8YezR0sSBToumQs23PVnIq7u1U+UAry0Q33ovmJRV50kQk3Qccl6omSDXezUIB+LYqI2ghoIo/+XfHaPepHWj3XnXKBGtlDIpUbgVIbqdHcsE9uRHK6YfeiWqX+fW0h8rcn5z3cj5awzYJ8kkGKACS6TNccfFCouMoKskBB4ot2WBuIKEyJNqg7kn/wlCzsoHAgMBAAGjUDBOMB0GA1UdDgQWBBQ3lOrDsVPyDFZyZhjbbLZpdStYODAfBgNVHSMEGDAWgBQ3lOrDsVPyDFZyZhjbbLZpdStYODAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQBymkrTdaGCS5wSswAKwHmrTdZQdD4ksXszvQKZEiLtenoDyE7JomCME1a5BaGuDjaDBbVEO8StAEjQeCoGCkW0tkqBfgwSNGaIZp7SXcMSHN866D1r7whwjAXSehVSf1LSXYyMh2wcgbKVZB71EP8hIG37fl5dcCZJ+qhnExTf+EXgf3MwuE3eTnuiXem2F0lz1Vj8vkef+qr9wdSHoZ/L9Xje03wYSAT0J2KlbkUZNb/me6ZxeOWMWbCsYu4+OBfcWi+n2KDSFd6xI4DLm0685DP4hzlycGDiUmOHrt/ZpZEVBs1d/ooxfZhs6dCEUyUnSQJDMGy5cRRcanOu2OwE</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect" Location="http://localhost:3001/logout"/>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:2.0:nameid-format:persistent</md:NameIDFormat>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="http://localhost:3001/saml_consume" index="0"/>
+  </md:SPSSODescriptor>
+  <md:ContactPerson contactType="technical">
+    <md:GivenName>The Technician</md:GivenName>
+    <md:EmailAddress>tech@wootwoot.com</md:EmailAddress>
+  </md:ContactPerson>
+</md:EntityDescriptor>

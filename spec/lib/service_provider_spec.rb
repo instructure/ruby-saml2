@@ -30,11 +30,19 @@ module SAML2
     describe "valid metadata" do
       let(:entity) { Entity.parse(fixture('service_provider.xml')) }
       let(:sp) { entity.roles.first }
+      let(:entity2) { Entity.parse(fixture('service_provider_2.xml')) }
+      let(:sp2) { entity2.roles.first }
 
       it "should create the assertion_consumer_services array" do
         expect(sp.assertion_consumer_services.length).to eq 4
         expect(sp.assertion_consumer_services.map(&:index)).to eq [0, 1, 2, 3]
         expect(sp.assertion_consumer_services.first.location).to eq 'https://siteadmin.instructure.com/saml_consume'
+      end
+
+      it "should keep assertion_consumer_service location from xml" do
+        expect(sp2.assertion_consumer_services.length).to eq 1
+        expect(sp2.assertion_consumer_services.map(&:index)).to eq [0]
+        expect(sp2.assertion_consumer_services.first.location).to eq 'http://localhost:3001/saml_consume'
       end
 
       it "should find the signing certificate" do
