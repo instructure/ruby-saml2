@@ -258,6 +258,20 @@ module SAML2
         expect(response.errors).to eq []
         expect(response.assertions.first.subject.name_id.id).to eq 'jacob'
       end
+
+      it "allows signatures that don't include KeyInfo, if we have a full cert" do
+        response = Response.parse(fixture("response_without_keyinfo.xml"))
+        sp_entity.entity_id = 'http://unimelb-dev.instructure.com/saml2'
+        idp_entity.entity_id = 'https://authidm3tst.unimelb.edu.au:443/oam/fed'
+        idp_entity.identity_providers.first.keys.clear
+        idp_entity.identity_providers.first.keys << KeyDescriptor.new(<<-CERTIFICATE)
+MIIB/jCCAWegAwIBAgIBCjANBgkqhkiG9w0BAQQFADAkMSIwIAYDVQQDExlhZGRlcjEuaXRzLnVuaW1lbGIuZWR1LmF1MB4XDTE3MDUyMjA2MzQzOFoXDTI3MDUyMDA2MzQzOFowJDEiMCAGA1UEAxMZYWRkZXIxLml0cy51bmltZWxiLmVkdS5hdTCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAjJgoa5bPS+Jukq2vNaMwZ39L3IhAg6oOytz+bgOhmF+o5zYARbFqC67faa/rMSkfQwYIpp/MdsC8XHtHeR6HCJjbuPkH/EooHiREOClTI0EKZvI2Xv/DqexxEegRPxXiwPUEPozGGT1yWtSwkQTvRvA9tMpZl3yLg1LhDOP6s6MCAwEAAaNAMD4wDAYDVR0TAQH/BAIwADAPBgNVHQ8BAf8EBQMDB9gAMB0GA1UdDgQWBBRukBh7J1okLMIfSRpzF5opuj0LizANBgkqhkiG9w0BAQQFAAOBgQB0zySVaypIGRksTwpmjaQhMvNrYWGvj74Rs1iuqOdsEQkpgk5dQKRFiAFEr+6b7WN4k+IAH5S++l1R0bUG6k9HFSn7uy7AD+qZcdoUm9a39brtH2kefs0D3bQfrwkqggAtWKwqfU4r7nAcdtVE+CT3cny5QU2/mJav9W9bzFPMXQ==
+        CERTIFICATE
+
+        sp_entity.valid_response?(response, idp_entity, verification_time: Time.parse('2019-04-16T00:56:03Z'))
+        expect(response.errors).to eq []
+        expect(response.assertions.first.subject.name_id.id).to eq 'testuserint.sso@staff.oimtest.unimelb.edu.au'
+      end
     end
   end
 end

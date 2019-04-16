@@ -25,7 +25,11 @@ module SAML2
 
     # @return [KeyInfo, nil]
     def signing_key
-      @signing_key ||= KeyInfo.from_xml(signature)
+      unless instance_variable_defined?(:@signing_key)
+        # don't use `... if signature.at_xpath(...)` - we need to make sure we assign the nil
+        @signing_key = signature.at_xpath('dsig:KeyInfo', Namespaces::ALL) ? KeyInfo.from_xml(signature) : nil
+      end
+      @signing_key
     end
 
     def signed?
@@ -69,6 +73,11 @@ module SAML2
       end
       if signing_key&.certificate && trusted_keys.include?(signing_key.certificate.public_key.to_s)
         key ||= signing_key.certificate.public_key.to_s
+      end
+      # signature doesn't say who signed it. hope and pray it's with the only certificate
+      # we know about
+      if signing_key.nil? && key.nil? && trusted_keys.length == 1
+        key = trusted_keys.first
       end
 
       return ["no trusted signing key found"] if key.nil?
