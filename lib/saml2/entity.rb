@@ -65,7 +65,7 @@ module SAML2
 
       # (see Message#valid_schema?)
       def valid_schema?
-        Schemas.federation.valid?(xml.document)
+        Schemas.metadata.valid?(xml.document)
       end
 
       # (see Message#id)
@@ -101,7 +101,7 @@ module SAML2
 
     # (see Message#valid_schema?)
     def valid_schema?
-      Schemas.federation.valid?(xml.document)
+      Schemas.metadata.valid?(xml.document)
     end
 
     # @return [String]

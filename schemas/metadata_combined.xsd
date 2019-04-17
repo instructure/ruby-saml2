@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<schema
+        targetNamespace="https://www.instructure.com/ruby-saml2/metadata-combined"
+        xmlns="http://www.w3.org/2001/XMLSchema"
+        version="2.0">
+
+  <import namespace="http://docs.oasis-open.org/wsfed/federation/200706"
+          schemaLocation="ws-federation.xsd"/>
+  <import namespace="urn:oasis:names:tc:SAML:metadata:ext:query"
+          schemaLocation="sstc-saml-metadata-ext-query.xsd"/>
+
+</schema>
