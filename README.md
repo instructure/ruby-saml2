@@ -18,8 +18,9 @@ require 'saml2'
 
 class SamlIdpController < ApplicationController
   def create
-    authn_request = SAML2::AuthnRequest.decode(params[:SAMLRequest])
-    unless authn_request.valid_schema? &&
+    authn_request, @relay_state = SAML2::Bindings::HTTPRedirect.decode(params[:SAMLRequest])
+    unless authn_request.is_a?(SAML2::AuthnRequest) &&
+      authn_request.valid_schema? &&
       authn_request.valid_interoperable_profile? &&
       authn_request.resolve(self.class.service_provider)
 
@@ -35,7 +36,6 @@ class SamlIdpController < ApplicationController
 
       @saml_response = Base64.encode64(response.to_xml)
       @saml_acs_url = authn_request.assertion_consumer_service.location
-      @relay_state = params[:RelayState]
       render template: "saml2/http_post", layout: false
     else
       redirect_to login_url
