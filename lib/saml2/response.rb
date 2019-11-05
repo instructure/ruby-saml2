@@ -13,6 +13,8 @@ module SAML2
     attr_reader :assertions
 
     # Respond to an {AuthnRequest}
+    #
+    # {AuthnRequest#resolve} needs to have been previously called on the {AuthnRequest}.
     # @param authn_request [AuthnRequest]
     # @param issuer [NameID]
     # @param name_id [NameID] The Subject
