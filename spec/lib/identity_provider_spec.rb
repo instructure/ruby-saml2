@@ -32,6 +32,10 @@ module SAML2
       it "should find the signing certificate" do
         expect(idp.keys.first.x509).to match(/MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD/)
       end
+
+      it "loads identity provider attributes" do
+        expect(idp.want_authn_requests_signed?).to be_truthy
+      end
     end
   end
 end

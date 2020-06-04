@@ -64,6 +64,11 @@ module SAML2
         expect(sp.keys.first.encryption_methods.first.algorithm).to eq KeyDescriptor::EncryptionMethod::Algorithm::AES128_CBC
         expect(sp.keys.first.encryption_methods.first.key_size).to eq 128
       end
+
+      it "loads service provider attributes" do
+        expect(sp.authn_requests_signed?).to be_truthy
+        expect(sp.want_assertions_signed?).to be_truthy
+      end
     end
   end
 end
