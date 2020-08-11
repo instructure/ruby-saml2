@@ -7,16 +7,16 @@ module SAML2
     # @return [Nokogiri::XML::Element, nil]
     def signature
       unless instance_variable_defined?(:@signature)
-        @signature = xml.at_xpath('dsig:Signature', Namespaces::ALL)
-        if @signature
-          signed_node = @signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
+        @signature = xml.xpath('//dsig:Signature', Namespaces::ALL).find do |signature|
+          signed_node = signature.at_xpath('dsig:SignedInfo/dsig:Reference', Namespaces::ALL)['URI']
           if signed_node == ''
-            @signature = nil unless xml == xml.document.root
+            true if xml == xml.document.root
           elsif signed_node != "##{xml['ID']}"
-            @signature = nil
+            false
           else
             # validating the schema will automatically add ID attributes, so check that first
             xml.set_id_attribute('ID') unless xml.document.get_id(xml['ID'])
+            true
           end
         end
       end

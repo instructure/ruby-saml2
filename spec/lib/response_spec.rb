@@ -272,6 +272,20 @@ MIIB/jCCAWegAwIBAgIBCjANBgkqhkiG9w0BAQQFADAkMSIwIAYDVQQDExlhZGRlcjEuaXRzLnVuaW1l
         expect(response.errors).to eq []
         expect(response.assertions.first.subject.name_id.id).to eq 'testuserint.sso@staff.oimtest.unimelb.edu.au'
       end
+
+      it "finds signatures the sign the assertion, not inside the assertion" do
+        response = Response.parse(fixture("response_assertion_signed_reffed_from_response.xml"))
+        sp_entity.entity_id = 'http://wscc.instructure.com/saml2'
+        idp_entity.entity_id = 'https://my.wscc.edu/idp'
+        idp_entity.identity_providers.first.keys.clear
+        idp_entity.identity_providers.first.fingerprints << "c4f473274116a3cbc295c3abf77c7ed1ade9b904"
+
+        sp_entity.valid_response?(response, idp_entity, verification_time: response.issue_instant)
+        expect(response.errors).to eq []
+        expect(response.assertions.first.subject.name_id.id).to eq 'narnold@wscc.edu'
+        expect(response).not_to be_signed
+        expect(response.assertions.first).to be_signed
+      end
     end
   end
 end
