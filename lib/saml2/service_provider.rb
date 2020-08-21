@@ -20,6 +20,8 @@ module SAML2
     # (see Base#from_xml)
     def from_xml(node)
       super
+      remove_instance_variable(:@authn_requests_signed)
+      remove_instance_variable(:@want_assertions_signed)
       @assertion_consumer_services = nil
       @attribute_consuming_services = nil
     end
