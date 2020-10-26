@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require_relative '../../spec_helper'
 
 require 'openssl'
@@ -86,10 +88,10 @@ module SAML2
         end
 
         it "raises on unsupported signature algorithm" do
-          x = url
+          x = url.dup
           # SigAlg is now sha10
           x << "0"
-          expect { Bindings::HTTPRedirect.decode(url, public_key: certificate) }.to raise_error(UnsupportedSignatureAlgorithm)
+          expect { Bindings::HTTPRedirect.decode(x, public_key: certificate) }.to raise_error(UnsupportedSignatureAlgorithm)
         end
 
         it "allows the caller to detect an unsigned message" do
