@@ -30,7 +30,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'nokogiri-xmlsec-instructure', "~> 0.9", ">= 0.9.5"
   s.add_dependency 'activesupport', ">= 3.2", "< 6.2"
 
-  s.add_development_dependency "byebug", "~> 10.0"
+  s.add_development_dependency "byebug", "~> 11.0"
   s.add_development_dependency "rake", "~> 12.0"
   s.add_development_dependency "rspec", "~> 3.5"
 end

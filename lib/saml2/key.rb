@@ -11,6 +11,8 @@ module SAML2
   class KeyInfo < Base
     # @return [String] The PEM encoded certificate.
     attr_reader :x509
+    # @return [OpenSSL::PKey::PKey] An RSA Public Key
+    attr_accessor :key
 
     # @param x509 [String] The PEM encoded certificate.
     def initialize(x509 = nil)
@@ -19,7 +21,15 @@ module SAML2
 
     # (see Base#from_xml)
     def from_xml(node)
-      self.x509 = node.at_xpath('dsig:KeyInfo/dsig:X509Data/dsig:X509Certificate', Namespaces::ALL)&.content&.strip
+      self.x509 = node.at_xpath('dsig:X509Data/dsig:X509Certificate', Namespaces::ALL)&.content&.strip
+      if (rsa_key_value = node.at_xpath('dsig:KeyValue/dsig:RSAKeyValue', Namespaces::ALL))
+        modulus = crypto_binary_to_integer(rsa_key_value.at_xpath('dsig:Modulus', Namespaces::ALL)&.content&.strip)
+        exponent = crypto_binary_to_integer(rsa_key_value.at_xpath('dsig:Exponent', Namespaces::ALL)&.content&.strip)
+        if modulus && exponent
+          @key = OpenSSL::PKey::RSA.new
+          key.set_key(modulus, exponent, nil)
+        end
+      end
     end
 
     def x509=(value)
@@ -28,7 +38,13 @@ module SAML2
 
     # @return [OpenSSL::X509::Certificate]
     def certificate
+      return nil if x509.nil?
       @certificate ||= OpenSSL::X509::Certificate.new(Base64.decode64(x509))
+    end
+
+    # @return [OpenSSL::PKey::PKey]
+    def public_key
+      key || certificate&.public_key
     end
 
     # Formats a fingerprint as all lowercase, with a : every two characters,
@@ -41,16 +57,34 @@ module SAML2
 
     # @return [String]
     def fingerprint
+      return nil unless certificate
       @fingerprint ||= self.class.format_fingerprint(Digest::SHA1.hexdigest(certificate.to_der))
     end
 
     # (see Base#build)
     def build(builder)
       builder['dsig'].KeyInfo do |key_info|
-        key_info['dsig'].X509Data do |x509_data|
-          x509_data['dsig'].X509Certificate(x509)
+        if x509
+          key_info['dsig'].X509Data do |x509_data|
+            x509_data['dsig'].X509Certificate(x509)
+          end
+        end
+        if key.is_a?(OpenSSL::PKey::RSA)
+          key_info['dsig'].KeyValue do |key_value|
+            key_value['dsig'].RSAKeyValue do |rsa_key_value|
+              rsa_key_value['dsig'].Modulus(Base64.encode64(key.n.to_s(2)))
+              rsa_key_value['dsig'].Exponent(Base64.encode64(key.e.to_s(2)))
+            end
+          end
         end
       end
+    end
+
+    private
+
+    def crypto_binary_to_integer(str)
+      return nil unless str
+      OpenSSL::BN.new(Base64.decode64(str), 2)
     end
   end
 
@@ -99,7 +133,7 @@ module SAML2
 
     # (see Base#from_xml)
     def from_xml(node)
-      super
+      super(node.at_xpath('dsig:KeyInfo', Namespaces::ALL))
       self.use = node['use']
       self.encryption_methods = load_object_array(node, 'md:EncryptionMethod', EncryptionMethod)
     end

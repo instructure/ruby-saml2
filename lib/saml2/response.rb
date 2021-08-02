@@ -127,14 +127,16 @@ module SAML2
         return errors
       end
 
-      certificates = idp.signing_keys.map(&:certificate)
-      if idp.fingerprints.empty? && certificates.empty?
+      certificates = idp.signing_keys.map(&:certificate).compact
+      keys = idp.signing_keys.map(&:key).compact
+      if idp.fingerprints.empty? && certificates.empty? && keys.empty?
         errors << "could not find certificate to validate message"
         return errors
       end
 
       if signed?
-        unless (signature_errors = validate_signature(fingerprint: idp.fingerprints,
+        unless (signature_errors = validate_signature(key: keys,
+                                                      fingerprint: idp.fingerprints,
                                                       cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
@@ -145,7 +147,8 @@ module SAML2
 
       # this might be nil, if the assertion was encrypted
       if assertion&.signed?
-        unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
+        unless (signature_errors = assertion.validate_signature(key: keys,
+                                                                fingerprint: idp.fingerprints,
                                                                 cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
