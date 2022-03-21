@@ -28,7 +28,7 @@ Gem::Specification.new do |s|
   # on root elements with XML::Builder in that release
   s.add_dependency 'nokogiri', ">= 1.5.8", "< 2.0"
   s.add_dependency 'nokogiri-xmlsec-instructure', "~> 0.9", ">= 0.9.5"
-  s.add_dependency 'activesupport', ">= 3.2", "< 6.2"
+  s.add_dependency 'activesupport', ">= 3.2", "< 7.1"
 
   s.add_development_dependency "byebug", "~> 11.0"
   s.add_development_dependency "rake", "~> 12.0"
