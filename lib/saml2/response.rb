@@ -1,17 +1,15 @@
 # frozen_string_literal: true
 
-require 'nokogiri-xmlsec'
-require 'time'
+require "nokogiri-xmlsec"
+require "time"
 
-require 'saml2/assertion'
-require 'saml2/authn_statement'
-require 'saml2/status_response'
-require 'saml2/subject'
+require "saml2/assertion"
+require "saml2/authn_statement"
+require "saml2/status_response"
+require "saml2/subject"
 
 module SAML2
   class Response < StatusResponse
-    attr_reader :assertions
-
     # Respond to an {AuthnRequest}
     #
     # {AuthnRequest#resolve} needs to have been previously called on the {AuthnRequest}.
@@ -98,7 +96,11 @@ module SAML2
                  verification_time: nil,
                  ignore_audience_condition: false)
       raise ArgumentError, "service_provider should be an Entity object" unless service_provider.is_a?(Entity)
-      raise ArgumentError, "service_provider should have at least one service_provider role" unless (sp = service_provider.service_providers.first)
+
+      unless (sp = service_provider.service_providers.first)
+        raise ArgumentError,
+              "service_provider should have at least one service_provider role"
+      end
 
       # validate the schema
       super()
@@ -108,7 +110,9 @@ module SAML2
         verification_time = Time.now.utc
         # they issued it in the (near) future according to our clock;
         # use their clock instead
-        verification_time = issue_instant if issue_instant > verification_time && issue_instant < verification_time + 5 * 60
+        if issue_instant > verification_time && issue_instant < verification_time + (5 * 60)
+          verification_time = issue_instant
+        end
       end
 
       # not finding the issuer is not exceptional
@@ -119,16 +123,21 @@ module SAML2
 
       # getting the wrong data type is exceptional, and we should raise an error
       raise ArgumentError, "identity_provider should be an Entity object" unless identity_provider.is_a?(Entity)
-      raise ArgumentError, "identity_provider should have at least one identity_provider role" unless (idp = identity_provider.identity_providers.first)
+
+      unless (idp = identity_provider.identity_providers.first)
+        raise ArgumentError,
+              "identity_provider should have at least one identity_provider role"
+      end
 
       issuer = self.issuer || assertions.first&.issuer
       unless identity_provider.entity_id == issuer&.id
-        errors << "received unexpected message from '#{issuer&.id}'; expected it to be from '#{identity_provider.entity_id}'"
+        errors << "received unexpected message from '#{issuer&.id}'; " \
+                  "expected it to be from '#{identity_provider.entity_id}'"
         return errors
       end
 
-      certificates = idp.signing_keys.map(&:certificate).compact
-      keys = idp.signing_keys.map(&:key).compact
+      certificates = idp.signing_keys.filter_map(&:certificate)
+      keys = idp.signing_keys.filter_map(&:key)
       if idp.fingerprints.empty? && certificates.empty? && keys.empty?
         errors << "could not find certificate to validate message"
         return errors
@@ -140,6 +149,7 @@ module SAML2
                                                       cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
+
         response_signed = true
       end
 
@@ -152,24 +162,27 @@ module SAML2
                                                                 cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
+
         assertion_signed = true
       end
 
-      find_decryption_key = ->(embedded_certificates) do
+      find_decryption_key = lambda do |embedded_certificates|
         key = nil
         embedded_certificates.each do |cert_info|
           cert = case cert_info
-                   when OpenSSL::X509::Certificate; cert_info
-                   when Hash; sp.encryption_keys.map(&:certificate).find { |c| c.serial == cert_info[:serial] }
+                 when OpenSSL::X509::Certificate then cert_info
+                 when Hash then sp.encryption_keys.map(&:certificate).find { |c| c.serial == cert_info[:serial] }
                  end
           next unless cert
+
           key = sp.private_keys.find { |k| cert.check_private_key(k) }
           break if key
         end
-        if !key
+        unless key
           # couldn't figure out which key to use; just try them all
           next sp.private_keys
         end
+
         key
       end
 
@@ -208,23 +221,24 @@ module SAML2
                                                                 cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
+
         assertion_signed = true
       end
 
       # only do our own issue instant validation if the assertion
       # doesn't mandate any
-      unless assertion.conditions&.not_on_or_after
-        if assertion.issue_instant +  5 * 60 < verification_time ||
-            assertion.issue_instant - 5 * 60 > verification_time
-          errors << "assertion not recently issued"
-          return errors
-        end
+      if !assertion.conditions&.not_on_or_after && (assertion.issue_instant + (5 * 60) < verification_time ||
+           assertion.issue_instant - (5 * 60) > verification_time)
+        errors << "assertion not recently issued"
+        return errors
       end
 
       if assertion.conditions &&
-          !(condition_errors = assertion.conditions.validate(verification_time: verification_time,
-                                                             audience: service_provider.entity_id,
-                                                             ignore_audience_condition: ignore_audience_condition)).empty?
+         !(condition_errors = assertion.conditions.validate(
+           verification_time: verification_time,
+           audience: service_provider.entity_id,
+           ignore_audience_condition: ignore_audience_condition
+         )).empty?
         return errors.concat(condition_errors)
       end
 
@@ -253,9 +267,7 @@ module SAML2
 
     # @return [Array<Assertion>]
     def assertions
-      unless instance_variable_defined?(:@assertions)
-        @assertions = load_object_array(xml, 'saml:Assertion', Assertion)
-      end
+      @assertions = load_object_array(xml, "saml:Assertion", Assertion) unless instance_variable_defined?(:@assertions)
       @assertions
     end
 
@@ -275,9 +287,9 @@ module SAML2
     private
 
     def build(builder)
-      builder['samlp'].Response(
-        'xmlns:samlp' => Namespaces::SAMLP,
-        'xmlns:saml' => Namespaces::SAML
+      builder["samlp"].Response(
+        "xmlns:samlp" => Namespaces::SAMLP,
+        "xmlns:saml" => Namespaces::SAML
       ) do |response|
         super(response)
 

@@ -1,16 +1,16 @@
 # frozen_string_literal: true
 
-require 'base64'
-require 'uri'
-require 'zlib'
+require "base64"
+require "uri"
+require "zlib"
 
-require 'saml2/bindings'
-require 'saml2/message'
+require "saml2/bindings"
+require "saml2/message"
 
 module SAML2
   module Bindings
     module HTTPRedirect
-      URN ="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+      URN = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
 
       module SigAlgs
         DSA_SHA1 = "http://www.w3.org/2000/09/xmldsig#dsa-sha1"
@@ -51,18 +51,19 @@ module SAML2
           end
 
           raise MissingMessage unless uri.query
+
           query = URI.decode_www_form(uri.query)
-          base64 = query.assoc('SAMLRequest')&.last
+          base64 = query.assoc("SAMLRequest")&.last
           if base64
-            message_param = 'SAMLRequest'
+            message_param = "SAMLRequest"
           else
-            base64 = query.assoc('SAMLResponse')&.last
-            message_param = 'SAMLResponse'
+            base64 = query.assoc("SAMLResponse")&.last
+            message_param = "SAMLResponse"
           end
-          encoding = query.assoc('SAMLEncoding')&.last
-          relay_state = query.assoc('RelayState')&.last
-          signature = query.assoc('Signature')&.last
-          sig_alg = query.assoc('SigAlg')&.last
+          encoding = query.assoc("SAMLEncoding")&.last
+          relay_state = query.assoc("RelayState")&.last
+          signature = query.assoc("Signature")&.last
+          sig_alg = query.assoc("SigAlg")&.last
           raise MissingMessage unless base64
 
           raise UnsupportedEncoding if encoding && encoding != Encodings::DEFLATE
@@ -76,7 +77,7 @@ module SAML2
           end
 
           zstream = Zlib::Inflate.new(-Zlib::MAX_WBITS)
-          xml = String.new
+          xml = +""
           begin
             # do it in 1K slices, so we can protect against bombs
             (0..deflated.bytesize / 1024).each do |i|
@@ -106,19 +107,19 @@ module SAML2
             end
 
             base_string = find_raw_query_param(uri.query, message_param)
-            base_string << '&' << find_raw_query_param(uri.query, 'RelayState') if relay_state
-            base_string << '&' << find_raw_query_param(uri.query, 'SigAlg')
+            base_string << "&" << find_raw_query_param(uri.query, "RelayState") if relay_state
+            base_string << "&" << find_raw_query_param(uri.query, "SigAlg")
 
             valid_signature = false
             # there could be multiple certificates to try
             Array(public_key).each do |key|
-              hash = (sig_alg == SigAlgs::RSA_SHA256 ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
-              if key.verify(hash.new, signature, base_string)
-                # notify the caller which certificate was used
-                public_key_used&.call(key)
-                valid_signature = true
-                break
-              end
+              hash = ((sig_alg == SigAlgs::RSA_SHA256) ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
+              next unless key.verify(hash.new, signature, base_string)
+
+              # notify the caller which certificate was used
+              public_key_used&.call(key)
+              valid_signature = true
+              break
             end
             raise InvalidSignature unless valid_signature
           end
@@ -145,8 +146,8 @@ module SAML2
           original_query = URI.decode_www_form(result.query) if result.query
           original_query ||= []
           # remove any SAML protocol parameters
-          %w{SAMLEncoding SAMLRequest SAMLResponse RelayState SigAlg Signature}.each do |param|
-            original_query.delete_if { |(k, v)| k == param }
+          %w[SAMLEncoding SAMLRequest SAMLResponse RelayState SigAlg Signature].each do |param|
+            original_query.delete_if { |(k, _v)| k == param }
           end
 
           xml = message.to_s(pretty: false)
@@ -156,16 +157,19 @@ module SAML2
           base64 = Base64.strict_encode64(deflated)
 
           query = []
-          query << [message.is_a?(Request) ? 'SAMLRequest' : 'SAMLResponse', base64]
-          query << ['RelayState', relay_state] if relay_state
+          query << [message.is_a?(Request) ? "SAMLRequest" : "SAMLResponse", base64]
+          query << ["RelayState", relay_state] if relay_state
           if private_key
-            raise ArgumentError, "Unsupported signature algorithm #{sig_alg}" unless SigAlgs::RECOGNIZED.include?(sig_alg)
+            unless SigAlgs::RECOGNIZED.include?(sig_alg)
+              raise ArgumentError,
+                    "Unsupported signature algorithm #{sig_alg}"
+            end
 
-            query << ['SigAlg', sig_alg]
+            query << ["SigAlg", sig_alg]
             base_string = URI.encode_www_form(query)
-            hash = (sig_alg == SigAlgs::RSA_SHA256 ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
+            hash = ((sig_alg == SigAlgs::RSA_SHA256) ? OpenSSL::Digest::SHA256 : OpenSSL::Digest::SHA1)
             signature = private_key.sign(hash.new, base_string)
-            query << ['Signature', Base64.strict_encode64(signature)]
+            query << ["Signature", Base64.strict_encode64(signature)]
           end
 
           result.query = URI.encode_www_form(original_query + query)
@@ -177,7 +181,7 @@ module SAML2
         # we need to find the param, and return it still encoded from the URL
         def find_raw_query_param(query, param)
           start = query.index(param)
-          finish = (query.index('&', start + param.length + 1) || 0) - 1
+          finish = (query.index("&", start + param.length + 1) || 0) - 1
           query[start..finish]
         end
       end

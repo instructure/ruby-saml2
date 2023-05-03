@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require 'base64'
-require 'zlib'
+require "base64"
+require "zlib"
 
-require 'saml2/attribute_consuming_service'
-require 'saml2/bindings/http_redirect'
-require 'saml2/endpoint'
-require 'saml2/name_id'
-require 'saml2/namespaces'
-require 'saml2/request'
-require 'saml2/requested_authn_context'
-require 'saml2/schemas'
-require 'saml2/subject'
+require "saml2/attribute_consuming_service"
+require "saml2/bindings/http_redirect"
+require "saml2/endpoint"
+require "saml2/name_id"
+require "saml2/namespaces"
+require "saml2/request"
+require "saml2/requested_authn_context"
+require "saml2/schemas"
+require "saml2/subject"
 
 module SAML2
   class AuthnRequest < Request
@@ -35,8 +35,8 @@ module SAML2
     # @param service_provider [ServiceProvider]
     # @return [AuthnRequest]
     def self.initiate(issuer, identity_provider = nil,
-        assertion_consumer_service: nil,
-        service_provider: nil)
+                      assertion_consumer_service: nil,
+                      service_provider: nil)
       authn_request = new
       authn_request.issuer = issuer
       authn_request.destination = identity_provider.single_sign_on_services.first.location if identity_provider
@@ -80,12 +80,16 @@ module SAML2
     def resolve(service_provider)
       # TODO: check signature if present
 
-      if assertion_consumer_service_url
-        @assertion_consumer_service = service_provider.assertion_consumer_services.find { |acs| acs.location == assertion_consumer_service_url }
-      else
-        @assertion_consumer_service  = service_provider.assertion_consumer_services.resolve(assertion_consumer_service_index)
-      end
-      @attribute_consuming_service = service_provider.attribute_consuming_services.resolve(attribute_consuming_service_index)
+      @assertion_consumer_service =
+        if assertion_consumer_service_url
+          service_provider.assertion_consumer_services.find do |acs|
+            acs.location == assertion_consumer_service_url
+          end
+        else
+          service_provider.assertion_consumer_services.resolve(assertion_consumer_service_index)
+        end
+      @attribute_consuming_service =
+        service_provider.attribute_consuming_services.resolve(attribute_consuming_service_index)
 
       return false unless @assertion_consumer_service
       return false if attribute_consuming_service_index && !@attribute_consuming_service
@@ -96,7 +100,7 @@ module SAML2
     # @return [NameID::Policy, nil]
     def name_id_policy
       if xml && !instance_variable_defined?(:@name_id_policy)
-        @name_id_policy = NameID::Policy.from_xml(xml.at_xpath('samlp:NameIDPolicy', Namespaces::ALL))
+        @name_id_policy = NameID::Policy.from_xml(xml.at_xpath("samlp:NameIDPolicy", Namespaces::ALL))
       end
       @name_id_policy
     end
@@ -111,7 +115,7 @@ module SAML2
     # @return [Integer, nil]
     def assertion_consumer_service_index
       if xml && !instance_variable_defined?(:@assertion_consumer_service_index)
-        @assertion_consumer_service_index = xml['AssertionConsumerServiceIndex']&.to_i
+        @assertion_consumer_service_index = xml["AssertionConsumerServiceIndex"]&.to_i
       end
       @assertion_consumer_service_index
     end
@@ -119,7 +123,7 @@ module SAML2
     # @return [String, nil]
     def assertion_consumer_service_url
       if xml && !instance_variable_defined?(:@assertion_consumer_service_url)
-        @assertion_consumer_service_url = xml['AssertionConsumerServiceURL']
+        @assertion_consumer_service_url = xml["AssertionConsumerServiceURL"]
       end
       @assertion_consumer_service_url
     end
@@ -127,61 +131,64 @@ module SAML2
     # @return [Integer, nil]
     def attribute_consuming_service_index
       if xml && !instance_variable_defined?(:@attribute_consuming_service_index)
-        @attribute_consuming_service_index = xml['AttributeConsumingServiceIndex']&.to_i
+        @attribute_consuming_service_index = xml["AttributeConsumingServiceIndex"]&.to_i
       end
       @attribute_consuming_service_index
     end
 
     # @return [true, false, nil]
     def force_authn?
-      if xml && !instance_variable_defined?(:@force_authn)
-        @force_authn = xml['ForceAuthn']&.== 'true'
-      end
+      @force_authn = xml["ForceAuthn"]&.== "true" if xml && !instance_variable_defined?(:@force_authn)
       @force_authn
     end
 
     # @return [true, false, nil]
     def passive?
-      if xml && !instance_variable_defined?(:@passive)
-        @passive = xml['IsPassive']&.== 'true'
-      end
+      @passive = xml["IsPassive"]&.== "true" if xml && !instance_variable_defined?(:@passive)
       @passive
     end
 
     # @return [String, nil]
     def protocol_binding
-      if xml && !instance_variable_defined?(:@protocol_binding)
-        @protocol_binding = xml['ProtocolBinding']
-      end
+      @protocol_binding = xml["ProtocolBinding"] if xml && !instance_variable_defined?(:@protocol_binding)
       @protocol_binding
     end
 
     # @return [Subject, nil]
     def subject
       if xml && !instance_variable_defined?(:@subject)
-        @subject = Subject.from_xml(xml.at_xpath('saml:Subject', Namespaces::ALL))
+        @subject = Subject.from_xml(xml.at_xpath("saml:Subject", Namespaces::ALL))
       end
       @subject
     end
 
     # (see Base#build)
     def build(builder)
-      builder['samlp'].AuthnRequest(
-          'xmlns:samlp' => Namespaces::SAMLP,
-          'xmlns:saml' => Namespaces::SAML
+      builder["samlp"].AuthnRequest(
+        "xmlns:samlp" => Namespaces::SAMLP,
+        "xmlns:saml" => Namespaces::SAML
       ) do |authn_request|
         super(authn_request)
 
-        authn_request.parent['AssertionConsumerServiceIndex'] = assertion_consumer_service_index if assertion_consumer_service_index
-        authn_request.parent['AssertionConsumerServiceURL'] = assertion_consumer_service_url if assertion_consumer_service_url
-        authn_request.parent['AttributeConsumingServiceIndex'] = attribute_consuming_service_index if attribute_consuming_service_index
-        authn_request.parent['ForceAuthn'] = force_authn? unless force_authn?.nil?
-        authn_request.parent['IsPassive'] = passive? unless passive?.nil?
-        authn_request.parent['ProtocolBinding'] = protocol_binding if protocol_binding
+        if assertion_consumer_service_index
+          authn_request.parent["AssertionConsumerServiceIndex"] =
+            assertion_consumer_service_index
+        end
+        if assertion_consumer_service_url
+          authn_request.parent["AssertionConsumerServiceURL"] =
+            assertion_consumer_service_url
+        end
+        if attribute_consuming_service_index
+          authn_request.parent["AttributeConsumingServiceIndex"] =
+            attribute_consuming_service_index
+        end
+        authn_request.parent["ForceAuthn"] = force_authn? unless force_authn?.nil?
+        authn_request.parent["IsPassive"] = passive? unless passive?.nil?
+        authn_request.parent["ProtocolBinding"] = protocol_binding if protocol_binding
 
-        subject.build(authn_request) if subject
-        name_id_policy.build(authn_request) if name_id_policy
-        requested_authn_context.build(authn_request) if requested_authn_context
+        subject&.build(authn_request)
+        name_id_policy&.build(authn_request)
+        requested_authn_context&.build(authn_request)
       end
     end
   end

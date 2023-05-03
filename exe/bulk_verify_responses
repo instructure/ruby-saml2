@@ -1,9 +1,10 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
-require 'json'
-require 'openssl'
+require "json"
+require "openssl"
 
-require 'saml2'
+require "saml2"
 
 debug = ARGV.delete("--debug")
 
@@ -12,37 +13,37 @@ service_provider = SAML2::ServiceProvider.new
 service_provider_entity.roles << service_provider
 
 def getarg(key)
-  if (index = ARGV.index(key))
-    ARGV.delete_at(index)
-    ARGV.delete_at(index)
-  end
+  return unless (index = ARGV.index(key))
+
+  ARGV.delete_at(index)
+  ARGV.delete_at(index)
 end
 
-if (verification_time = getarg('--at'))
+if (verification_time = getarg("--at"))
   verification_time = Time.parse(verification_time)
 end
 verification_time ||= Time.now.utc
 
-while (key_file = getarg('--key'))
+while (key_file = getarg("--key"))
   service_provider.private_keys << OpenSSL::PKey.read(File.read(key_file))
 end
 
-while (cert_file = getarg('--certificate'))
+while (cert_file = getarg("--certificate"))
   service_provider.keys << SAML2::KeyDescriptor.new(File.read(cert_file))
 end
 
 ignored_idps = Set.new
-while (idp = getarg('--ignore'))
-  if idp[0] == '@'
-    ignored_idps.merge(File.read(idp[1..-1]).strip.split("\n"))
+while (idp = getarg("--ignore"))
+  if idp[0] == "@"
+    ignored_idps.merge(File.read(idp[1..]).strip.split("\n"))
   else
     ignored_idps << idp
   end
 end
 
 idps = {}
-if (trusted_certificates_file = getarg('--trusted-certificates'))
-  trusted_certificates = JSON.load(File.read(trusted_certificates_file))
+if (trusted_certificates_file = getarg("--trusted-certificates"))
+  trusted_certificates = JSON.parse(File.read(trusted_certificates_file))
   trusted_certificates.each do |(issuer, fingerprints)|
     idp_entity = SAML2::Entity.new
     idp_entity.entity_id = issuer
@@ -53,24 +54,22 @@ if (trusted_certificates_file = getarg('--trusted-certificates'))
   end
 end
 
-responses = JSON.load(File.read(ARGV.first))
-if ARGV.last.to_i.to_s == ARGV.last
-  index = ARGV.pop.to_i
-end
+responses = JSON.parse(File.read(ARGV.first))
+index = ARGV.pop.to_i if ARGV.last.to_i.to_s == ARGV.last
 
 bad_counts = Hash.new(0)
 non_ignored_count = 0
 
 responses = [responses[index]] if index
 responses.each_with_index do |response_raw, i|
-  next if response_raw['SAMLResponse'].empty?
-  next if response_raw['error'] # we're not expected to be able to validate this
+  next if response_raw["SAMLResponse"].empty?
+  next if response_raw["error"] # we're not expected to be able to validate this
 
   begin
     puts response_raw.to_json if debug
     response, _relay_state = SAML2::Bindings::HTTP_POST.decode(response_raw)
   rescue => e
-    STDERR.puts "Unable to decode '#{response_raw}' (index #{i}) due to #{e}"
+    warn "Unable to decode '#{response_raw}' (index #{i}) due to #{e}"
     next
   end
 
@@ -78,7 +77,7 @@ responses.each_with_index do |response_raw, i|
 
   non_ignored_count += 1
 
-  puts response.xml.to_s if debug
+  puts response.xml if debug
 
   # TODO: ignore audience restrictions
   errors = response.validate(service_provider: service_provider_entity,
@@ -86,10 +85,10 @@ responses.each_with_index do |response_raw, i|
                              verification_time: verification_time)
   unless errors.empty?
     bad_counts[response.issuer&.id] += 1
-    STDERR.puts "#{errors.inspect} for response #{response.id} from #{response.issuer&.id} (index #{i})"
+    warn "#{errors.inspect} for response #{response.id} from #{response.issuer&.id} (index #{i})"
   end
 end
 
-puts ''
+puts ""
 puts bad_counts.sort_by(&:last).reverse.to_h.inspect
 puts "#{bad_counts.values.sum}/#{non_ignored_count} failed"

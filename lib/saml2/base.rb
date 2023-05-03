@@ -1,19 +1,61 @@
 # frozen_string_literal: true
 
-require 'saml2/namespaces'
+require "saml2/namespaces"
 
 module SAML2
   # @abstract
   class Base
-    # Create an appropriate object to represent the given XML element.
-    #
-    # @param node [Nokogiri::XML::Element, nil]
-    # @return [Base, nil]
-    def self.from_xml(node)
-      return nil unless node
-      result = new
-      result.from_xml(node)
-      result
+    class << self
+      def lookup_qname(qname, namespaces)
+        prefix, local_name = split_qname(qname)
+        [lookup_namespace(prefix, namespaces), local_name]
+      end
+
+      # Create an appropriate object to represent the given XML element.
+      #
+      # @param node [Nokogiri::XML::Element, nil]
+      # @return [Base, nil]
+      def from_xml(node)
+        return nil unless node
+
+        result = new
+        result.from_xml(node)
+        result
+      end
+
+      def load_string_array(node, element)
+        node.xpath(element, Namespaces::ALL).map do |element_node|
+          element_node.content&.strip
+        end
+      end
+
+      def load_object_array(node, element, klass = nil)
+        node.xpath(element, Namespaces::ALL).map do |element_node|
+          if klass.nil?
+            SAML2.const_get(element_node.name, false).from_xml(element_node)
+          elsif klass.is_a?(Hash)
+            klass[element_node.name].from_xml(element_node)
+          else
+            klass.from_xml(element_node)
+          end
+        end
+      end
+
+      private
+
+      def split_qname(qname)
+        if qname.include?(":")
+          qname.split(":", 2)
+        else
+          [nil, qname]
+        end
+      end
+
+      def lookup_namespace(prefix, namespaces)
+        return nil if namespaces.empty?
+
+        namespaces[prefix.empty? ? "xmlns" : "xmlns:#{prefix}"]
+      end
     end
 
     # @return [Nokogiri::XML::Element]
@@ -45,13 +87,15 @@ module SAML2
         if pretty
           xml.to_s
         else
-          xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
+          xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML |
+                                Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
         end
       elsif pretty
         to_xml.to_s
       else
         # make sure to not FORMAT it - it breaks signatures!
-        to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML | Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
+        to_xml.to_xml(save_with: Nokogiri::XML::Node::SaveOptions::AS_XML |
+                                 Nokogiri::XML::Node::SaveOptions::NO_DECLARATION)
       end
     end
 
@@ -62,7 +106,11 @@ module SAML2
     # not be created until their attribute is accessed.
     # @return [String]
     def inspect
-      "#<#{self.class.name} #{instance_variables.map { |iv| next if iv == :@xml; "#{iv}=#{instance_variable_get(iv).inspect}" }.compact.join(", ") }>"
+      "#<#{self.class.name} #{instance_variables.filter_map do |iv|
+                                next if iv == :@xml
+
+                                "#{iv}=#{instance_variable_get(iv).inspect}"
+                              end.join(", ")}>"
     end
 
     # Serialize this object to XML
@@ -84,8 +132,7 @@ module SAML2
     #
     # @param builder [Nokogiri::XML::Builder] The builder helper object to serialize to.
     # @return [void]
-    def build(builder)
-    end
+    def build(builder); end
 
     # Decrypt (in-place) encrypted portions of this object
     #
@@ -107,13 +154,14 @@ module SAML2
       encrypted_nodes.each do |node|
         this_nodes_keys = keys
         if keys.nil?
-          allowed_certs = node.xpath("dsig:KeyInfo/xenc:EncryptedKey/dsig:KeyInfo/dsig:X509Data", SAML2::Namespaces::ALL).map do |x509data|
+          allowed_certs = node.xpath("dsig:KeyInfo/xenc:EncryptedKey/dsig:KeyInfo/dsig:X509Data",
+                                     SAML2::Namespaces::ALL).map do |x509data|
             if (cert = x509data.at_xpath("dsig:X509Certificate", SAML2::Namespaces::ALL)&.content&.strip)
               OpenSSL::X509::Certificate.new(Base64.decode64(cert))
             elsif (issuer_serial = x509data.at_xpath("dsig:X509IssuerSerial", SAML2::Namespaces::ALL))
               {
-                  issuer: issuer_serial.at_xpath("dsig:X509IssuerName", SAML2::Namespaces::ALL).content.strip,
-                  serial: issuer_serial.at_xpath("dsig:X509SerialNumber", SAML2::Namespaces::ALL).content.strip.to_i,
+                issuer: issuer_serial.at_xpath("dsig:X509IssuerName", SAML2::Namespaces::ALL).content.strip,
+                serial: issuer_serial.at_xpath("dsig:X509SerialNumber", SAML2::Namespaces::ALL).content.strip.to_i
               }
             elsif (subject_name = x509data.at_xpath("dsig:X509SubjectName", SAML2::Namespaces::ALL)&.content&.strip)
               subject_name
@@ -126,42 +174,16 @@ module SAML2
 
         old_node = node.parent
         this_nodes_keys.each_with_index do |key, i|
-          begin
-            old_node.replace(node.decrypt_with(key: key))
-          rescue XMLSec::DecryptionError
-            # swallow errors on all but the last key
-            raise if i - 1 == this_nodes_keys.length
-          end
+          old_node.replace(node.decrypt_with(key: key))
+        rescue XMLSec::DecryptionError
+          # swallow errors on all but the last key
+          raise if i - 1 == this_nodes_keys.length
         end
       end
       !encrypted_nodes.empty?
     end
 
-    def self.load_string_array(node, element)
-      node.xpath(element, Namespaces::ALL).map do |element_node|
-        element_node.content&.strip
-      end
-    end
-
-
-    def self.load_object_array(node, element, klass = nil)
-      node.xpath(element, Namespaces::ALL).map do |element_node|
-        if klass.nil?
-          SAML2.const_get(element_node.name, false).from_xml(element_node)
-        elsif klass.is_a?(Hash)
-          klass[element_node.name].from_xml(element_node)
-        else
-          klass.from_xml(element_node)
-        end
-      end
-    end
-
-    def self.lookup_qname(qname, namespaces)
-      prefix, local_name = split_qname(qname)
-      [lookup_namespace(prefix, namespaces), local_name]
-    end
-
-    protected
+    private
 
     def load_string_array(node, element)
       self.class.load_string_array(node, element)
@@ -172,20 +194,7 @@ module SAML2
     end
 
     def encrypted_nodes
-      xml.xpath('//xenc:EncryptedData', Namespaces::ALL)
-    end
-
-    def self.split_qname(qname)
-      if qname.include?(':')
-        qname.split(':', 2)
-      else
-        [nil, qname]
-      end
-    end
-
-    def self.lookup_namespace(prefix, namespaces)
-      return nil if namespaces.empty?
-      namespaces[prefix.empty? ? 'xmlns' : "xmlns:#{prefix}"]
+      xml.xpath("//xenc:EncryptedData", Namespaces::ALL)
     end
   end
 end

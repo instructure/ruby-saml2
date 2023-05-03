@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'saml2/base'
+require "saml2/base"
 
 module SAML2
   class RequestedAuthnContext < Base
@@ -11,10 +11,10 @@ module SAML2
 
     # (see Base#build)
     def build(builder)
-      builder['samlp'].RequestedAuthnContext do |requested_authn_context|
-        requested_authn_context.parent['Comparison'] = comparison.to_s if comparison
+      builder["samlp"].RequestedAuthnContext do |requested_authn_context|
+        requested_authn_context.parent["Comparison"] = comparison.to_s if comparison
         Array(class_ref).each do |individual_class_ref|
-          requested_authn_context['saml'].AuthnContextClassRef(individual_class_ref)
+          requested_authn_context["saml"].AuthnContextClassRef(individual_class_ref)
         end
       end
     end

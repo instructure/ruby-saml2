@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
-require 'securerandom'
-require 'time'
+require "securerandom"
+require "time"
 
-require 'saml2/base'
-require 'saml2/signable'
+require "saml2/base"
+require "saml2/signable"
 
 module SAML2
   class InvalidMessage < RuntimeError
@@ -59,8 +59,10 @@ module SAML2
       #   SAML message type.
       def from_xml(node)
         return super unless self == Message
+
         klass = Message.known_messages[node.name]
-        raise UnknownMessage.new("Unknown message #{node.name}") unless klass
+        raise UnknownMessage, "Unknown message #{node.name}" unless klass
+
         klass.from_xml(node)
       end
 
@@ -72,8 +74,12 @@ module SAML2
       #   If called on a subclass, will raise if the parsed message does not
       #   match the class is was called on.
       def parse(xml)
-        result = Message.from_xml(Nokogiri::XML(xml) { |config| config.strict }.root)
-        raise UnexpectedMessage.new("Expected a #{self.name}, but got a #{result.class.name}") unless self == Message || result.class == self
+        result = Message.from_xml(Nokogiri::XML(xml, &:strict).root)
+        unless self == Message || result.instance_of?(self)
+          raise UnexpectedMessage,
+                "Expected a #{name}, but got a #{result.class.name}"
+        end
+
         result
       rescue Nokogiri::XML::SyntaxError
         raise CorruptMessage
@@ -86,10 +92,10 @@ module SAML2
       end
 
       def inherited(klass)
+        super
         # explicitly keep track of all messages in this base class
-        Message.known_messages[klass.name.sub(/^SAML2::/, '')] = klass
+        Message.known_messages[klass.name.sub(/^SAML2::/, "")] = klass
       end
-
     end
 
     def initialize
@@ -133,37 +139,35 @@ module SAML2
 
     # @return [String]
     def id
-      @id ||= xml['ID']
+      @id ||= xml["ID"]
     end
 
     # @return [Time]
     def issue_instant
-      @issue_instant ||= Time.parse(xml['IssueInstant'])
+      @issue_instant ||= Time.parse(xml["IssueInstant"])
     end
 
     # @return [String, nil]
     def destination
-      if xml && !instance_variable_defined?(:@destination)
-        @destination = xml['Destination']
-      end
+      @destination = xml["Destination"] if xml && !instance_variable_defined?(:@destination)
       @destination
     end
 
     # @return [NameID, nil]
     def issuer
-      @issuer ||= NameID.from_xml(xml.at_xpath('saml:Issuer', Namespaces::ALL))
+      @issuer ||= NameID.from_xml(xml.at_xpath("saml:Issuer", Namespaces::ALL))
     end
 
     protected
 
     # should be called from inside the specific request element
     def build(message)
-      message.parent['ID'] = id
-      message.parent['Version'] = '2.0'
-      message.parent['IssueInstant'] = issue_instant.iso8601
-      message.parent['Destination'] = destination if destination
+      message.parent["ID"] = id
+      message.parent["Version"] = "2.0"
+      message.parent["IssueInstant"] = issue_instant.iso8601
+      message.parent["Destination"] = destination if destination
 
-      issuer.build(message, element: 'Issuer') if issuer
+      issuer&.build(message, element: "Issuer")
     end
   end
 end

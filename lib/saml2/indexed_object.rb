@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'saml2/base'
+require "saml2/base"
 
 module SAML2
   module IndexedObject
@@ -12,9 +12,9 @@ module SAML2
       super
     end
 
-    def eql?(rhs)
-      index == rhs.index &&
-        default? == rhs.default? &&
+    def eql?(other)
+      index == other.index &&
+        default? == other.default? &&
         super
     end
 
@@ -28,8 +28,8 @@ module SAML2
 
     # (see Base#from_xml)
     def from_xml(node)
-      @index = node['index'] && node['index'].to_i
-      @is_default = node['isDefault'] && node['isDefault'] == 'true'
+      @index = node["index"]&.to_i
+      @is_default = node["isDefault"] && node["isDefault"] == "true"
       super
     end
 
@@ -41,10 +41,15 @@ module SAML2
       attr_reader :default
 
       def self.from_xml(nodes)
-        new(nodes.map { |node| name.split('::')[1..-2].inject(SAML2) { |mod, klass| mod.const_get(klass) }.from_xml(node) }).freeze
+        new(nodes.map do |node|
+              name.split("::")[1..-2].inject(SAML2) do |mod, klass|
+                mod.const_get(klass)
+              end.from_xml(node)
+            end).freeze
       end
 
       def initialize(objects = nil)
+        super()
         replace(objects.sort_by { |object| object.index || 0 }) if objects
         re_index
       end
@@ -72,18 +77,16 @@ module SAML2
           last_index = object.index
           @index[object.index] = object
         end
-        @default = find { |object| object.default? } || first
+        @default = find(&:default?) || first
       end
     end
 
     # (see Base#build)
     def build(builder, *)
       super
-      builder.parent.children.last['index'] = index
-      builder.parent.children.last['isDefault'] = default? if default_defined?
+      builder.parent.children.last["index"] = index
+      builder.parent.children.last["isDefault"] = default? if default_defined?
     end
-
-    private
 
     def self.included(klass)
       klass.const_set(:Array, Array.dup)

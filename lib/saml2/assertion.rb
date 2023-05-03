@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'saml2/conditions'
+require "saml2/conditions"
 
 module SAML2
   class Assertion < Message
@@ -21,7 +21,7 @@ module SAML2
     # @return [Subject, nil]
     def subject
       if xml && !instance_variable_defined?(:@subject)
-        @subject = Subject.from_xml(xml.at_xpath('saml:Subject', Namespaces::ALL))
+        @subject = Subject.from_xml(xml.at_xpath("saml:Subject", Namespaces::ALL))
       end
       @subject
     end
@@ -29,7 +29,7 @@ module SAML2
     # @return [Conditions]
     def conditions
       if !instance_variable_defined?(:@conditions) && xml
-        @conditions = Conditions.from_xml(xml.at_xpath('saml:Conditions', Namespaces::ALL))
+        @conditions = Conditions.from_xml(xml.at_xpath("saml:Conditions", Namespaces::ALL))
       end
       @conditions
     end
@@ -46,19 +46,19 @@ module SAML2
 
     # @return [Array<AuthnStatement, AttributeStatement>]
     def statements
-      @statements ||= load_object_array(xml, 'saml:AuthnStatement|saml:AttributeStatement')
+      @statements ||= load_object_array(xml, "saml:AuthnStatement|saml:AttributeStatement")
     end
 
     # (see Base#build)
     def build(builder)
-      builder['saml'].Assertion(
-          'xmlns:saml' => Namespaces::SAML
+      builder["saml"].Assertion(
+        "xmlns:saml" => Namespaces::SAML
       ) do |assertion|
         super(assertion)
 
         subject.build(assertion)
 
-        conditions.build(assertion) if conditions
+        conditions&.build(assertion)
 
         statements.each { |stmt| stmt.build(assertion) }
       end

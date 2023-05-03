@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'saml2/contact'
-require 'saml2/organization'
+require "saml2/contact"
+require "saml2/organization"
 
 module SAML2
   module OrganizationAndContacts
@@ -22,20 +22,20 @@ module SAML2
     # @return [Organization, nil]
     def organization
       unless instance_variable_defined?(:@organization)
-        @organization = Organization.from_xml(xml.at_xpath('md:Organization', Namespaces::ALL))
+        @organization = Organization.from_xml(xml.at_xpath("md:Organization", Namespaces::ALL))
       end
       @organization
     end
 
     # @return [Array<Contact>]
     def contacts
-      @contacts ||= load_object_array(xml, 'md:ContactPerson', Contact)
+      @contacts ||= load_object_array(xml, "md:ContactPerson", Contact)
     end
 
     protected
 
     def build(builder)
-      organization.build(builder) if organization
+      organization&.build(builder)
       contacts.each do |contact|
         contact.build(builder)
       end

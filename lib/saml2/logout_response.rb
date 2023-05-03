@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'saml2/status_response'
+require "saml2/status_response"
 
 module SAML2
   class LogoutResponse < StatusResponse
@@ -21,9 +21,9 @@ module SAML2
     private
 
     def build(builder)
-      builder['samlp'].LogoutResponse(
-                          'xmlns:samlp' => Namespaces::SAMLP,
-                          'xmlns:saml' => Namespaces::SAML
+      builder["samlp"].LogoutResponse(
+        "xmlns:samlp" => Namespaces::SAMLP,
+        "xmlns:saml" => Namespaces::SAML
       ) do |logout_response|
         super(logout_response)
       end

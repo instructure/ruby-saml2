@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'nokogiri'
+require "nokogiri"
 
-require 'saml2/endpoint'
-require 'saml2/sso'
+require "saml2/endpoint"
+require "saml2/sso"
 
 module SAML2
   class ServiceProvider < SSO
@@ -29,7 +29,7 @@ module SAML2
     # @return [Boolean, nil]
     def authn_requests_signed?
       unless instance_variable_defined?(:@authn_requests_signed)
-        @authn_requests_signed = xml['AuthnRequestsSigned'] && xml['AuthnRequestsSigned'] == 'true'
+        @authn_requests_signed = xml["AuthnRequestsSigned"] && xml["AuthnRequestsSigned"] == "true"
       end
       @authn_requests_signed
     end
@@ -37,7 +37,7 @@ module SAML2
     # @return [Boolean, nil]
     def want_assertions_signed?
       unless instance_variable_defined?(:@want_assertions_signed)
-        @want_assertions_signed = xml['WantAssertionsSigned'] && xml['WantAssertionsSigned'] == 'true'
+        @want_assertions_signed = xml["WantAssertionsSigned"] && xml["WantAssertionsSigned"] == "true"
       end
       @want_assertions_signed
     end
@@ -45,7 +45,7 @@ module SAML2
     # @return [Endpoint::Indexed::Array]
     def assertion_consumer_services
       @assertion_consumer_services ||= begin
-        nodes = xml.xpath('md:AssertionConsumerService', Namespaces::ALL)
+        nodes = xml.xpath("md:AssertionConsumerService", Namespaces::ALL)
         Endpoint::Indexed::Array.from_xml(nodes)
       end
     end
@@ -53,21 +53,21 @@ module SAML2
     # @return [AttributeConsumingService::Array]
     def attribute_consuming_services
       @attribute_consuming_services ||= begin
-        nodes = xml.xpath('md:AttributeConsumingService', Namespaces::ALL)
+        nodes = xml.xpath("md:AttributeConsumingService", Namespaces::ALL)
         AttributeConsumingService::Array.from_xml(nodes)
       end
     end
 
     # (see Base#build)
     def build(builder)
-      builder['md'].SPSSODescriptor do |sp_sso_descriptor|
+      builder["md"].SPSSODescriptor do |sp_sso_descriptor|
         super(sp_sso_descriptor)
 
-        sp_sso_descriptor.parent['AuthnRequestsSigned'] = authn_requests_signed? unless authn_requests_signed?.nil?
-        sp_sso_descriptor.parent['WantAssertionsSigned'] = want_assertions_signed? unless authn_requests_signed?.nil?
+        sp_sso_descriptor.parent["AuthnRequestsSigned"] = authn_requests_signed? unless authn_requests_signed?.nil?
+        sp_sso_descriptor.parent["WantAssertionsSigned"] = want_assertions_signed? unless authn_requests_signed?.nil?
 
         assertion_consumer_services.each do |acs|
-          acs.build(sp_sso_descriptor, 'AssertionConsumerService')
+          acs.build(sp_sso_descriptor, "AssertionConsumerService")
         end
 
         attribute_consuming_services.each do |acs|
@@ -77,4 +77,3 @@ module SAML2
     end
   end
 end
-

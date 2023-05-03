@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'saml2/message'
-require 'saml2/status'
+require "saml2/message"
+require "saml2/status"
 
 module SAML2
   class StatusResponse < Message
@@ -19,12 +19,12 @@ module SAML2
       super
       @status = nil
       remove_instance_variable(:@status)
-      @in_response_to = node['InResponseTo']
+      @in_response_to = node["InResponseTo"]
     end
 
     # @return [Status]
     def status
-      @status ||= Status.from_xml(xml.at_xpath('samlp:Status', Namespaces::ALL))
+      @status ||= Status.from_xml(xml.at_xpath("samlp:Status", Namespaces::ALL))
     end
 
     protected
@@ -32,7 +32,7 @@ module SAML2
     def build(status_response)
       super(status_response)
 
-      status_response.parent['InResponseTo'] = in_response_to if in_response_to
+      status_response.parent["InResponseTo"] = in_response_to if in_response_to
 
       status.build(status_response)
     end

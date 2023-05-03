@@ -1,20 +1,21 @@
 # frozen_string_literal: true
 
-require 'saml2/base'
-require 'saml2/namespaces'
+require "saml2/base"
+require "saml2/namespaces"
 
 module SAML2
   class LocalizedName < Hash
     attr_reader :element
 
     def initialize(element, name = nil)
+      super()
       @element = element
-      unless name.nil?
-        if name.is_a?(Hash)
-          replace(name)
-        else
-          self[nil] = name
-        end
+      return if name.nil?
+
+      if name.is_a?(Hash)
+        replace(name)
+      else
+        self[nil] = name
       end
     end
 
@@ -42,14 +43,14 @@ module SAML2
     def from_xml(nodes)
       clear
       nodes.each do |node|
-        self[node['xml:lang'].to_sym] = node.content && node.content.strip
+        self[node["xml:lang"].to_sym] = node.content && node.content.strip
       end
       self
     end
 
     def build(builder)
       each do |lang, value|
-        builder['md'].__send__(element, value, 'xml:lang' => lang)
+        builder["md"].__send__(element, value, "xml:lang" => lang)
       end
     end
   end

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'active_support/core_ext/array/wrap'
+require "active_support/core_ext/array/wrap"
 
 module SAML2
   class Conditions < Array
@@ -12,6 +12,7 @@ module SAML2
     # (see Base.from_xml)
     def self.from_xml(node)
       return nil unless node
+
       result = new
       result.from_xml(node)
       result
@@ -20,15 +21,15 @@ module SAML2
     # (see Base#from_xml)
     def from_xml(node)
       @xml = node
-      @not_before = Time.parse(node['NotBefore']) if node['NotBefore']
-      @not_on_or_after = Time.parse(node['NotOnOrAfter']) if node['NotOnOrAfter']
+      @not_before = Time.parse(node["NotBefore"]) if node["NotBefore"]
+      @not_on_or_after = Time.parse(node["NotOnOrAfter"]) if node["NotOnOrAfter"]
 
       replace(node.element_children.map do |restriction|
         klass = if self.class.const_defined?(restriction.name, false)
-          self.class.const_get(restriction.name, false)
-        else
-          Condition
-        end
+                  self.class.const_get(restriction.name, false)
+                else
+                  Condition
+                end
         klass.from_xml(restriction)
       end)
     end
@@ -67,9 +68,9 @@ module SAML2
 
     # (see Base#build)
     def build(builder)
-      builder['saml'].Conditions do |conditions|
-        conditions.parent['NotBefore'] = not_before.iso8601 if not_before
-        conditions.parent['NotOnOrAfter'] = not_on_or_after.iso8601 if not_on_or_after
+      builder["saml"].Conditions do |conditions|
+        conditions.parent["NotBefore"] = not_before.iso8601 if not_before
+        conditions.parent["NotOnOrAfter"] = not_on_or_after.iso8601 if not_on_or_after
 
         each do |condition|
           condition.build(conditions)
@@ -81,7 +82,7 @@ module SAML2
     class Condition < Base
       # @return []
       def validate(_)
-        ["unable to validate #{xml&.name || 'unrecognized'} condition"]
+        ["unable to validate #{xml&.name || "unrecognized"} condition"]
       end
 
       def valid?(*args)
@@ -94,6 +95,7 @@ module SAML2
 
       # @param audience [Array<String>]
       def initialize(audience = [])
+        super()
         @audience = audience
       end
 
@@ -105,7 +107,7 @@ module SAML2
 
       # @return [Array<String>] Allowed audiences
       def audience
-        @audience ||= load_string_array(xml, 'saml:Audience')
+        @audience ||= load_string_array(xml, "saml:Audience")
       end
 
       # @param audience [String]
@@ -113,16 +115,17 @@ module SAML2
         return [] if ignore_audience_condition
 
         unless Array.wrap(self.audience).include?(audience)
-          return ["audience #{audience} not in allowed list of #{Array.wrap(self.audience).join(', ')}"]
+          return ["audience #{audience} not in allowed list of #{Array.wrap(self.audience).join(", ")}"]
         end
+
         []
       end
 
       # (see Base#build)
       def build(builder)
-        builder['saml'].AudienceRestriction do |audience_restriction|
+        builder["saml"].AudienceRestriction do |audience_restriction|
           Array.wrap(audience).each do |single_audience|
-            audience_restriction['saml'].Audience(single_audience)
+            audience_restriction["saml"].Audience(single_audience)
           end
         end
       end
@@ -138,7 +141,7 @@ module SAML2
 
       # (see Base#build)
       def build(builder)
-        builder['saml'].OneTimeUse
+        builder["saml"].OneTimeUse
       end
     end
   end

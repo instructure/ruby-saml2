@@ -1,0 +1,13 @@
+require:
+  - rubocop-rake
+
+inherit_gem:
+  rubocop-inst:
+  - rubocop.yml
+  - rubocop-rspec.yml
+
+AllCops:
+  TargetRubyVersion: 2.7
+
+Style/Documentation:
+  Enabled: false

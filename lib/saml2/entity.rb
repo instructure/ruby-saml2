@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'nokogiri'
+require "nokogiri"
 
-require 'saml2/base'
-require 'saml2/identity_provider'
-require 'saml2/organization_and_contacts'
-require 'saml2/service_provider'
-require 'saml2/signable'
+require "saml2/base"
+require "saml2/identity_provider"
+require "saml2/organization_and_contacts"
+require "saml2/service_provider"
+require "saml2/signable"
 
 module SAML2
   class Entity < Base
@@ -39,15 +39,16 @@ module SAML2
       include Enumerable
       include Signable
 
-      [:each, :[]].each do |method|
+      %i[each \[\]].each do |method|
         class_eval <<-RUBY, __FILE__, __LINE__ + 1
-          def #{method}(*args, &block)
-            @entities.#{method}(*args, &block)
-          end
+          def #{method}(*args, &block)          # def each(*args, &block)
+            @entities.#{method}(*args, &block)  #   @entities.each(*args, &block)
+          end                                   # end
         RUBY
       end
 
       def initialize
+        super
         @entities = []
         @id = "_#{SecureRandom.uuid}"
         @valid_until = nil
@@ -58,9 +59,10 @@ module SAML2
         super
         @id = nil
         remove_instance_variable(:@valid_until)
-        @entities = Base.load_object_array(xml, "md:EntityDescriptor|md:EntitiesDescriptor",
-                'EntityDescriptor' => Entity,
-                'EntitiesDescriptor' => Group)
+        @entities = Base.load_object_array(xml,
+                                           "md:EntityDescriptor|md:EntitiesDescriptor",
+                                           "EntityDescriptor" => Entity,
+                                           "EntitiesDescriptor" => Group)
       end
 
       # (see Message#valid_schema?)
@@ -70,13 +72,13 @@ module SAML2
 
       # (see Message#id)
       def id
-        @id ||= xml['ID']
+        @id ||= xml["ID"]
       end
 
       # @return [Time, nil]
       def valid_until
         unless instance_variable_defined?(:@valid_until)
-          @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
+          @valid_until = xml["validUntil"] && Time.parse(xml["validUntil"])
         end
         @valid_until
       end
@@ -106,19 +108,17 @@ module SAML2
 
     # @return [String]
     def entity_id
-      @entity_id || xml && xml['entityID']
+      @entity_id || (xml && xml["entityID"])
     end
 
     # (see Message#id)
     def id
-      @id ||= xml['ID']
+      @id ||= xml["ID"]
     end
 
     # @return [Time, nil]
     def valid_until
-      unless instance_variable_defined?(:@valid_until)
-        @valid_until = xml['validUntil'] && Time.parse(xml['validUntil'])
-      end
+      @valid_until = xml["validUntil"] && Time.parse(xml["validUntil"]) unless instance_variable_defined?(:@valid_until)
       @valid_until
     end
 
@@ -134,17 +134,17 @@ module SAML2
 
     # @return [Array<Role>]
     def roles
-      @roles ||= load_object_array(xml, 'md:IDPSSODescriptor', IdentityProvider) +
-          load_object_array(xml, 'md:SPSSODescriptor', ServiceProvider)
+      @roles ||= load_object_array(xml, "md:IDPSSODescriptor", IdentityProvider) +
+                 load_object_array(xml, "md:SPSSODescriptor", ServiceProvider)
     end
 
     # (see Base#build)
     def build(builder)
-      builder['md'].EntityDescriptor('entityID' => entity_id,
-                                     'xmlns:md' => Namespaces::METADATA,
-                                     'xmlns:dsig' => Namespaces::DSIG,
-                                     'xmlns:xenc' => Namespaces::XENC) do |entity_descriptor|
-        entity_descriptor.parent['ID'] = id if id
+      builder["md"].EntityDescriptor("entityID" => entity_id,
+                                     "xmlns:md" => Namespaces::METADATA,
+                                     "xmlns:dsig" => Namespaces::DSIG,
+                                     "xmlns:xenc" => Namespaces::XENC) do |entity_descriptor|
+        entity_descriptor.parent["ID"] = id if id
 
         roles.each do |role|
           role.build(entity_descriptor)

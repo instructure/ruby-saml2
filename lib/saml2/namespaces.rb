@@ -12,14 +12,14 @@ module SAML2
     X500     = "urn:oasis:names:tc:SAML:2.0:profiles:attribute:X500"
 
     ALL = {
-        'xmlns:dsig'  => DSIG,
-        'xmlns:md'    => METADATA,
-        'xmlns:saml'  => SAML,
-        'xmlns:samlp' => SAMLP,
-        'xmlns:x500'  => X500,
-        'xmlns:xenc'  => XENC,
-        'xmlns:xs'    => XS,
-        'xmlns:xsi'   => XSI,
+      "xmlns:dsig" => DSIG,
+      "xmlns:md" => METADATA,
+      "xmlns:saml" => SAML,
+      "xmlns:samlp" => SAMLP,
+      "xmlns:x500" => X500,
+      "xmlns:xenc" => XENC,
+      "xmlns:xs" => XS,
+      "xmlns:xsi" => XSI
     }.freeze
   end
 end

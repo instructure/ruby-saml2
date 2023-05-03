@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'saml2/bindings/http_post'
+require "saml2/bindings/http_post"
 
 module SAML2
   class Endpoint < Base
@@ -10,25 +10,27 @@ module SAML2
     # @param location [String]
     # @param binding [String]
     def initialize(location = nil, binding = Bindings::HTTP_POST::URN)
-      @location, @binding = location, binding
+      super()
+      @location = location
+      @binding = binding
     end
 
     # @param rhs [Endpoint]
     # @return [Boolean]
-    def ==(rhs)
-      location == rhs.location && binding == rhs.binding
+    def ==(other)
+      location == other.location && binding == other.binding
     end
 
     # (see Base#from_xml)
     def from_xml(node)
       super
-      @location = node['Location']
-      @binding = node['Binding']
+      @location = node["Location"]
+      @binding = node["Binding"]
     end
 
     # (see Base#build)
     def build(builder, element)
-      builder['md'].__send__(element, 'Location' => location, 'Binding' => binding)
+      builder["md"].__send__(element, "Location" => location, "Binding" => binding)
     end
 
     class Indexed < Endpoint
@@ -40,12 +42,13 @@ module SAML2
       # @param binding [String]
       def initialize(location = nil, index = nil, is_default = nil, binding = Bindings::HTTP_POST::URN)
         super(location, binding)
-        @index, @is_default = index, is_default
+        @index = index
+        @is_default = is_default
       end
 
-      def eql?(rhs)
-        location == rhs.location &&
-            binding == rhs.binding && super
+      def eql?(other)
+        location == other.location &&
+          binding == other.binding && super
       end
     end
   end
