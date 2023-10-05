@@ -75,7 +75,7 @@ module SAML2
 
       trusted_keys = Array.wrap(key).map(&:to_s)
       trusted_keys.concat(certs.map do |certificate|
-        certificate = certificate.is_a?(String) ? OpenSSL::X509::Certificate.new(certificate) : certificate
+        certificate = OpenSSL::X509::Certificate.new(certificate) if certificate.is_a?(String)
         certificate.public_key.to_s
       end)
 

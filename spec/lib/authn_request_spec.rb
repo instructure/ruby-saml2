@@ -25,8 +25,7 @@ module SAML2
     end
 
     it "should find the ACS by index" do
-      allow(request).to receive(:assertion_consumer_service_url).and_return(nil)
-      allow(request).to receive(:assertion_consumer_service_index).and_return(2)
+      allow(request).to receive_messages(assertion_consumer_service_url: nil, assertion_consumer_service_index: 2)
       expect(request.resolve(sp)).to be true
       expect(request.assertion_consumer_service.location).to eq "https://siteadmin.beta.instructure.com/saml_consume"
     end
