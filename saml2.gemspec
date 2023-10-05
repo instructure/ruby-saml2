@@ -17,9 +17,6 @@ Gem::Specification.new do |s|
     _not_ parsing via Regex or generating XML by string concatenation,
     _not_ serializing/re-parsing multiple times just to get it into
     the correct format to sign or validate.
-
-    For now, it provides a clean interface for implementing an IdP,
-    but not an SP.
   TEXT
   s.license = "MIT"
   s.bindir = "exe"
@@ -30,7 +27,7 @@ Gem::Specification.new do |s|
 
   # Very specifically at least 1.5.8 - they fixed a bug with namespaces
   # on root elements with XML::Builder in that release
-  s.add_dependency "activesupport", ">= 3.2", "< 7.1"
+  s.add_dependency "activesupport", ">= 3.2", "< 7.2"
   s.add_dependency "nokogiri", ">= 1.5.8", "< 2.0"
   s.add_dependency "nokogiri-xmlsec-instructure", "~> 0.9", ">= 0.9.5"
 
