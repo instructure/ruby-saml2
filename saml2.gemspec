@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.license = "MIT"
   s.bindir = "exe"
   s.executables = "bulk_verify_responses"
-  s.files = Dir["{app,lib,schemas|exe}/**/*"] + ["Rakefile"]
+  s.files = Dir["{app,lib,schemas,exe}/**/*"] + ["Rakefile"]
 
   s.required_ruby_version = ">= 2.7"
 
