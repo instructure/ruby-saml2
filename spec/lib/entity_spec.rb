@@ -36,6 +36,10 @@ module SAML2
       it "validates metadata from ADFS containing lots of non-SAML schemas" do
         expect(Entity.parse(fixture("FederationMetadata.xml")).valid_schema?).to be true
       end
+
+      it "validates metadata with algsupport schemas" do
+        expect(Entity.parse(fixture("algsupport_metadata.xml")).valid_schema?).to be true
+      end
     end
 
     it "should sign correctly" do

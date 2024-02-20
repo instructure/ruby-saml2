@@ -1,0 +1,82 @@
+<?xml version="1.0"?>
+<EntityDescriptor xmlns="urn:oasis:names:tc:SAML:2.0:metadata" xmlns:alg="urn:oasis:names:tc:SAML:metadata:algsupport" entityID="http://siteadmin.instructure.com/saml2" ID="unique">
+  <SPSSODescriptor AuthnRequestsSigned="true" WantAssertionsSigned="true" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+
+    <KeyDescriptor use="encryption">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>
+            SSB1c2UgdGhpcyBmb3IgZW5jcnlwdGlvbg==
+          </X509Certificate>
+        </X509Data>
+      </KeyInfo>
+      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#aes128-cbc">
+        <KeySize xmlns="http://www.w3.org/2001/04/xmlenc#">128</KeySize>
+      </EncryptionMethod>
+      <EncryptionMethod Algorithm="http://www.w3.org/2001/04/xmlenc#rsa-oaep-mgf1p">
+        <alg:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"/>
+      </EncryptionMethod>
+    </KeyDescriptor>
+
+    <KeyDescriptor use="signing">
+      <KeyInfo xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <X509Data>
+          <X509Certificate>
+            MIIE8TCCA9mgAwIBAgIJAITusxON60cKMA0GCSqGSIb3DQEBBQUAMIGrMQswCQYD
+            VQQGEwJVUzENMAsGA1UECBMEVXRhaDEXMBUGA1UEBxMOU2FsdCBMYWtlIENpdHkx
+            GTAXBgNVBAoTEEluc3RydWN0dXJlLCBJbmMxEzARBgNVBAsTCk9wZXJhdGlvbnMx
+            IDAeBgNVBAMTF0NhbnZhcyBTQU1MIENlcnRpZmljYXRlMSIwIAYJKoZIhvcNAQkB
+            FhNvcHNAaW5zdHJ1Y3R1cmUuY29tMB4XDTEzMDQyMjE3NDQ0M1oXDTE1MDQyMjE3
+            NDQ0M1owgasxCzAJBgNVBAYTAlVTMQ0wCwYDVQQIEwRVdGFoMRcwFQYDVQQHEw5T
+            YWx0IExha2UgQ2l0eTEZMBcGA1UEChMQSW5zdHJ1Y3R1cmUsIEluYzETMBEGA1UE
+            CxMKT3BlcmF0aW9uczEgMB4GA1UEAxMXQ2FudmFzIFNBTUwgQ2VydGlmaWNhdGUx
+            IjAgBgkqhkiG9w0BCQEWE29wc0BpbnN0cnVjdHVyZS5jb20wggEiMA0GCSqGSIb3
+            DQEBAQUAA4IBDwAwggEKAoIBAQDHRYRp/slsoqD7iPFo+8UFjqd+LgSQ062x09CG
+            m5uW9smY/x2ig8hxfd05Dtk42wrA9frRh6QiEhtoy8qL/4g/LOmYq5USDdzLXsPF
+            /nqTVPkTOhGcuSpfJbxucRsMfGL6IvrGqLNxpyfroyV1dv9/fim+d6bs7js5k1i5
+            EkKksgVlnnpUpOx5pswWVcZICeIJwTMe1C0KHcpUMycZxMHueJ+Y7tWHtWW+R75T
+            QWdWjL+TevEL57B3cW19+9Sud2Y63DcwP6V0aDrwArxQwmp73uUb5ol6gSSvD+Ol
+            CIsf6S/5gqMdgqxJJsWqzBOTeDsVr8m2Dx3VX7Plho7pk06FAgMBAAGjggEUMIIB
+            EDAdBgNVHQ4EFgQUQy1zIfZP/NZKPYLGugNSjjBnTYgwgeAGA1UdIwSB2DCB1YAU
+            Qy1zIfZP/NZKPYLGugNSjjBnTYihgbGkga4wgasxCzAJBgNVBAYTAlVTMQ0wCwYD
+            VQQIEwRVdGFoMRcwFQYDVQQHEw5TYWx0IExha2UgQ2l0eTEZMBcGA1UEChMQSW5z
+            dHJ1Y3R1cmUsIEluYzETMBEGA1UECxMKT3BlcmF0aW9uczEgMB4GA1UEAxMXQ2Fu
+            dmFzIFNBTUwgQ2VydGlmaWNhdGUxIjAgBgkqhkiG9w0BCQEWE29wc0BpbnN0cnVj
+            dHVyZS5jb22CCQCE7rMTjetHCjAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBBQUA
+            A4IBAQC1dgkv3cT4KRMR42mIKgJRp4Jf7swUrtoAFOdOr1R6fjI/9bFNSVNgauiQ
+            flN6q8QA5B2sbDihiSqAylm9F34hpI3C3PvzSWzuIk+Z2FPHcA05CZtwrUWj1M0c
+            eBXxXragtR7ZYtIbEb0srzBfwoFYvWnLU7tM8t6wM6+1rxvOuQFVCCSXyptsGoBl
+            D9qyzAbyYDgJZYpbTjaA9bqhpkn/9CLN3JhNHLyBVr03fp3hQqNwZ2do9bFZBnW0
+            c5Dx9pbKTvC3TAUb2cwUD69yTYS1oq7//yIC2ha2ouzkV/VpB1fcF5YEj2pc6uaj
+            lOTDX4Eg7OBEkTzU8cX04b15bJfE
+          </X509Certificate>
+        </X509Data>
+      </KeyInfo>
+    </KeyDescriptor>
+
+    <SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
+                         Location="https://siteadmin.instructure.com/saml_logout"/>
+    <AssertionConsumerService index="0" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                              Location="https://siteadmin.instructure.com/saml_consume"/>
+    <AssertionConsumerService index="1" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                              Location="https://siteadmin.staging.instructure.com/saml_consume"/>
+    <AssertionConsumerService index="2" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                              Location="https://siteadmin.beta.instructure.com/saml_consume"/>
+    <AssertionConsumerService index="3" Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
+                              Location="https://siteadmin.test.instructure.com/saml_consume"/>
+
+    <AttributeConsumingService index="0">
+      <ServiceName xml:lang="en">service</ServiceName>
+      <RequestedAttribute Name="urn:oid:2.5.4.42" FriendlyName="givenName" />
+    </AttributeConsumingService>
+  </SPSSODescriptor>
+  <Organization>
+    <OrganizationName xml:lang="en">Canvas</OrganizationDisplayName>
+    <OrganizationDisplayName xml:lang="en">Canvas</OrganizationDisplayName>
+    <OrganizationURL xml:lang="en">https://www.canvaslms.com/</OrganizationDisplayName>
+  </Organization>
+  <ContactPerson contactType="technical">
+    <SurName>Administrator</SurName>
+    <EmailAddress>mailto:info@instructure.com</EmailAddress>
+  </ContactPerson>
+</EntityDescriptor>

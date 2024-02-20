@@ -9,5 +9,6 @@
           schemaLocation="ws-federation.xsd"/>
   <import namespace="urn:oasis:names:tc:SAML:metadata:ext:query"
           schemaLocation="sstc-saml-metadata-ext-query.xsd"/>
-
+  <import namespace="urn:oasis:names:tc:SAML:metadata:algsupport"
+          schemaLocation="sstc-saml-metadata-algsupport-v1.0.xsd"/>
 </schema>
