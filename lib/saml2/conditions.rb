@@ -85,8 +85,8 @@ module SAML2
         ["unable to validate #{xml&.name || "unrecognized"} condition"]
       end
 
-      def valid?(*args)
-        validate(*args).empty?
+      def valid?(...)
+        validate(...).empty?
       end
     end
 

@@ -29,8 +29,9 @@ module SAML2
       exponent = crypto_binary_to_integer(rsa_key_value.at_xpath("dsig:Exponent", Namespaces::ALL)&.content&.strip)
       return unless modulus && exponent
 
-      @key = OpenSSL::PKey::RSA.new
-      key.set_key(modulus, exponent, nil)
+      @key = OpenSSL::PKey::RSA.new(
+        OpenSSL::ASN1::Sequence([OpenSSL::ASN1::Integer(modulus), OpenSSL::ASN1::Integer(exponent)]).to_der
+      )
     end
 
     def x509=(value)
