@@ -29,6 +29,32 @@ module SAML2
       expect(Schemas.metadata.validate(Nokogiri::XML(entity.to_s))).to eq []
     end
 
+    it "doesn't serialize empty attributes" do
+      entity = Entity.new
+      entity.entity_id = "http://sso.canvaslms.com/SAML2"
+      entity.organization = Organization.new("Canvas", "Canvas by Instructure", "https://www.canvaslms.com/")
+      contact = Contact.new(Contact::Type::TECHNICAL)
+      contact.company = "Instructure"
+      contact.email_addresses << "mailto:ops@instructure.com"
+      entity.contacts << contact
+
+      sp = ServiceProvider.new
+      sp.single_logout_services << Endpoint.new("https://sso.canvaslms.com/SAML2/Logout",
+                                                Bindings::HTTPRedirect::URN)
+      sp.assertion_consumer_services << Endpoint::Indexed.new("https://sso.canvaslms.com/SAML2/Login1")
+      sp.assertion_consumer_services << Endpoint::Indexed.new("https://sso.canvaslms.com/SAML2/Login2")
+      sp.keys << KeyDescriptor.new("somedata", KeyDescriptor::Type::ENCRYPTION, [KeyDescriptor::EncryptionMethod.new])
+      sp.keys << KeyDescriptor.new("somedata", KeyDescriptor::Type::SIGNING)
+      acs = AttributeConsumingService.new
+      acs.name[:en] = "service"
+      acs.requested_attributes << RequestedAttribute.create("uid")
+      sp.attribute_consuming_services << acs
+      sp.authn_requests_signed = true
+
+      entity.roles << sp
+      expect(entity.to_s).not_to include("WantAssertionsSigned")
+    end
+
     describe "valid metadata" do
       let(:entity) { Entity.parse(fixture("service_provider.xml")) }
       let(:sp) { entity.roles.first }

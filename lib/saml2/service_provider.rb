@@ -64,7 +64,7 @@ module SAML2
         super(sp_sso_descriptor)
 
         sp_sso_descriptor.parent["AuthnRequestsSigned"] = authn_requests_signed? unless authn_requests_signed?.nil?
-        sp_sso_descriptor.parent["WantAssertionsSigned"] = want_assertions_signed? unless authn_requests_signed?.nil?
+        sp_sso_descriptor.parent["WantAssertionsSigned"] = want_assertions_signed? unless want_assertions_signed?.nil?
 
         assertion_consumer_services.each do |acs|
           acs.build(sp_sso_descriptor, "AssertionConsumerService")
