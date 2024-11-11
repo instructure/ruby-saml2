@@ -36,6 +36,13 @@ module SAML2
                                                               "moodle.bridge.feide.no")
     end
 
+    it "parses RequestedAuthnContext" do
+      expect(request.requested_authn_context).not_to be_nil
+      expect(request.requested_authn_context.class_ref).to eql(
+        ["urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"]
+      )
+    end
+
     it "serializes valid XML" do
       authn_request = AuthnRequest.initiate(NameID.new("entity"),
                                             assertion_consumer_service: Endpoint.new("https://somewhere/"))

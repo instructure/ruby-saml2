@@ -23,7 +23,7 @@ module SAML2
     # @return [Boolean, nil]
     attr_writer :force_authn, :passive
     # @return [RequestedAuthnContext, nil]
-    attr_accessor :requested_authn_context
+    attr_writer :requested_authn_context
 
     # Initiate a SAML SSO flow, from a service provider to an identity
     # provider.
@@ -160,6 +160,14 @@ module SAML2
         @subject = Subject.from_xml(xml.at_xpath("saml:Subject", Namespaces::ALL))
       end
       @subject
+    end
+
+    def requested_authn_context
+      if xml && !instance_variable_defined?(:@requested_authn_context)
+        @requested_authn_context = RequestedAuthnContext.from_xml(xml.at_xpath("samlp:RequestedAuthnContext",
+                                                                               Namespaces::ALL))
+      end
+      @requested_authn_context
     end
 
     # (see Base#build)

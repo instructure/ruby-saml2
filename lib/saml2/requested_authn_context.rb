@@ -9,6 +9,12 @@ module SAML2
     # @return [String, Array<String>]
     attr_accessor :class_ref
 
+    # (see Base#from_xml)
+    def from_xml(node)
+      super
+      @class_ref = load_string_array(node, "saml:AuthnContextClassRef")
+    end
+
     # (see Base#build)
     def build(builder)
       builder["samlp"].RequestedAuthnContext do |requested_authn_context|
