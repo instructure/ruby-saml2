@@ -25,13 +25,13 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = ">= 2.7"
 
+  s.add_dependency "activesupport", ">= 3.2", "< 8.2"
   # Very specifically at least 1.5.8 - they fixed a bug with namespaces
   # on root elements with XML::Builder in that release
-  s.add_dependency "activesupport", ">= 3.2", "< 7.2"
   s.add_dependency "nokogiri", ">= 1.5.8", "< 2.0"
   s.add_dependency "nokogiri-xmlsec-instructure", "~> 0.9", ">= 0.9.5"
 
-  s.add_development_dependency "byebug", "~> 11.0"
+  s.add_development_dependency "debug", "~> 1.10"
   s.add_development_dependency "rake", "~> 12.0"
   s.add_development_dependency "rspec", "~> 3.5"
   s.add_development_dependency "rubocop-inst", "~> 1"
