@@ -9,6 +9,11 @@ module SAML2
     # @return [String, Array<String>]
     attr_accessor :class_ref
 
+    def initialize(class_ref = nil)
+      super()
+      @class_ref = class_ref
+    end
+
     # (see Base#from_xml)
     def from_xml(node)
       super

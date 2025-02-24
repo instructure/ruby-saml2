@@ -46,8 +46,8 @@ module SAML2
     it "serializes valid XML" do
       authn_request = AuthnRequest.initiate(NameID.new("entity"),
                                             assertion_consumer_service: Endpoint.new("https://somewhere/"))
-      authn_request.requested_authn_context = RequestedAuthnContext.new
-      authn_request.requested_authn_context.class_ref = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
+      authn_request.requested_authn_context =
+        RequestedAuthnContext.new("urn:oasis:names:tc:SAML:2.0:ac:classes:Password")
       authn_request.requested_authn_context.comparison = :exact
       authn_request.passive = true
       xml = authn_request.to_s
