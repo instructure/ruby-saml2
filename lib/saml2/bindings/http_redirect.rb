@@ -27,7 +27,7 @@ module SAML2
         # A signature, if present, will be verified only if +public_key+ is
         # passed.
         #
-        # @param url [String]
+        # @param url [String, URI]
         #   The full URL to decode. Will check for both +SAMLRequest+ and
         #   +SAMLResponse+ params.
         # @param public_key optional [Array<OpenSSL::PKey>, OpenSSL::PKey, Proc]
@@ -45,7 +45,7 @@ module SAML2
         #   The same as a +Proc+ provided to +public_key+. Deprecated.
         def decode(url, public_key: nil, public_key_used: nil)
           uri = begin
-            URI.parse(url)
+            url.is_a?(URI) ? url : URI.parse(url)
           rescue URI::InvalidURIError
             raise CorruptMessage
           end
