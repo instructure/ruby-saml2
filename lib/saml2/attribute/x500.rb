@@ -3,8 +3,8 @@
 module SAML2
   class Attribute
     class X500 < Attribute
-      GIVEN_NAME             = "urn:oid:2.5.4.42"
-      SN = SURNAME           = "urn:oid:2.5.4.4"
+      GIVEN_NAME = "urn:oid:2.5.4.42"
+      SN = SURNAME = "urn:oid:2.5.4.4"
       # https://www.ietf.org/rfc/rfc2798.txt
       module InetOrgPerson
         DISPLAY_NAME         = "urn:oid:2.16.840.1.113730.3.1.241"

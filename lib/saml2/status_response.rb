@@ -30,7 +30,7 @@ module SAML2
     protected
 
     def build(status_response)
-      super(status_response)
+      super
 
       status_response.parent["InResponseTo"] = in_response_to if in_response_to
 

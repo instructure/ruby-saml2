@@ -36,6 +36,6 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rspec", "~> 3.5"
   s.add_development_dependency "rubocop-inst", "~> 1"
   s.add_development_dependency "rubocop-rake", "~> 0.6"
-  s.add_development_dependency "rubocop-rspec", "~> 2.20"
+  s.add_development_dependency "rubocop-rspec", "~> 3.5"
   s.metadata["rubygems_mfa_required"] = "true"
 end

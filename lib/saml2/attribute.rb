@@ -131,8 +131,9 @@ module SAML2
       lookup_qname("xs:date", Namespaces::ALL) =>
         [Date, nil, ->(v) { Date.parse(v) if v }],
       lookup_qname("xs:dateTime", Namespaces::ALL) =>
-        [Time, ->(v) { v.iso8601 }, ->(v) { Time.parse(v) if v }]
+        [Time, lambda(&:iso8601), ->(v) { Time.parse(v) if v }]
     }.freeze
+    private_constant :XS_TYPES
 
     def convert_to_xsi(value)
       xs_type = nil
