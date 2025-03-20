@@ -4,7 +4,9 @@ require "saml2/base"
 
 module SAML2
   class Status < Base
-    SUCCESS      = "urn:oasis:names:tc:SAML:2.0:status:Success"
+    SUCCESS   = "urn:oasis:names:tc:SAML:2.0:status:Success"
+    REQUESTER = "urn:oasis:names:tc:SAML:2.0:status:Requester"
+    RESPONDER = "urn:oasis:names:tc:SAML:2.0:status:Responder"
 
     # @return [String]
     attr_accessor :code, :message
