@@ -59,7 +59,8 @@ module SAML2
       # @param rhs [Policy]
       # @return [Boolean]
       def ==(other)
-        allow_create? == other.allow_create? &&
+        other.is_a?(Policy) &&
+          allow_create? == other.allow_create? &&
           format == other.format &&
           sp_name_qualifier == other.sp_name_qualifier
       end
@@ -102,7 +103,8 @@ module SAML2
     # @param rhs [NameID]
     # @return [Boolean]
     def ==(other)
-      id == other.id &&
+      other.is_a?(NameID) &&
+        id == other.id &&
         format == other.format &&
         name_qualifier == other.name_qualifier &&
         sp_name_qualifier == other.sp_name_qualifier

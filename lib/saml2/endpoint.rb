@@ -108,7 +108,8 @@ module SAML2
     # @param rhs [Endpoint]
     # @return [Boolean]
     def ==(other)
-      location == other.location && binding == other.binding && response_location == other.response_location
+      other.is_a?(Endpoint) &&
+        location == other.location && binding == other.binding && response_location == other.response_location
     end
 
     # (see Base#from_xml)
