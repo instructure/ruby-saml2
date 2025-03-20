@@ -4,6 +4,10 @@ require "saml2/base"
 
 module SAML2
   module IndexedObject
+    def self.included(klass)
+      klass.const_set(:Array, Array.dup)
+    end
+
     # @return [Integer]
     attr_accessor :index
 
@@ -42,9 +46,7 @@ module SAML2
 
       def self.from_xml(nodes)
         new(nodes.map do |node|
-              name.split("::")[1..-2].inject(SAML2) do |mod, klass|
-                mod.const_get(klass)
-              end.from_xml(node)
+              Object.const_get(name.rpartition("::").first, false).from_xml(node)
             end).freeze
       end
 
@@ -88,8 +90,14 @@ module SAML2
       builder.parent.children.last["isDefault"] = default? if default_defined?
     end
 
-    def self.included(klass)
-      klass.const_set(:Array, Array.dup)
+    private
+
+    def indexed_object_inspect
+      if default_defined?
+        "index=#{index}, default=#{default?}"
+      else
+        "index=#{index}"
+      end
     end
   end
 end

@@ -30,16 +30,23 @@ module SAML2
     # @todo go over these params, and use kwargs. Maybe pass Entity instead
     #   of ServiceProvider.
     # @param issuer [NameID]
-    # @param identity_provider [IdentityProvider]
-    # @param assertion_consumer_service [Endpoint::Indexed]
-    # @param service_provider [ServiceProvider]
+    # @param identity_provider [IdentityProvider, nil]
+    # @param assertion_consumer_service [Endpoint::Indexed, nil]
+    # @param service_provider [ServiceProvider, nil]
+    # @param binding [String] the binding to use for the request
     # @return [AuthnRequest]
     def self.initiate(issuer, identity_provider = nil,
                       assertion_consumer_service: nil,
-                      service_provider: nil)
+                      service_provider: nil,
+                      binding: Bindings::HTTPRedirect::URN)
       authn_request = new
       authn_request.issuer = issuer
-      authn_request.destination = identity_provider.single_sign_on_services.first.location if identity_provider
+      if identity_provider
+        authn_request.destination = identity_provider
+                                    .single_sign_on_services
+                                    .choose_endpoint(binding)
+                                    &.location
+      end
       authn_request.name_id_policy = NameID::Policy.new(true, NameID::Format::UNSPECIFIED)
       assertion_consumer_service ||= service_provider.assertion_consumer_services.default if service_provider
       if assertion_consumer_service

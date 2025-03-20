@@ -35,7 +35,7 @@ module SAML2
     end
 
     # Begin an IdP Initiated login
-    # @param service_provider [ServiceProvider]
+    # @param service_provider [ServiceProvider, nil]
     # @param issuer [NameID]
     # @param name_id [NameID] The subject
     # @param attributes optional [Hash<String => String>, Array<Attribute>]
@@ -43,7 +43,12 @@ module SAML2
     def self.initiate(service_provider, issuer, name_id, attributes = nil)
       response = new
       response.issuer = issuer
-      response.destination = service_provider.assertion_consumer_services.default.location if service_provider
+      if service_provider
+        response.destination = service_provider
+                               .assertion_consumer_services
+                               .choose_endpoint(Bindings::HTTP_POST::URN)
+                               &.effective_response_location
+      end
       assertion = Assertion.new
       assertion.subject = Subject.new
       assertion.subject.name_id = name_id

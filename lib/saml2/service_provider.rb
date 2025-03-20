@@ -44,18 +44,16 @@ module SAML2
 
     # @return [Endpoint::Indexed::Array]
     def assertion_consumer_services
-      @assertion_consumer_services ||= begin
-        nodes = xml.xpath("md:AssertionConsumerService", Namespaces::ALL)
-        Endpoint::Indexed::Array.from_xml(nodes)
-      end
+      @assertion_consumer_services ||= load_object_array(xml,
+                                                         "md:AssertionConsumerService",
+                                                         Endpoint::Indexed)
     end
 
     # @return [AttributeConsumingService::Array]
     def attribute_consuming_services
-      @attribute_consuming_services ||= begin
-        nodes = xml.xpath("md:AttributeConsumingService", Namespaces::ALL)
-        AttributeConsumingService::Array.from_xml(nodes)
-      end
+      @attribute_consuming_services ||= load_object_array(xml,
+                                                          "md:AttributeConsumingService",
+                                                          AttributeConsumingService)
     end
 
     # (see Base#build)

@@ -12,7 +12,7 @@ module SAML2
     def initialize
       super
       @want_authn_requests_signed = nil
-      @single_sign_on_services = []
+      @single_sign_on_services = Endpoint::Array.new
       @attribute_profiles = []
       @attributes = []
     end
@@ -34,7 +34,7 @@ module SAML2
       @want_authn_requests_signed
     end
 
-    # @return [Array<Endpoint>]
+    # @return [Endpoint::Array]
     def single_sign_on_services
       @single_sign_on_services ||= load_object_array(xml, "md:SingleSignOnService", Endpoint)
     end

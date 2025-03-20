@@ -7,15 +7,16 @@ module SAML2
   class LogoutRequest < Request
     attr_writer :name_id, :session_index
 
-    # @param sso [SSO]
+    # @param sso [SSO, nil]
     # @param issuer [NameID]
     # @param name_id [NameID]
     # @param session_index optional [String, Array<String>]
+    # @param binding [String] the binding to use for the request
     # @return [LogoutRequest]
-    def self.initiate(sso, issuer, name_id, session_index = [])
+    def self.initiate(sso, issuer, name_id, session_index = [], binding: Bindings::HTTPRedirect::URN)
       logout_request = new
       logout_request.issuer = issuer
-      logout_request.destination = sso.single_logout_services.first.location
+      logout_request.destination = sso.single_logout_services.choose_endpoint(binding)&.location if sso
       logout_request.name_id = name_id
       logout_request.session_index = session_index
 

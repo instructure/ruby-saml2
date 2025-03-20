@@ -30,7 +30,10 @@ module SAML2
       end
 
       def load_object_array(node, element, klass = nil)
-        node.xpath(element, Namespaces::ALL).map do |element_node|
+        nodes = node.xpath(element, Namespaces::ALL)
+        return klass::Array.from_xml(nodes) if klass.is_a?(Module) && klass&.const_defined?(:Array, false)
+
+        nodes.map do |element_node|
           if klass.nil?
             SAML2.const_get(element_node.name, false).from_xml(element_node)
           elsif klass.is_a?(Hash)

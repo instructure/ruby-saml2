@@ -7,7 +7,7 @@ module SAML2
   class SSO < Role
     def initialize
       super
-      @single_logout_services = []
+      @single_logout_services = Endpoint::Array.new
       @name_id_formats = []
     end
 
@@ -18,7 +18,7 @@ module SAML2
       @name_id_formats = nil
     end
 
-    # @return [Array<Endpoint>]
+    # @return [Endpoint::Array]
     def single_logout_services
       @single_logout_services ||= load_object_array(xml, "md:SingleLogoutService", Endpoint)
     end
