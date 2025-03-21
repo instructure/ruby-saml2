@@ -113,13 +113,14 @@ module SAML2
     end
 
     def validate
-      @errors = Schemas.protocol.validate(xml.document)
+      @errors = xml ? Schemas.protocol.validate(xml.document) : []
       errors
     end
 
     # If the XML is valid according to SAML XSDs.
     # @return [Boolean]
     def valid_schema?
+      return true if xml.nil? # it didn't come from parsing XML; there's nothing to be invalid
       return false unless Schemas.protocol.valid?(xml.document)
 
       true
