@@ -110,10 +110,10 @@ module SAML2
     # @return [String]
     def inspect
       "#<#{self.class.name} #{instance_variables.filter_map do |iv|
-                                next if iv == :@xml
+                                next if IGNORED_IVARS.include?(iv)
 
                                 "#{iv}=#{instance_variable_get(iv).inspect}"
-                              end.join(", ")}>"
+                              end.join(" ")}>"
     end
 
     # Serialize this object to XML
@@ -187,6 +187,9 @@ module SAML2
     end
 
     private
+
+    IGNORED_IVARS = %i[@errors @pretty @xml].freeze
+    private_constant :IGNORED_IVARS
 
     def load_string_array(node, element)
       self.class.load_string_array(node, element)

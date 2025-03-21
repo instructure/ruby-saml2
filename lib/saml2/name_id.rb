@@ -118,5 +118,18 @@ module SAML2
       args["SPNameQualifier"] = sp_name_qualifier if sp_name_qualifier
       builder["saml"].__send__(element || "NameID", id, args)
     end
+
+    # @return [String]
+    def inspect
+      return id.inspect unless format || name_qualifier || sp_name_qualifier
+      return "#{id.inspect}@#{format.inspect}" unless name_qualifier || sp_name_qualifier
+
+      r = "#<SAML2::NameID id=#{id.inspect}"
+      r << " format=#{format.inspect}" if format
+      r << " name_qualifier=#{name_qualifier.inspect}" if name_qualifier
+      r << " sp_name_qualifier=#{sp_name_qualifier.inspect}" if sp_name_qualifier
+      r << ">"
+      r
+    end
   end
 end
