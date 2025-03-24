@@ -156,7 +156,11 @@ module SAML2
 
     # @return [NameID, nil]
     def issuer
-      @issuer ||= NameID.from_xml(xml.at_xpath("saml:Issuer", Namespaces::ALL))
+      if xml && !instance_variable_defined?(:@issuer)
+        @issuer = NameID.from_xml(xml.at_xpath("saml:Issuer",
+                                               Namespaces::ALL))
+      end
+      @issuer
     end
 
     protected

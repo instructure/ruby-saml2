@@ -17,5 +17,11 @@ module SAML2
         expect { Message.parse("<Garbage></Garbage>") }.to raise_error(UnknownMessage)
       end
     end
+
+    describe "#issuer" do
+      it "isn't required" do
+        expect(Message.new.issuer).to be_nil
+      end
+    end
   end
 end
