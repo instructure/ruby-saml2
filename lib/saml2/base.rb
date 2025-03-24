@@ -177,7 +177,7 @@ module SAML2
 
         old_node = node.parent
         this_nodes_keys.each_with_index do |key, i|
-          old_node.replace(node.decrypt_with(key: key))
+          old_node.replace(node.decrypt_with(key:))
         rescue XMLSec::DecryptionError
           # swallow errors on all but the last key
           raise if i - 1 == this_nodes_keys.length

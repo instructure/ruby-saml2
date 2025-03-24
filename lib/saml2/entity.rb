@@ -175,7 +175,7 @@ module SAML2
       end
 
       message.validate(service_provider: self,
-                       identity_provider: identity_provider,
+                       identity_provider:,
                        **).empty?
     end
   end

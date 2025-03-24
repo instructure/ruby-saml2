@@ -31,11 +31,5 @@ Gem::Specification.new do |s|
   s.add_dependency "nokogiri", ">= 1.5.8", "< 2.0"
   s.add_dependency "nokogiri-xmlsec-instructure", "~> 0.9", ">= 0.9.5"
 
-  s.add_development_dependency "debug", "~> 1.10"
-  s.add_development_dependency "rake", "~> 13.2"
-  s.add_development_dependency "rspec", "~> 3.5"
-  s.add_development_dependency "rubocop-inst", "~> 1"
-  s.add_development_dependency "rubocop-rake", "~> 0.6"
-  s.add_development_dependency "rubocop-rspec", "~> 3.5"
   s.metadata["rubygems_mfa_required"] = "true"
 end

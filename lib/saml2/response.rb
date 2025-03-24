@@ -240,9 +240,9 @@ module SAML2
 
       if assertion.conditions &&
          !(condition_errors = assertion.conditions.validate(
-           verification_time: verification_time,
+           verification_time:,
            audience: service_provider.entity_id,
-           ignore_audience_condition: ignore_audience_condition
+           ignore_audience_condition:
          )).empty?
         return errors.concat(condition_errors)
       end

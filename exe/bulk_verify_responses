@@ -82,7 +82,7 @@ responses.each_with_index do |response_raw, i|
   # TODO: ignore audience restrictions
   errors = response.validate(service_provider: service_provider_entity,
                              identity_provider: idps[response.issuer&.id],
-                             verification_time: verification_time)
+                             verification_time:)
   unless errors.empty?
     bad_counts[response.issuer&.id] += 1
     warn "#{errors.inspect} for response #{response.id} from #{response.issuer&.id} (index #{i})"
