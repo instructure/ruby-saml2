@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../spec_helper"
-
 module SAML2
   describe Entity do
     it "should parse and validate" do

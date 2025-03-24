@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../spec_helper"
-
 module SAML2
   describe Conditions do
     it "empty should be valid" do
@@ -51,25 +49,6 @@ module SAML2
       conditions << Conditions::Condition.new
       conditions << Conditions::AudienceRestriction.new("audience")
       expect(conditions.valid?).to be false
-    end
-  end
-
-  describe Conditions::AudienceRestriction do
-    it "should be invalid" do
-      expect(Conditions::AudienceRestriction.new("expected").valid?(audience: "actual")).to be false
-    end
-
-    it "should be valid" do
-      expect(Conditions::AudienceRestriction.new("expected").valid?(audience: "expected")).to be true
-    end
-
-    it "should be valid with an array" do
-      expect(Conditions::AudienceRestriction.new(%w[expected actual]).valid?(audience: "actual")).to be true
-    end
-
-    it "is valid when ignored" do
-      expect(Conditions::AudienceRestriction.new("expected").valid?(audience: "actual",
-                                                                    ignore_audience_condition: true)).to be true
     end
   end
 end

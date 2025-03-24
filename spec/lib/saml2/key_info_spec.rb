@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../spec_helper"
-
 module SAML2
   describe KeyInfo do
     describe ".format_fingerprint" do

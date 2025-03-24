@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require_relative "../spec_helper"
-
 module SAML2
   describe ServiceProvider do
     it "should serialize valid xml" do
