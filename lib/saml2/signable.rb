@@ -100,8 +100,8 @@ module SAML2
     #
     # @param (see #validate_signature)
     # @return [Boolean]
-    def valid_signature?(**kwargs)
-      validate_signature(**kwargs).empty?
+    def valid_signature?(**)
+      validate_signature(**).empty?
     end
 
     # Sign this object.

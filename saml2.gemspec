@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
   s.executables = "bulk_verify_responses"
   s.files = Dir["{app,lib,schemas,exe}/**/*"] + ["Rakefile"]
 
-  s.required_ruby_version = ">= 2.7"
+  s.required_ruby_version = ">= 3.2"
 
   s.add_dependency "activesupport", ">= 3.2", "< 8.2"
   # Very specifically at least 1.5.8 - they fixed a bug with namespaces

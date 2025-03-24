@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "set"
-
 require "saml2/base"
 require "saml2/key"
 require "saml2/organization_and_contacts"

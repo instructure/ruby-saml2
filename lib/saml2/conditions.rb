@@ -62,8 +62,8 @@ module SAML2
 
     # Use validate instead.
     # @deprecated
-    def valid?(now: Time.now.utc, **options)
-      validate(verification_time: now, **options).empty?
+    def valid?(now: Time.now.utc, **)
+      validate(verification_time: now, **).empty?
     end
 
     # (see Base#build)

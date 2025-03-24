@@ -168,7 +168,7 @@ module SAML2
     # @param identity_provider [Entity]
     def valid_response?(message,
                         identity_provider,
-                        **opts)
+                        **)
       unless message.is_a?(Response)
         message.errors << "not a Response object"
         return false
@@ -176,7 +176,7 @@ module SAML2
 
       message.validate(service_provider: self,
                        identity_provider: identity_provider,
-                       **opts).empty?
+                       **).empty?
     end
   end
 end
