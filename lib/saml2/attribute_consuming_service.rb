@@ -131,7 +131,6 @@ module SAML2
 
       attributes_hash = {}
       attributes.each do |attr|
-        attr.value = attr.value.call if attr.value.respond_to?(:call)
         attributes_hash[[attr.name, attr.name_format]] = attr
         attributes_hash[[attr.name, nil]] = attr if attr.name_format
       end
@@ -141,6 +140,7 @@ module SAML2
         attr = attributes_hash[[requested_attr.name, requested_attr.name_format]]
         attr ||= attributes_hash[[requested_attr.name, nil]] if requested_attr.name_format
         if attr
+          attr.value = attr.value.call if attr.value.respond_to?(:call)
           if requested_attr.value &&
              !Array.wrap(requested_attr.value).include?(attr.value)
             raise InvalidAttributeValue.new(requested_attr, attr.value)

@@ -45,6 +45,13 @@ module SAML2
         expect(stmt.attributes.first.value).to eq "cody"
       end
 
+      it "should not materialize deferred attributes that aren't requested" do
+        stmt = acs.create_statement("name" => "cody", "other attr" => -> { raise "not called" })
+        expect(stmt.attributes.length).to eq 1
+        expect(stmt.attributes.first.name).to eq "name"
+        expect(stmt.attributes.first.value).to eq "cody"
+      end
+
       it "should match explicit name formats" do
         acs.requested_attributes.first.name_format = "format"
         stmt = acs.create_statement([Attribute.new("name", "cody", nil, "format"),
