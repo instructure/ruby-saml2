@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 </head>
-<body onload="document.forms[0].submit();" style="visibility:hidden;">
+<body style="visibility:hidden;">
 <%
   target = @saml_destination || @saml_acs_url
   message = @saml_request || @saml_response || @saml_message
@@ -17,5 +17,10 @@
   <%= hidden_field_tag("RelayState", @relay_state) if @relay_state %>
   <%= submit_tag "Submit" %>
 <% end %>
+<script type="text/javascript">
+  document.addEventListener('DOMContentLoaded', function() {
+    document.forms[0].submit();
+  });
+</script>
 </body>
 </html>
