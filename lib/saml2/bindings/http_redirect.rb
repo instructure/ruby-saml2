@@ -131,7 +131,7 @@ module SAML2
         # @param message [Message]
         #   Note that the base URI is taken from {Message#destination}.
         # @param relay_state optional [String]
-        # @param private_key optional [OpenSSL::PKey::RSA]
+        # @param private_key optional [OpenSSL::PKey::RSA, String]
         #   A key to use to sign the encoded message.
         # @param sig_alg optional [String]
         #   The signing algorithm to use. Defaults to RSA-SHA1, as it's the
@@ -164,6 +164,7 @@ module SAML2
               raise ArgumentError,
                     "Unsupported signature algorithm #{sig_alg}"
             end
+            private_key = OpenSSL::PKey.read(private_key) if private_key.is_a?(String)
 
             query << ["SigAlg", sig_alg]
             base_string = URI.encode_www_form(query)

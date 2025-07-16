@@ -201,6 +201,20 @@ module SAML2
         end
       end
 
+      it "signs a message with a string key" do
+        key = fixture("privatekey.key")
+        url = Bindings::HTTPRedirect.encode(message,
+                                            relay_state: "abc",
+                                            private_key: key)
+
+        # verify the signature
+        allow(Message).to receive(:parse).with("hi").and_return("parsed")
+        Bindings::HTTPRedirect.decode(url) do |_message, sig_alg|
+          expect(sig_alg).to eq Bindings::HTTPRedirect::SigAlgs::RSA_SHA1
+          OpenSSL::X509::Certificate.new(fixture("certificate.pem")).public_key
+        end
+      end
+
       it "signs a message with RSA-SHA256" do
         key = OpenSSL::PKey::RSA.new(fixture("privatekey.key"))
         url = Bindings::HTTPRedirect.encode(message,
