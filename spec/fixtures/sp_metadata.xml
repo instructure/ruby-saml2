@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" validUntil="2025-08-29T13:24:59Z" cacheDuration="PT604800S" entityID="https://poc.securesaml.com/sp/acs">
+  <md:SPSSODescriptor AuthnRequestsSigned="false" WantAssertionsSigned="false" protocolSupportEnumeration="urn:oasis:names:tc:SAML:2.0:protocol">
+    <md:KeyDescriptor use="signing">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDhzCCAm+gAwIBAgIURDVLMPLJQO6hco7nvYP0XawbZzYwDQYJKoZIhvcNAQELBQAwbDELMAkGA1UEBhMCVVMxEDAOBgNVBAgMB05ld1lvcmsxEDAOBgNVBAcMB05ld1lvcmsxEzARBgNVBAoMCkV4YW1wbGVPcmcxCzAJBgNVBAsMAklUMRcwFQYDVQQDDA5zZWN1cmVzYW1sLmNvbTAeFw0yNTA4MjcwNzM1MTdaFw0zNTA4MjUwNzM1MTdaMGwxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdOZXdZb3JrMRAwDgYDVQQHDAdOZXdZb3JrMRMwEQYDVQQKDApFeGFtcGxlT3JnMQswCQYDVQQLDAJJVDEXMBUGA1UEAwwOc2VjdXJlc2FtbC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDPAeqOoPrHKUNz6XA+Se8WwMPUaPUQxUIjfBJBhqDWkS50pGsIJh/KLECIXx3guLi1K38dTRyuDXg7ve+ql2+WEAf3J5uINnvzZbO17Hj0/ujAinJi3gVrQeFMG9g9IsCPj62Q43FEiOQeMxRTaeYqAkFvdDoxXCtX3IAbPsJBHwpbLeDWxL2+NuFpFMjzY2BPnf3W6IqqtUczt/enUTqqLwSXVw1Y6KWrH4YWTaqsRMXzwbnQnpuidodfBw5mpAm17MazTBanqw+GVg+RzAfTYos15wE+7FlMYl7+yB1JSg8NT4YrbpHpFO8ahwCCrPrYElCMvy/S3/jGRC5GUWujAgMBAAGjITAfMB0GA1UdDgQWBBSRc50Fp3WoNfYCYjX4MTYvNsnDeDANBgkqhkiG9w0BAQsFAAOCAQEAxk0dumegTcj8cxNqJ9otJqoaEiPt7089CHJAVZs0m8J+zVVZ1rPEFSOAAJf15izItJmSZ38iJE0T53zqkn8VXRmn5wo/4zGMMAsjhE9BjsHe9isZ6xrMrF5fA0PJXFCxi2FWinkqqgtLIOLNQ3kF5cyVYQ0b3k8bRv+gsd2sfGV5ioMnQOZiW+5AvWxCICOFjpKenStPzvTxfall6IaDdQ9aq49vEPBkQ1Q3KHuEGu8G9GmEOa4zQWQhiH5OjVGB8pFbSCmpGgwJTN6+8+mPK++osZuHZjeioU1a+eCbRcRHUc0C/NvcP+Kmo8VOKTflT404wrnHc9Tw1Nd6jmqFEA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:KeyDescriptor use="encryption">
+      <ds:KeyInfo xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+        <ds:X509Data>
+          <ds:X509Certificate>MIIDhzCCAm+gAwIBAgIURDVLMPLJQO6hco7nvYP0XawbZzYwDQYJKoZIhvcNAQELBQAwbDELMAkGA1UEBhMCVVMxEDAOBgNVBAgMB05ld1lvcmsxEDAOBgNVBAcMB05ld1lvcmsxEzARBgNVBAoMCkV4YW1wbGVPcmcxCzAJBgNVBAsMAklUMRcwFQYDVQQDDA5zZWN1cmVzYW1sLmNvbTAeFw0yNTA4MjcwNzM1MTdaFw0zNTA4MjUwNzM1MTdaMGwxCzAJBgNVBAYTAlVTMRAwDgYDVQQIDAdOZXdZb3JrMRAwDgYDVQQHDAdOZXdZb3JrMRMwEQYDVQQKDApFeGFtcGxlT3JnMQswCQYDVQQLDAJJVDEXMBUGA1UEAwwOc2VjdXJlc2FtbC5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDPAeqOoPrHKUNz6XA+Se8WwMPUaPUQxUIjfBJBhqDWkS50pGsIJh/KLECIXx3guLi1K38dTRyuDXg7ve+ql2+WEAf3J5uINnvzZbO17Hj0/ujAinJi3gVrQeFMG9g9IsCPj62Q43FEiOQeMxRTaeYqAkFvdDoxXCtX3IAbPsJBHwpbLeDWxL2+NuFpFMjzY2BPnf3W6IqqtUczt/enUTqqLwSXVw1Y6KWrH4YWTaqsRMXzwbnQnpuidodfBw5mpAm17MazTBanqw+GVg+RzAfTYos15wE+7FlMYl7+yB1JSg8NT4YrbpHpFO8ahwCCrPrYElCMvy/S3/jGRC5GUWujAgMBAAGjITAfMB0GA1UdDgQWBBSRc50Fp3WoNfYCYjX4MTYvNsnDeDANBgkqhkiG9w0BAQsFAAOCAQEAxk0dumegTcj8cxNqJ9otJqoaEiPt7089CHJAVZs0m8J+zVVZ1rPEFSOAAJf15izItJmSZ38iJE0T53zqkn8VXRmn5wo/4zGMMAsjhE9BjsHe9isZ6xrMrF5fA0PJXFCxi2FWinkqqgtLIOLNQ3kF5cyVYQ0b3k8bRv+gsd2sfGV5ioMnQOZiW+5AvWxCICOFjpKenStPzvTxfall6IaDdQ9aq49vEPBkQ1Q3KHuEGu8G9GmEOa4zQWQhiH5OjVGB8pFbSCmpGgwJTN6+8+mPK++osZuHZjeioU1a+eCbRcRHUc0C/NvcP+Kmo8VOKTflT404wrnHc9Tw1Nd6jmqFEA==</ds:X509Certificate>
+        </ds:X509Data>
+      </ds:KeyInfo>
+    </md:KeyDescriptor>
+    <md:NameIDFormat>urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified</md:NameIDFormat>
+    <md:AssertionConsumerService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST" Location="https://poc.securesaml.com/sp/acs" index="1"/>
+  </md:SPSSODescriptor>
+</md:EntityDescriptor>

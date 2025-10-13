@@ -133,6 +133,22 @@ module SAML2
         idp_entity
       end
 
+      let(:sp_entity2) do
+        sp_entity = Entity.parse(fixture("sp_metadata.xml"))
+        sp = sp_entity.roles.first
+        sp.private_keys << OpenSSL::PKey::RSA.new(fixture("sp_decryption.key"))
+
+        sp_entity
+      end
+
+      let(:idp_entity2) do
+        idp_entity = Entity.new("https://poc.securesaml.com")
+        idp = IdentityProvider.new
+        idp.keys << KeyDescriptor.new(fixture("idp_certificate.pem"))
+        idp_entity.roles << idp
+        idp_entity
+      end
+
       before do
         sp.private_keys << OpenSSL::PKey::RSA.new(fixture("privatekey.key"))
       end
@@ -318,6 +334,24 @@ module SAML2
         expect(response.assertions.first.subject.name_id.id).to eq "narnold@wscc.edu"
         expect(response).not_to be_signed
         expect(response.assertions.first).to be_signed
+      end
+
+      it "errors if an encrypted assertion 'hides' a validated and signed assertion" do
+        response = Response.parse(fixture("response_with_encrypted_assertion_followed_by_signed_assertion.xml"))
+        sp_entity2.valid_response?(response,
+                                   idp_entity2,
+                                   verification_time: Time.parse("2025-08-27T13:42:15Z"))
+
+        expect(response.errors).to eql ["neither response nor assertion were signed"]
+      end
+
+      it "ignores an encrypted assertion following a validated and signed assertion" do
+        response = Response.parse(fixture("response_with_signed_assertion_followed_by_encrypted_assertion.xml"))
+        sp_entity2.valid_response?(response,
+                                   idp_entity2,
+                                   verification_time: Time.parse("2025-08-27T13:42:15Z"))
+
+        expect(response.errors).to eql ["neither response nor assertion were signed"]
       end
     end
   end

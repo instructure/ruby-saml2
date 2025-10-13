@@ -158,17 +158,17 @@ module SAML2
         response_signed = true
       end
 
-      assertion = assertions.first
+      signed_assertions = []
+      assertions.each do |assertion|
+        next unless assertion.signed?
 
-      # this might be nil, if the assertion was encrypted
-      if assertion&.signed?
         unless (signature_errors = assertion.validate_signature(key: keys,
                                                                 fingerprint: idp.fingerprints,
                                                                 cert: certificates)).empty?
           return errors.concat(signature_errors)
         end
 
-        assertion_signed = true
+        signed_assertions << assertion.xml
       end
 
       find_decryption_key = lambda do |embedded_certificates|
@@ -213,46 +213,45 @@ module SAML2
         return errors
       end
 
-      assertion ||= assertions.first
-      unless assertion
+      if assertions.empty?
         errors << "no assertion found"
         return errors
       end
 
-      # if we didn't previously check the assertion's signature (because it was encrypted)
-      # check it now
-      if assertion.signed? && !assertion_signed
-        unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
-                                                                cert: certificates)).empty?
-          return errors.concat(signature_errors)
+      assertions.each do |assertion|
+        assertion_signed = signed_assertions.include?(assertion.xml)
+        # if we didn't previously check the assertion's signature (because it was encrypted)
+        # check it now
+        if !response_signed && !assertion_signed
+          unless assertion.signed?
+            errors << "neither response nor assertion were signed"
+            return errors
+          end
+          unless (signature_errors = assertion.validate_signature(fingerprint: idp.fingerprints,
+                                                                  cert: certificates)).empty?
+            return errors.concat(signature_errors)
+          end
         end
 
-        assertion_signed = true
-      end
+        # only do our own issue instant validation if the assertion
+        # doesn't mandate any
+        if !assertion.conditions&.not_on_or_after && (assertion.issue_instant + (5 * 60) < verification_time ||
+            assertion.issue_instant - (5 * 60) > verification_time)
+          errors << "assertion not recently issued"
+          return errors
+        end
 
-      # only do our own issue instant validation if the assertion
-      # doesn't mandate any
-      if !assertion.conditions&.not_on_or_after && (assertion.issue_instant + (5 * 60) < verification_time ||
-           assertion.issue_instant - (5 * 60) > verification_time)
-        errors << "assertion not recently issued"
-        return errors
-      end
+        if assertion.conditions &&
+           !(condition_errors = assertion.conditions.validate(
+             verification_time:,
+             audience: service_provider.entity_id,
+             ignore_audience_condition:
+           )).empty?
+          return errors.concat(condition_errors)
+        end
 
-      if assertion.conditions &&
-         !(condition_errors = assertion.conditions.validate(
-           verification_time:,
-           audience: service_provider.entity_id,
-           ignore_audience_condition:
-         )).empty?
-        return errors.concat(condition_errors)
-      end
+        next if sp.private_keys.empty?
 
-      if !response_signed && !assertion_signed
-        errors << "neither response nor assertion were signed"
-        return errors
-      end
-
-      unless sp.private_keys.empty?
         begin
           decypted_anything = assertion.decrypt(&find_decryption_key)
         rescue XMLSec::DecryptionError
