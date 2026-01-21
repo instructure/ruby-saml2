@@ -4,27 +4,45 @@ require "saml2/base"
 
 module SAML2
   class AuthnStatement < Base
+    # @see https://docs.oasis-open.org/security/saml/v2.0/saml-authn-context-2.0-os.pdf
     module Classes
-      INTERNET_PROTOCOL =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol" # IP address
-      INTERNET_PROTOCOL_PASSWORD =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocolPassword" # IP address, as well as username/password
-      KERBEROS =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos"
-      PASSWORD =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:Password" # username/password, NOT over SSL
-      PASSWORD_PROTECTED_TRANSPORT =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport" # username/password over SSL
-      PREVIOUS_SESSION =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession" # remember me
-      SMARTCARD =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard"
-      SMARTCARD_PKI =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:SmartcardPKI" # smartcard with a private key on it
-      TLS_CLIENT =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient" # SSL client certificate
-      UNSPECIFIED =
-        "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"
+      INTERNET_PROTOCOL = "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocol"
+      INTERNET_PROTOCOL_PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:InternetProtocolPassword"
+      KERBEROS = "urn:oasis:names:tc:SAML:2.0:ac:classes:Kerberos"
+      MOBILE_ONE_FACTOR_CONTRACT = "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorContract"
+      MOBILE_ONE_FACTOR_UNREGISTERED = "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileOneFactorUnregistered"
+      MOBILE_TWO_FACTOR_CONTRACT = "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorContract"
+      MOBILE_TWO_FACTOR_UNREGISTERED = "urn:oasis:names:tc:SAML:2.0:ac:classes:MobileTwoFactorUnregistered"
+      PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:Password"
+      PASSWORD_PROTECTED_TRANSPORT = "urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport"
+      PGP = "urn:oasis:names:tc:SAML:2.0:ac:classes:PGP"
+      PREVIOUS_SESSION = "urn:oasis:names:tc:SAML:2.0:ac:classes:PreviousSession"
+      SMARTCARD = "urn:oasis:names:tc:SAML:2.0:ac:classes:Smartcard"
+      SMARTCARD_PKI = "urn:oasis:names:tc:SAML:2.0:ac:classes:SmartcardPKI"
+      SOFTWARE_PKI = "urn:oasis:names:tc:SAML:2.0:ac:classes:SoftwarePKI"
+      SPKI = "urn:oasis:names:tc:SAML:2.0:ac:classes:SPKI"
+      SECURE_REMOTE_PASSWORD = "urn:oasis:names:tc:SAML:2.0:ac:classes:SecureRemotePassword"
+      TELEPHONY = "urn:oasis:names:tc:SAML:2.0:ac:classes:Telephony"
+      TELEPHONY_AUTHENTICATED = "urn:oasis:names:tc:SAML:2.0:ac:classes:AuthenticatedTelephony"
+      TELEPHONHY_NOMAD = "urn:oasis:names:tc:SAML:2.0:ac:classes:NomadTelephony"
+      TELEPHONY_PERSONALIZED = "urn:oasis:names:tc:SAML:2.0:ac:classes:PersonalTelephony"
+      TIME_SYNC_TOKEN = "urn:oasis:names:tc:SAML:2.0:ac:classes:TimeSyncToken"
+      TLS_CLIENT = "urn:oasis:names:tc:SAML:2.0:ac:classes:TLSClient"
+      X509 = "urn:oasis:names:tc:SAML:2.0:ac:classes:X509"
+      XMLDSIG = "urn:oasis:names:tc:SAML:2.0:ac:classes:XMLDSig"
+      UNSPECIFIED = "urn:oasis:names:tc:SAML:2.0:ac:classes:unspecified"
+
+      # @see https://refeds.org/profile/mfa
+      REFEDS_MFA = "https://refeds.org/profile/mfa"
+      # @see https://refeds.org/profile/sfa
+      REFEDS_SFA = "https://refeds.org/profile/sfa"
+
+      # @see https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-expected-inbound-assertions
+      MICROSOFT_MULTIPLE_AUTHN = "http://schemas.microsoft.com/claims/multipleauthn"
+      # @see https://learn.microsoft.com/en-us/entra/identity/authentication/how-to-mfa-expected-inbound-assertions
+      MICROSOFT_WIA_OR_MULTI_AUTHN = "http://schemas.microsoft.com/claims/wiaormultiauthn"
+      # @see https://learn.microsoft.com/en-us/entra/identity-platform/single-sign-on-saml-protocol#requestedauthncontext
+      MICROSOFT_WINDOWS = "urn:federation:authentication:windows"
     end
 
     # @return [Time]
